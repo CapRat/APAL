@@ -17,7 +17,7 @@ build:
     - make 
   artifacts:
     paths:
-    expire_in: 2hrs
+   # expire_in: 2hrs
       - build/
       # depending on your build setup it's most likely a good idea to cache outputs to reduce the build time
       # cache:
