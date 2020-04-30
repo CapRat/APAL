@@ -17,7 +17,7 @@ void* LoadFuncRaw(library_t lib, const char* fncName)
     FARPROC lastFunc = GetProcAddress(static_cast<HMODULE>(lib), fncName);
     if (lastFunc == NULL)
         lastError = "Could not load function";
-    return lastFunc;
+    return static_cast<void*>(lastFunc);
 }
 
 const char* GetError()

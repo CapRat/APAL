@@ -7,6 +7,7 @@ include(GenerateExportHeader)
 
 enable_testing()
 
+enable_testing()
 add_subdirectory(ladspa)
 add_subdirectory(Catch2)
 
