@@ -18,9 +18,8 @@ set_version(1 0 0)
 use_cxx(11)
 
 
-add_subdirectory(formats)
-
 #####################BUILD######################
+add_subdirectory(formats)
 add_subdirectory(include)
 add_subdirectory(src)
 add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES} )

@@ -17,8 +17,9 @@ docker-build-win64:
   stage: build
   services:
     - docker:dind
-#  before_script:    
-#
+  before_script:    
+    - ls 
+    - ls include
   script:
     - mkdir build
     - cd build
