@@ -2,5 +2,5 @@
 
 VERSION XPlugGetVersion()
 {
-	return XPlug_VERSION;
+    return XPlug_VERSION;
 }

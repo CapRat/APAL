@@ -15,8 +15,9 @@ option(XPLUG_BUILD_DOC "Build Documentation" OFF)
 option(XPLUG_RUN_TESTS "Run XPlug tests" ON)
 #option(XPLUG_INSTALL "Install Xplug and Examples, if Build" OFF)
 set_version(1 0 0)
-use_cxx(11)
 
+#use_cxx(11)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
 #####################BUILD######################
 add_subdirectory(formats)

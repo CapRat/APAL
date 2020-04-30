@@ -3,7 +3,7 @@
 
 #include "generated/XPlug_version.h"
 extern "C" {
-	VERSION XPlugGetVersion();
-} 
+VERSION XPlugGetVersion();
+}
 
 #endif //! GLOBAL_DATA_HPP

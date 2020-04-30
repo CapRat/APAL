@@ -15,6 +15,7 @@ add_library(ExportLib MODULE "TestSymbolLoading.cpp" )
 target_compile_definitions(ExportLib PRIVATE EXPORT_SYMBOL_LOADING)
 set_target_properties(ExportLib PROPERTIES  WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
 GENERATE_EXPORT_HEADER(ExportLib)
+
 target_link_libraries(ExportLib  XPlug )
 target_include_directories(ExportLib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -23,7 +24,13 @@ target_include_directories(ExportLib PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable(catch_tests catch_main.cpp "TestSymbolLoading.cpp" "TestLadspa.cpp" "lib_loading.cpp" "catch_main.cpp" )
 target_include_directories(catch_tests PUBLIC ${CMAKE_CURRENT_LIST_DIR})
-target_link_libraries(catch_tests Catch2::Catch2 XPlug)
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_libraries(catch_tests Catch2::Catch2 XPlug dl)
+else()
+    target_link_libraries(catch_tests Catch2::Catch2 XPlug)
+endif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+
 #add_dependencies(catch_tests SymbolExportLib)#Add Dependency, so that the exportlib is build before the testlib
 
 

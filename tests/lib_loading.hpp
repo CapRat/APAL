@@ -7,9 +7,10 @@ library_t LoadLib(const char* libName);
 
 void* LoadFuncRaw(library_t lib, const char* fncName);
 
-template<typename T>
-T LoadFunc(library_t lib, const char* fncName) {
-	return static_cast<T>(LoadFuncRaw(lib,fncName));
+template <typename T>
+T LoadFunc(library_t lib, const char* fncName)
+{
+    return (T)(LoadFuncRaw(lib, fncName));
 }
 
 const char* GetError();

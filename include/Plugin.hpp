@@ -3,10 +3,10 @@
 
 class Plugin {
 public:
-	virtual ~Plugin() = default;
-	virtual processAudio(float**) = 0;
+    virtual ~Plugin() = default;
+    virtual void processAudio(float**) = 0;
 };
 
 extern Plugin* createPlugin();
-extern deletePlugin();
+extern void deletePlugin();
 #endif //! PLUGIN_HPP
