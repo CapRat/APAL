@@ -12,19 +12,27 @@
 #    - ./dockcross ninja -Cbuild
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-docker-build-win64:
-  image: dockcross/windows-static-x86
+  
+docker-build-linux-x64 :
+  image: dockcross/linux-x64 
   stage: build
-  services:
-    - docker:dind
-  before_script:    
-    - ls 
-    - ls include
+  script:
+    - mkdir build
+    - cd build
+    - cmake -G "Ninja" ..
+    - cmake --build .  
+  
+docker-build-win64:
+  image: dockcross/windows-static-x64
+  stage: build
   script:
     - mkdir build
     - cd build
     - cmake -G "Ninja" ..
     - cmake --build .
+
+
+
 #docker-build:
 #  # Official docker image.
 #  image: docker:latest
