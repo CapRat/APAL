@@ -10,7 +10,8 @@
 #  script:
 #    - ./dockcross cmake -Bbuild -H. -GNinja
 #    - ./dockcross ninja -Cbuild
-
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
 docker-build-win64:
   image: dockcross/windows-static-x86
   stage: build
