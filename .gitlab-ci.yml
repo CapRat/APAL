@@ -1,4 +1,3 @@
-
 docker-build-win64:
   image: docker:latest
   stage: build
@@ -7,6 +6,7 @@ docker-build-win64:
   before_script:    
     - docker run --rm dockcross/windows-static-x86 > ./dockcross
     - chmod +x ./dockcross
+    - cat ./dockcross
   script:
     - ./dockcross cmake -Bbuild -H. -GNinja
     - ./dockcross ninja -Cbuild
