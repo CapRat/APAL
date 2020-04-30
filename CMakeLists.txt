@@ -32,5 +32,6 @@ target_include_directories(XPlug PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include ${CMAK
 
 
 if(XPLUG_RUN_TESTS)
-add_subdirectory(tests)
+add_subdirectory(test)
+enable_testing()
 endif(XPLUG_RUN_TESTS)

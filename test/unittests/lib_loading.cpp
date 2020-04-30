@@ -17,7 +17,7 @@ void* LoadFuncRaw(library_t lib, const char* fncName)
     FARPROC lastFunc = GetProcAddress(static_cast<HMODULE>(lib), fncName);
     if (lastFunc == NULL)
         lastError = "Could not load function";
-    return static_cast<void*>(lastFunc);
+    return reinterpret_cast<void*>(lastFunc);
 }
 
 const char* GetError()
@@ -35,7 +35,7 @@ void UnloadLib(library_t lib)
 #include <dlfcn.h>
 library_t LoadLib(const char* libName)
 {
-    return dlopen(libName, RTLD_NOW);
+    return dlopen(libName, RTLD_LAZY);
 }
 
 void* LoadFuncRaw(library_t lib, const char* fncName)
