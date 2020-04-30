@@ -1,16 +1,28 @@
+#docker-build-win64:
+#  image: docker:latest
+#  stage: build
+#  services:
+#    - docker:dind
+#  before_script:    
+#    - docker run --rm dockcross/windows-static-x86 > ./dockcross
+#    - chmod +x ./dockcross
+#    - cat ./dockcross
+#  script:
+#    - ./dockcross cmake -Bbuild -H. -GNinja
+#    - ./dockcross ninja -Cbuild
+
 docker-build-win64:
-  image: docker:latest
+  image: dockcross/windows-static-x86
   stage: build
   services:
     - docker:dind
-  before_script:    
-    - docker run --rm dockcross/windows-static-x86 > ./dockcross
-    - chmod +x ./dockcross
-    - cat ./dockcross
+#  before_script:    
+#
   script:
-    - ./dockcross cmake -Bbuild -H. -GNinja
-    - ./dockcross ninja -Cbuild
-
+    - mkdir build
+    - cd build
+    - cmake -G "Ninja" ..
+    - cmake --build .
 #docker-build:
 #  # Official docker image.
 #  image: docker:latest
