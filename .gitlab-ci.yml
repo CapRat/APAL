@@ -19,18 +19,18 @@ docker-build-linux-x64:
   script:
     - mkdir build
     - cd build
-    - cmake -G "Ninja" ..
+    - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..
     - cmake --build .  
   artifacts:
     paths:
-      - test/unittests/catch_tests
-      - test/unittests/test_components/libsimple_sybol_export.so
-    expire_in: 5 mins
+      - build/
+    expire_in: 30 mins
     
 docker-test-linux-x64 :
-  image: ubuntu:latest
+  image: dockcross/linux-x64 
   stage: test
   script:
+    - cd build
     - ctest  
   dependencies: 
     - docker-build-linux-x64
