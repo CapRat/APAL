@@ -1,0 +1,6 @@
+set(TEST_TOOLS_SOURCE  ${TEST_TOOLS_SOURCE}
+${CMAKE_CURRENT_LIST_DIR}/lib_loading.cpp
+${CMAKE_CURRENT_LIST_DIR}/lib_loading.hpp
+${CMAKE_CURRENT_LIST_DIR}/TestLoading.hpp
+PARENT_SCOPE)
+ 

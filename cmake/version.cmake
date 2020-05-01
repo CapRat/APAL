@@ -1,4 +1,3 @@
-# DISTRHO Plugin Framework (DPF)
 # Copyright (C) 2019-2020 Benjamin Heisch <benjaminheisch@yahoo.de>
 #
 # Permission to use, copy, modify, and/or distribute this software for any purpose with
@@ -15,7 +14,7 @@
 # This cmake-Module contains functions arround versioning.
 # set_version(MAJOR,MINOR,PATCH,BUILD)  -> Sets the Version, if BUILD is not given, this
 #                   Module tries to detect the Build version with git or svn.
-#
+# if you got an error with cmake policy, try adding cmake_policy(SET CMP0048 NEW ) in your CMakeLists.txt
 #
 #
 
@@ -33,10 +32,6 @@ function(set_version major minor patch)
         else(NOT ARGV3)
 	set(TEMP_CURRENT_REVISON ${ARGV3})
         endif(NOT ARGV3)
-	
-	if(POLICY CMP0048)
-		cmake_policy(SET CMP0048 NEW)
-	endif(POLICY CMP0048)
 	set(${TEMP_PROJECT_NAME}_VERSION "${major}.${minor}.${patch}.${TEMP_CURRENT_REVISON}" PARENT_SCOPE)
 	set(${TEMP_PROJECT_NAME}_VERSION_MAJOR ${major} PARENT_SCOPE)
 	set(${TEMP_PROJECT_NAME}_VERSION_MINOR ${minor} PARENT_SCOPE)
