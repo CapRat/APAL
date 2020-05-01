@@ -13,7 +13,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   
-docker-build-linux-x64 :
+docker-build-linux-x64:
   image: dockcross/linux-x64 
   stage: build
   script:
@@ -21,7 +21,22 @@ docker-build-linux-x64 :
     - cd build
     - cmake -G "Ninja" ..
     - cmake --build .  
-  
+  artifacts:
+    paths:
+      - test/unittests/catch_tests
+      - test/unittests/test_components/libsimple_sybol_export.so
+    expire_in: 5 mins
+    
+docker-test-linux-x64 :
+  image: ubuntu:latest
+  stage: test
+  script:
+    - ctest  
+  dependencies: 
+    - docker-build-linux-x64
+    
+    
+    
 docker-build-win64:
   image: dockcross/windows-static-x64
   stage: build
