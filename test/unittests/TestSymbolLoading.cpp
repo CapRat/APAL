@@ -4,7 +4,7 @@
  **/
 #include "TestLoading.hpp"
 #ifdef _WIN32
-#define SYMBOL_EXPORT_TEST_LIB "testcomponents/simple_symbol_export"
+#define SYMBOL_EXPORT_TEST_LIB "test_components/simple_symbol_export"
 #else
 #define SYMBOL_EXPORT_TEST_LIB "test_components/libsimple_symbol_export.so"
 #endif //! _WIN32

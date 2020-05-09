@@ -1,5 +1,3 @@
-
-
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/Catch2/contrib) #Set CMake module path
 include(Catch)
 include(ParseAndAddCatchTests)
@@ -12,9 +10,10 @@ file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/catch_main.cpp CONTENT "#define
 
 add_executable(catch_tests ${CMAKE_CURRENT_BINARY_DIR}/catch_main.cpp ${TEST_TOOLS_SOURCE}
     "TestSymbolLoading.cpp"
-    "TestLadspa.cpp" )
+    "TestBaseFunctionality.cpp"
+    "./test_components/simple_example_plugin.cpp")
 
-target_include_directories(catch_tests PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/../tools/)
+target_include_directories(catch_tests PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_LIST_DIR}/../tools/ ${CMAKE_CURRENT_LIST_DIR}/../../examples/Volume Plugin)
 
 if (NOT WIN32)
     SET(ADD_LIBS ${ADD_LIBS} dl)

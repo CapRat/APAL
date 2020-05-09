@@ -16,18 +16,11 @@ if(WIN32)
        file(WRITE ${EXPORT_SYMBOLS_OUTDIR}/${EXPORT_SYMBOLS_FILE_NAME} "EXPORTS \n  ${EXPORT_SYMBOLS_NEWLINED_FUNCTION_NAMES}")
        target_sources(${EXPORT_SYMBOLS_TARGET} INTERFACE  ${EXPORT_SYMBOLS_OUTDIR}/${EXPORT_SYMBOLS_FILE_NAME})
    else(WIN32)
-
        foreach(loop_var ${EXPORT_SYMBOLS_FUNCTION_NAMES})
-            #string(APPEND SYMBOL_LINK_STRING "--require-defined=${loop_var} ")
             target_link_options(${EXPORT_SYMBOLS_TARGET} INTERFACE "LINKER:--undefined=${loop_var}")
-          #  string(APPEND SYMBOL_LINK_STRING --undefined=${loop_var} )
        endforeach(loop_var)
-      # message("linkstring: ${SYMBOL_LINK_STRING}")
-      # target_link_options(${EXPORT_SYMBOLS_TARGET} INTERFACE "LINKER:${SYMBOL_LINK_STRING}")
-       message ('target_link_options(${EXPORT_SYMBOLS_TARGET} INTERFACE "LINKER:${SYMBOL_LINK_STRING}")')
 endif(WIN32)
 
 
-#target_include_directories(${GENERATE_VERSION_HEADER_TARGET} PUBLIC ${GENERATE_VERSION_HEADER_OUTDIR})
 endfunction(EXPORT_SYMBOLS)
 
