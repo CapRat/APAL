@@ -1,10 +1,8 @@
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/Catch2/contrib) #Set CMake module path
 include(Catch)
 include(ParseAndAddCatchTests)
 
 
 add_subdirectory(test_components)
-add_subdirectory(Catch2)
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/catch_main.cpp CONTENT "#define CATCH_CONFIG_MAIN\r\n#include \"catch2/catch.hpp\"" )
 

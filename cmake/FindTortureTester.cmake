@@ -1,0 +1,14 @@
+#TortureTester_EXECUTABLE
+find_program(TortureTester_EXECUTABLE NAMES plugin-torture torture DOC "Path to torture-plugin tester Executable")
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(TortureTester
+  FOUND_VAR TortureTester_FOUND
+  REQUIRED_VARS
+    TortureTester_EXECUTABLE
+)
+
+if(TortureTester_FOUND AND NOT TARGET TortureTester)
+  add_executable(TortureTester IMPORTED GLOBAL)
+  set_target_properties(TortureTester PROPERTIES  IMPORTED_LOCATION "${TortureTester_EXECUTABLE}")
+endif()

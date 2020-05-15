@@ -1,11 +1,19 @@
-#########################Set Supported Format Variables###########################
-find_package(Jack)
-set(VST2_SUPPORT ON CACHE INTERNAL "IS VST2 SUPPORTED?")
-set(LV2_SUPPORT ON CACHE INTERNAL "IS LV2 SUPPORTED?")
-set(LADSPA_SUPPORT ON CACHE INTERNAL "IS LADSPA SUPPORTED?")
-if(JACK_FOUND)
-    set(JACK_SUPPORT ON CACHE INTERNAL "IS JACK SUPPORTED?")
-endif(JACK_FOUND)
 
+
+if(XPLUG_LADSPA_SUPPORT)
 add_subdirectory(ladspa)
-add_subdirectory(vst2)
+endif(XPLUG_LADSPA_SUPPORT)
+
+
+if(XPLUG_VST2_SUPPORT)
+add_subdirectory(vst2_os)
+endif(XPLUG_VST2_SUPPORT)
+
+if(XPLUG_VST3_SUPPORT)
+add_subdirectory(vst3)
+endif(XPLUG_VST3_SUPPORT)	
+
+
+if(XPLUG_LV2_SUPPORT)
+add_subdirectory(lv2)
+endif(XPLUG_LV2_SUPPORT)	

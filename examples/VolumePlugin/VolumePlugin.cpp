@@ -13,39 +13,6 @@ void VolumePlugin::deinit()
 {
 }
 
-void VolumePlugin::registerPlugin()
-{
-}
-
-PluginInfo VolumePlugin::getPluginInfo()
-{
-	PluginInfo inf;
-	inf.name = "ExamplePlugin";
-	return inf;
-}
-
-void VolumePlugin::setPluginInfo(PluginInfo inf)
-{
-}
-
-void VolumePlugin::updatePluginInfo()
-{
-}
-
-bool VolumePlugin::hasUI()
-{
-	return false;
-}
-
-void* VolumePlugin::getParameter()
-{
-	return nullptr;
-}
-
-void VolumePlugin::setParameter()
-{
-}
-
 void VolumePlugin::activate()
 {
 }
@@ -54,7 +21,26 @@ void VolumePlugin::deactivate()
 {
 }
 
+PluginInfo VolumePlugin::getPluginInfo()
+{
+	return PluginInfo();
+}
+
 size_t VolumePlugin::getParameterCount()
 {
 	return size_t();
+}
+
+void* VolumePlugin::getParameter()
+{
+	return nullptr;
+}
+
+void VolumePlugin::setParameter(void*)
+{
+}
+
+std::vector<Port> VolumePlugin::getPorts()
+{
+	return std::vector<Port>();
 }

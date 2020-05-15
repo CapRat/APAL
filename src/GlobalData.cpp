@@ -1,5 +1,4 @@
 #include "GlobalData.hpp"
-
 GlobalDataType& GlobalData()
 { 
    static GlobalDataType* globalDataInstance = new GlobalDataType();
@@ -27,5 +26,11 @@ size_t GlobalDataType::getNumberOfRegisteredPlugins()
 
 PluginPtr GlobalDataType::getPlugin(size_t index)
 {
+    return   this->registeredPlugins.at(index);
+}
+/*
+PluginController GlobalDataType::getPlugin(size_t index)
+{
     return  this->registeredPlugins.at(index);
 }
+*/

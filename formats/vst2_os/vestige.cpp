@@ -20,13 +20,6 @@ struct ERect {
 #else
 # include "vst/aeffectx.h"
 #endif
-/*extern "C" {
-	const AEffect* VSTPluginMain(audioMasterCallback audioMaster) {
-		return nullptr;
-	}
-	//const AEffect* main(audioMasterCallback audioMaster) { return VSTPluginMain(audioMaster); }
-
-}*/
 
 #include <GlobalData.hpp>
 #include <IPlugin.hpp>
@@ -1208,37 +1201,12 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
     return 0;
 }
 
-static float vst_getParameterCallback(AEffect* effect, int32_t index)
-{
-   // if (validPlugin)
-  //      return pluginPtr->vst_getParameter(index);
-    return 0.0f;
-}
 
-static void vst_setParameterCallback(AEffect* effect, int32_t index, float value)
-{
-   // if (validPlugin)
-   //     pluginPtr->vst_setParameter(index, value);
-}
-
-static void vst_processCallback(AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames)
-{
-   // if (validPlugin)
-   //     pluginPtr->vst_processReplacing(const_cast<const float**>(inputs), outputs, sampleFrames);
-}
-
-static void vst_processReplacingCallback(AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames)
-{
-   // if (validPlugin)
-  //      pluginPtr->vst_processReplacing(const_cast<const float**>(inputs), outputs, sampleFrames);
-}
-
-
-
+#include <iostream>
 // -----------------------------------------------------------------------
 extern "C" {
     const AEffect* VSTPluginMain(audioMasterCallback audioMaster) {
-        PluginPtr plugin = GlobalData().getPlugin(0);
+        //PluginController plugin = GlobalData().getPlugin(0);
         // old version
         if (audioMaster(nullptr, audioMasterVersion, 0, 0, nullptr, 0.0f) == 0)
             return nullptr;
@@ -1251,9 +1219,9 @@ extern "C" {
 
          // vst fields
         effect->magic = kEffectMagic;
-        effect->uniqueID = //plugin->getUniqueId();
+       // effect->uniqueID = //plugin->getUniqueId();
         //effect->version = plugin->getPluginInfo().ver;
-        effect->numParams = plugin->getParameterCount();
+        //effect->numParams = plugin->getParameterCount();
         effect->numPrograms = 1;
         //  effect->numInputs = DISTRHO_PLUGIN_NUM_INPUTS;
         //  effect->numOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
@@ -1281,7 +1249,7 @@ extern "C" {
         //  effect->numOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
 
           // plugin flags
-        effect->flags |= effFlagsCanReplacing;
+        //effect->flags |= effFlagsCanReplacing;
         /*#if DISTRHO_PLUGIN_IS_SYNTH
             effect->flags |= effFlagsIsSynth;
         #endif
@@ -1293,13 +1261,33 @@ extern "C" {
         #endif*/
      
 
-
+        effect->numInputs = 1;
+        effect->numOutputs = 1;
+        effect->numParams = 0;
+        effect->numPrograms = 0;
         // static calls
         effect->dispatcher = vst_dispatcherCallback;
-        effect->process = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {};
+        effect->process = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {
+            // std::cout << "process";
+            std::vector<audio_data> inputsD;
+            std::vector<audio_data> outputsD;
+            audio_data input;
+            input.assign(inputs[0][0], inputs[0][sampleFrames]);
+            audio_data output;
+            input.assign(outputs[0][0], outputs[0][sampleFrames]);
+           
+          
+            GlobalData().getPlugin(0)->processAudio(inputsD, outputsD);
+     
+           
+        };
         effect->getParameter = [](AEffect* effect, int32_t index)->float {return 0; };
         effect->setParameter = [](AEffect* effect, int32_t index, float value) {};
-        effect->processReplacing = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {};
+        effect->processReplacing = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {
+            std::cout << "processReplacing";
+            audio_data x;
+           // GlobalData().getPlugin(0)->processAudio()
+        };
 
         // pointers
 
