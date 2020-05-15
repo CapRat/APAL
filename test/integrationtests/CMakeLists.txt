@@ -35,7 +35,7 @@ endif(${XPLUG_BUILD_EXAMPLES})
      add_executable(pluginval IMPORTED GLOBAL)
      set_target_properties(pluginval PROPERTIES IMPORTED_LOCATION "${PLUGINVAL_EXE_PATH}")
      if(XPLUG_INSTALL)
-        install(PROGRAMS pluginval TYPE BIN)
+        install(PROGRAMS pluginval DESTINATION bin)
      endif(XPLUG_INSTALL)
     endif(NOT TARGET pluginval)
 
@@ -52,8 +52,8 @@ endif(${XPLUG_BUILD_EXAMPLES})
     set_target_properties(TortureTester PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/TortureTester")
 
     if(XPLUG_INSTALL)
-    install(PROGRAMS TortureTester TYPE BIN)
-    install(FILES ${INSTALL_DIR}/TortureTester/TortureTestingBin.cmake DESTINATION cmake)
+    install(PROGRAMS TortureTester DESTINATION bin)
+    install(FILES ${INSTALL_DIR}/cmake/* DESTINATION cmake)
     endif(XPLUG_INSTALL)
 
 #############RUN The tests for Example Plugins, if they are build###############
