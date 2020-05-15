@@ -14,8 +14,10 @@
 #define VERSION_STRUCT
 #ifdef __cplusplus
 extern "C" {
+#else 
+typedef
 #endif
-typedef struct VERSION {
+ struct VERSION {
   int MAJOR;
   int MINOR;
   int PATCH;
