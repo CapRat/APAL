@@ -40,7 +40,7 @@ docker-deploy-linux-x64 :
   image: dockcross/linux-x64
   script:
     - cd build
-    - apt install rpm
+    - "Y" | apt install rpm
     - cpack -G DEP .
     - cpack -G RPM .
   dependencies:
