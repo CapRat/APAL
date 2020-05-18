@@ -33,6 +33,7 @@ option(XPLUG_JACK_SUPPORT "IS JACK SUPPORTED?" ${JACK_FOUND})
 
 
 option(XPLUG_INSTALL "Install Xplug and Examples, if Build" ON)
+
 set_version(1 0 0)
 
 use_cxx(11)
@@ -46,13 +47,40 @@ add_subdirectory(deps)
 add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES} )
 
 
-set_target_properties(XPlug PROPERTIES POSITION_INDEPENDENT_CODE  True)
+set_target_properties(XPlug PROPERTIES POSITION_INDEPENDENT_CODE  True VERSION  ${XPlug_VERSION_MAJOR})
 
 EXPORT_SYMBOLS(XPlug FUNCTION_NAMES "XPlugGetVersion" )
 GENERATE_EXPORT_HEADER(XPlug)
-GENERATE_VERSION_HEADER(XPlug)
-target_include_directories(XPlug PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include ${CMAKE_CURRENT_BINARY_DIR})
+GENERATE_VERSION_HEADER(XPlug VISIBILITY PRIVATE)
+target_include_directories(XPlug PUBLIC  
+ $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+ $<INSTALL_INTERFACE:include> )
+ target_include_directories(XPlug PUBLIC  
+ $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/generated>
+ $<INSTALL_INTERFACE:include> )
 
+if(XPLUG_INSTALL)
+
+install(TARGETS XPlug EXPORT XPlugExport DESTINATION lib)
+install(EXPORT XPlugExport NAMESPACE XPlug:: DESTINATION cmake)
+install(FILES   cmake/FindJack.cmake
+                cmake/Findpluginval.cmake
+                cmake/FindTortureTester.cmake
+                DESTINATION cmake)
+
+set(CPACK_PACKAGE_NAME "XPlug")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "XPlug a Crossplattform audioplugin abstraction library")
+set(CPACK_PACKAGE_DESCRIPTION "XPlug a Crossplattform audioplugin abstraction library")
+set(CPACK_PACKAGE_VENDOR "Benjamin Heisch")
+#set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/ReadMe.txt")
+#set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/Copyright.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR ${XPlug_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${XPlug_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${XPlug_VERSION_PATCH})
+#set(CPACK_PACKAGE_INSTALL_DIRECTORY "CMake ${CMake_VERSION_MAJOR}.${CMake_VERSION_MINOR}")
+include(CPack)
+
+endif(XPLUG_INSTALL)
 if(XPLUG_BUILD_TESTS)
 enable_testing()
 add_subdirectory(test)

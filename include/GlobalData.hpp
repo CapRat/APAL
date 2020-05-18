@@ -1,8 +1,11 @@
 #ifndef GLOBAL_DATA_HPP
 #define GLOBAL_DATA_HPP
-#include "generated/XPlug_version.h"
+#include "XPlug_version.h"
 #include <memory>
 #include <vector>
+
+
+
 class IPlugin;
 //class PluginController;
 typedef std::shared_ptr<IPlugin> PluginPtr;

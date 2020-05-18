@@ -1,26 +1,16 @@
 
 
 function(EXPORT_SYMBOLS EXPORT_SYMBOLS_TARGET)
-   set(oneValueArgs OUTDIR FILE_NAME)
+   set(oneValueArgs )
    set(multiValueArgs FUNCTION_NAMES)
    cmake_parse_arguments(EXPORT_SYMBOLS "" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-
-   if(NOT EXPORT_SYMBOLS_OUTDIR)
-        set(EXPORT_SYMBOLS_OUTDIR ${PROJECT_BINARY_DIR}/generated/)
-   endif(NOT EXPORT_SYMBOLS_OUTDIR)
-   if(NOT EXPORT_SYMBOLS_FILE_NAME )
-        set(EXPORT_SYMBOLS_FILE_NAME ${EXPORT_SYMBOLS_TARGET}_export.def)
-   endif(NOT EXPORT_SYMBOLS_FILE_NAME)
-if(WIN32)
-       string (REPLACE ";" "\n  " EXPORT_SYMBOLS_NEWLINED_FUNCTION_NAMES "${EXPORT_SYMBOLS_FUNCTION_NAMES}")
-       file(WRITE ${EXPORT_SYMBOLS_OUTDIR}/${EXPORT_SYMBOLS_FILE_NAME} "EXPORTS \n  ${EXPORT_SYMBOLS_NEWLINED_FUNCTION_NAMES}")
-       target_sources(${EXPORT_SYMBOLS_TARGET} INTERFACE  ${EXPORT_SYMBOLS_OUTDIR}/${EXPORT_SYMBOLS_FILE_NAME})
+   foreach(loop_var ${EXPORT_SYMBOLS_FUNCTION_NAMES})
+   if(WIN32)
+     target_link_options(${EXPORT_SYMBOLS_TARGET} INTERFACE "/EXPORT:${loop_var}")
    else(WIN32)
-       foreach(loop_var ${EXPORT_SYMBOLS_FUNCTION_NAMES})
-            target_link_options(${EXPORT_SYMBOLS_TARGET} INTERFACE "LINKER:--undefined=${loop_var}")
-       endforeach(loop_var)
-endif(WIN32)
-
+     target_link_options(${EXPORT_SYMBOLS_TARGET} INTERFACE "LINKER:--undefined=${loop_var}")
+   endif(WIN32)
+   endforeach(loop_var)
 
 endfunction(EXPORT_SYMBOLS)
 

@@ -1,4 +1,5 @@
 #include "GlobalData.hpp"
+
 GlobalDataType& GlobalData()
 { 
    static GlobalDataType* globalDataInstance = new GlobalDataType();
@@ -8,6 +9,7 @@ GlobalDataType& GlobalData()
 
 VERSION XPlugGetVersion()
 {
+    static const struct VERSION XPlug_VERSION = { XPlug_VERSION_MAJOR, XPlug_VERSION_MINOR, XPlug_VERSION_PATCH, XPlug_VERSION_TWEAK, XPlug_VERSION_STRING };
     return XPlug_VERSION;
 }
 

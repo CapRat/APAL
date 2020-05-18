@@ -34,8 +34,9 @@ endif(${XPLUG_BUILD_EXAMPLES})
      endif(NOT EXISTS  ${PLUGINVAL_EXE_PATH})
      add_executable(pluginval IMPORTED GLOBAL)
      set_target_properties(pluginval PROPERTIES IMPORTED_LOCATION "${PLUGINVAL_EXE_PATH}")
+   
      if(XPLUG_INSTALL)
-        install(PROGRAMS pluginval DESTINATION bin)
+        install(PROGRAMS  "${PLUGINVAL_EXE_PATH}" DESTINATION bin)
      endif(XPLUG_INSTALL)
     endif(NOT TARGET pluginval)
 
@@ -48,12 +49,13 @@ endif(${XPLUG_BUILD_EXAMPLES})
       CMAKE_ARGS -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR> 
     )
     ExternalProject_Get_Property(TortureTesterBuild INSTALL_DIR)
+    set(TORTURE_TESTER_PATH  "${INSTALL_DIR}/bin/TortureTester${CMAKE_EXECUTABLE_SUFFIX}")
     add_executable(TortureTester IMPORTED GLOBAL)
-    set_target_properties(TortureTester PROPERTIES IMPORTED_LOCATION "${INSTALL_DIR}/bin/TortureTester")
+    set_target_properties(TortureTester PROPERTIES IMPORTED_LOCATION ${TORTURE_TESTER_PATH})
 
     if(XPLUG_INSTALL)
-    install(PROGRAMS TortureTester DESTINATION bin)
-    install(FILES ${INSTALL_DIR}/cmake/* DESTINATION cmake)
+    install(PROGRAMS ${TORTURE_TESTER_PATH} DESTINATION bin)
+    install(FILES ${CMAKE_CURRENT_LIST_DIR}/../../cmake/integration_tests.cmake DESTINATION cmake)
     endif(XPLUG_INSTALL)
 
 #############RUN The tests for Example Plugins, if they are build###############

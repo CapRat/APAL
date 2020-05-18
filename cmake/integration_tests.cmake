@@ -8,7 +8,7 @@ function(run_pluginval_test TARGET)
     if(TARGET pluginval)
         add_test(NAME ${TARGET}_pluginval_test COMMAND pluginval 
         --validate-in-process  
-        --output-dir ${CMAKE_BINARY_DIR}/logs 
+        --output-dir ${PROJECT_BINARY_DIR}/logs 
         --strictnessLevel 5
        #--skip-gui-tests
         --validate $<TARGET_FILE:${TARGET}> )

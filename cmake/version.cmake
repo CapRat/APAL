@@ -46,17 +46,21 @@ set(__DIR_OF_GENERATE_CMAKE ${CMAKE_CURRENT_LIST_DIR})
 # if not provided OUTDIR is BIN_DIR/generated 
 # Use it like GENERATE_VERSION_HEADER(Blub OUTDIR Bla)
 # the versionheader is included to the given target.
+# Use the VISIBILITY option if the version header is added to include_directories public interface or private(default is PUBLIC)
 function(GENERATE_VERSION_HEADER GENERATE_VERSION_HEADER_TARGET)
-        set(oneValueArgs OUTDIR)
+        set(oneValueArgs OUTDIR VISIBILITY)
         cmake_parse_arguments(GENERATE_VERSION_HEADER "" "${oneValueArgs}" "" ${ARGN} )
         if(NOT GENERATE_VERSION_HEADER_OUTDIR)
                 set(GENERATE_VERSION_HEADER_OUTDIR ${PROJECT_BINARY_DIR}/generated/)
         endif(NOT GENERATE_VERSION_HEADER_OUTDIR) 
+		if(NOT GENERATE_VERSION_HEADER_VISIBILITY)
+                set(GENERATE_VERSION_HEADER_VISIBILITY PUBLIC)
+        endif(NOT GENERATE_VERSION_HEADER_VISIBILITY) 
         configure_file (
          ${__DIR_OF_GENERATE_CMAKE}/version.h.in
          "${GENERATE_VERSION_HEADER_OUTDIR}/${GENERATE_VERSION_HEADER_TARGET}_version.h"
          )
-     target_include_directories(${GENERATE_VERSION_HEADER_TARGET} PUBLIC ${GENERATE_VERSION_HEADER_OUTDIR})
+     target_include_directories(${GENERATE_VERSION_HEADER_TARGET} ${GENERATE_VERSION_HEADER_VISIBILITY} ${GENERATE_VERSION_HEADER_OUTDIR})
 endfunction(GENERATE_VERSION_HEADER)
 
 
