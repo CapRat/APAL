@@ -35,8 +35,20 @@ docker-test-linux-x64 :
     - ctest  
   dependencies: 
     - docker-build-linux-x64
-    
-    
+
+docker-deploy-linux-x64 :
+  image: dockcross/linux-x64
+  script:
+    - cd build
+    - apt install rpm
+    - cpack -G DEP .
+    - cpack -G RPM .
+  dependencies:
+    - docker-build-linux-x64
+  artifacts:
+    paths:
+      - build
+    expire_in: 30 mins
     
 docker-build-win64:
   image: dockcross/windows-static-x64
