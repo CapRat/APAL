@@ -41,7 +41,7 @@ docker-deploy-linux-x64 :
   stage: deploy
   script:
     - cd build
-    - \"Y\" | apt install rpm
+    - echo Y | apt install rpm
     - cpack -G DEP .
     - cpack -G RPM .
   dependencies:
