@@ -42,7 +42,7 @@ docker-deploy-linux-x64 :
   script:
     - cd build
     - echo Y | apt install rpm
-    - cpack -G DEP .
+    - cpack -G DEB .
     - cpack -G RPM .
   dependencies:
     - docker-build-linux-x64
