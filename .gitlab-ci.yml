@@ -38,6 +38,7 @@ docker-test-linux-x64 :
 
 docker-deploy-linux-x64 :
   image: dockcross/linux-x64
+  stage: deploy
   script:
     - cd build
     - \"Y\" | apt install rpm
