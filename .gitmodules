@@ -1,9 +1,6 @@
 [submodule "deps/Catch2"]
 	path = deps/Catch2
 	url = https://github.com/catchorg/Catch2.git
-[submodule "deps/vst3sdk"]
-	path = deps/vst3sdk
-	url = https://github.com/steinbergmedia/vst3sdk.git
 [submodule "deps/lv2"]
 	path = deps/lv2
 	url = https://gitlab.com/lv2/lv2

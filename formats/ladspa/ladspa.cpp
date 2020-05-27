@@ -21,7 +21,7 @@ void update_ports(PluginPtr plug, LADSPA_Descriptor* desc) {
 
 }
 //Initialize a single Plugin.
-void init_plugin(PluginPtr plug){
+void ladspa_init_plugin(PluginPtr plug){
 	auto desc = new LADSPA_Descriptor();
 	ladspaDescriptorArray.push_back(desc);
 	//LADSPA_Descriptor desc = ladspaDescriptorArray.at(ladspaDescriptorArray.size() - 1);
@@ -54,11 +54,11 @@ void init_plugin(PluginPtr plug){
 }
 
 //Initializes the plugins, if not already done.
-void init_plugins() {
+void ladspa_init_plugins() {
 
 	if (ladspaDescriptorArray.size() != GlobalData().getNumberOfRegisteredPlugins()) {
 		for (int x = 0; x < GlobalData().getNumberOfRegisteredPlugins(); x++) {
-			init_plugin(GlobalData().getPlugin(x));
+			ladspa_init_plugin(GlobalData().getPlugin(x));
 		}
 	}
 }
@@ -67,7 +67,7 @@ void init_plugins() {
 extern "C" {
 	const LADSPA_Descriptor* ladspa_descriptor(unsigned long Index)
 	{
-		init_plugins(); // not the best way to initialize.... but it will work hopefully.
+		ladspa_init_plugins(); // not the best way to initialize.... but it will work hopefully.
 		if (Index < ladspaDescriptorArray.size()) {
 			return ladspaDescriptorArray.at(Index);
 		}

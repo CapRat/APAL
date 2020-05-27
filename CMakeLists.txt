@@ -23,9 +23,9 @@ option(XPLUG_BUILD_TESTS "Build and installs tests,which can be reused and are u
 #########################Set Supported Format Variables###########################
 ## Here add maybe an detect if feature is build ready macro or function.
 option(XPLUG_VST2_SUPPORT "Support vor VST2" ON)
-option(XPLUG_VST3_SUPPORT "Support vor VST3" OFF)
+option(XPLUG_VST3_SUPPORT "Support vor VST3" ON)
 option(XPLUG_LADSPA_SUPPORT "Support vor LADSPA" ON)
-option(XPLUG_LV2_SUPPORT "Support vor LV2" OFF)
+option(XPLUG_LV2_SUPPORT "Support vor LV2" ON)
 option(XPLUG_AU_SUPPORT "Support vor AU" OFF)
 option(XPLUG_JACK_SUPPORT "IS JACK SUPPORTED?" ${JACK_FOUND})
 

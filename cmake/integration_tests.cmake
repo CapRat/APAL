@@ -13,7 +13,7 @@ function(run_vst2_test TARGET)
       else()
       message(WARNING "No ${TARGET}_pluginval_test is added, tue to no installed Pluginval. ")
     endif(TARGET pluginval)
-endfunction(run_pluginval_test TARGET)
+endfunction(run_vst2_test TARGET)
 
 # Run pluginval tests with given TARGET. pluginval must be available as target or be installed.
 function(run_vst3_test TARGET)
@@ -27,7 +27,7 @@ function(run_vst3_test TARGET)
       else()
       message(WARNING "No ${TARGET}_pluginval_test is added, tue to no installed Pluginval. ")
     endif(TARGET pluginval)
-endfunction(run_pluginval_test TARGET)
+endfunction(run_vst3_test TARGET)
 
 function(run_ladspa_tests TARGET)
     if(TARGET TortureTester)
@@ -43,7 +43,7 @@ endfunction(run_ladspa_tests TARGET)
 
 function(run_lv2_tests TARGET)
     if(TARGET TortureTester)
-      add_test(NAME ${TARGET}_torture_ladspa_test COMMAND $<TARGET_FILE:TortureTester> 
+      add_test(NAME ${TARGET}_torture_lv2_test COMMAND $<TARGET_FILE:TortureTester> 
       --evil
       --lv2
       --ladspa
