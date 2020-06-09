@@ -1,7 +1,8 @@
-#include "vst_def.hpp"
-#include <algorithm>
-#include <GlobalData.hpp>
 #include "interfaces/IPlugin.hpp"
+#include "vst_def.hpp"
+#include <GlobalData.hpp>
+#include <algorithm>
+#include <cstring>
 using namespace XPlug;
 
 float vst_getParameter(const int32_t index)
@@ -117,19 +118,14 @@ void vst_processReplacing(const float** const inputs, float** const outputs, con
 
 // -------------------------------------------------------------------
 
-
-
-
 static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
 {
     // handle base opcodes
-    switch (opcode)
-    {
+    switch (opcode) {
         /**
          * Opens the Effect .
          */
     case effOpen:
-
 
         /*    audioMasterCallback audioMaster = (audioMasterCallback)obj->audioMaster;
 
@@ -218,7 +214,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
 
     case effGetEffectName:
         //return GlobalData().getPlugin(0)->getPluginInfo()->
-        ptr = (void*)GlobalData().getPlugin(0)->getPluginInfo()->name.c_str();
+        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getPluginInfo()->name.c_str()));
         //std::strncpy((char*)ptr, GlobalData().getPlugin(0)->getPluginInfo()->name.c_str(), 32);
         return 1;
         /*if (char* const cptr = (char*)ptr)
@@ -229,9 +225,9 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
         // return 0;
 
     case effGetVendorString:
-        ptr = (void*)GlobalData().getPlugin(0)->getPluginInfo()->creater.c_str();
+        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getPluginInfo()->creater.c_str()));
         // std::strncpy((char*)ptr, GlobalData().getPlugin(0)->getPluginInfo()->creater.c_str(), 32);
-         /*if (char* const cptr = (char*)ptr)
+        /*if (char* const cptr = (char*)ptr)
          {
              DISTRHO_NAMESPACE::strncpy(cptr, plugin.getMaker(), 32);
              return 1;
@@ -239,9 +235,9 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
         return 0;
 
     case effGetProductString:
-        ptr = (void*)GlobalData().getPlugin(0)->getPluginInfo()->description.c_str();
+        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getPluginInfo()->description.c_str()));
         // std::strncpy((char*)ptr, GlobalData().getPlugin(0)->getPluginInfo()->description.c_str(), 32);
-          /*if (char* const cptr = (char*)ptr)
+        /*if (char* const cptr = (char*)ptr)
           {
               DISTRHO_NAMESPACE::strncpy(cptr, plugin.getLabel(), 32);
               return 1;
@@ -253,7 +249,6 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
 
     case effGetVstVersion:
         return kVstVersion;
-
 
     case effGetProgram:
         return 0;
@@ -460,9 +455,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
               return fVstUI->handlePluginKeyEvent(false, index, value);*/
         break;
 
-
-    case effGetChunk:
-    {
+    case effGetChunk: {
         /* STATE BLAH
         if (ptr == nullptr)
             return 0;
@@ -553,8 +546,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
         */
     }
 
-    case effSetChunk:
-    {
+    case effSetChunk: {
         /* STATE BLAH
         if (value <= 1 || ptr == nullptr)
             return 0;
@@ -714,203 +706,205 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
         //    break;
     };
     // handle advanced opcodes
-   // if (validPlugin)
-   //     return pluginPtr->vst_dispatcher(opcode, index, value, ptr, opt);
+    // if (validPlugin)
+    //     return pluginPtr->vst_dispatcher(opcode, index, value, ptr, opt);
 
     return 0;
 }
 
-
-static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt) {
+static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
+{
     auto plug = GlobalData().getPlugin(0);
     switch (opcode) {
-    case effOpen:                ///< no arguments  @see AudioEffect::open
+    case effOpen: ///< no arguments  @see AudioEffect::open
         plug->init();
         break;
-    case effClose:                ///< no arguments  @see AudioEffect::open
+    case effClose: ///< no arguments  @see AudioEffect::open
         plug->deinit();
         break;
-    case effSetProgram:            ///< [value]: new program number  @see AudioEffect::setProgram
+    case effSetProgram: ///< [value]: new program number  @see AudioEffect::setProgram
         break;
-    case effGetProgram:            ///< [return value]: current program number  @see AudioEffect::getProgram
+    case effGetProgram: ///< [return value]: current program number  @see AudioEffect::getProgram
         break;
-    case effSetProgramName:        ///< [ptr]: char* with new program name, limited to #kVstMaxProgNameLen  @see AudioEffect::setProgramName
+    case effSetProgramName: ///< [ptr]: char* with new program name, limited to #kVstMaxProgNameLen  @see AudioEffect::setProgramName
         break;
-    case effGetProgramName:        ///< [ptr]: char buffer for current program name, limited to #kVstMaxProgNameLen  @see AudioEffect::getProgramName
+    case effGetProgramName: ///< [ptr]: char buffer for current program name, limited to #kVstMaxProgNameLen  @see AudioEffect::getProgramName
         break;
-    case effGetParamLabel:        ///< [ptr]: char buffer for parameter label, limited to #kVstMaxParamStrLen  @see AudioEffect::getParameterLabel
+    case effGetParamLabel: ///< [ptr]: char buffer for parameter label, limited to #kVstMaxParamStrLen  @see AudioEffect::getParameterLabel
         break;
-    case effGetParamDisplay:    ///< [ptr]: char buffer for parameter display, limited to #kVstMaxParamStrLen  @see AudioEffect::getParameterDisplay
+    case effGetParamDisplay: ///< [ptr]: char buffer for parameter display, limited to #kVstMaxParamStrLen  @see AudioEffect::getParameterDisplay
         break;
-    case effGetParamName:        ///< [ptr]: char buffer for parameter name, limited to #kVstMaxParamStrLen  @see AudioEffect::getParameterName
+    case effGetParamName: ///< [ptr]: char buffer for parameter name, limited to #kVstMaxParamStrLen  @see AudioEffect::getParameterName
         break;
-    case effSetSampleRate:        ///< [opt]: new sample rate for audio processing  @see AudioEffect::setSampleRate
+    case effSetSampleRate: ///< [opt]: new sample rate for audio processing  @see AudioEffect::setSampleRate
         break;
-    case effSetBlockSize:        ///< [value]: new maximum block size for audio processing  @see AudioEffect::setBlockSize
+    case effSetBlockSize: ///< [value]: new maximum block size for audio processing  @see AudioEffect::setBlockSize
         break;
-    case effMainsChanged:        ///< [value]: 0 means "turn off", 1 means "turn on"  @see AudioEffect::suspend @see AudioEffect::resume
+    case effMainsChanged: ///< [value]: 0 means "turn off", 1 means "turn on"  @see AudioEffect::suspend @see AudioEffect::resume
         if (value == 0)
             plug->activate();
         else
             plug->deactivate();
         break;
-    case effEditGetRect:           ///< [ptr]: #ERect** receiving pointer to editor size  @see ERect @see AEffEditor::getRect
+    case effEditGetRect: ///< [ptr]: #ERect** receiving pointer to editor size  @see ERect @see AEffEditor::getRect
         break;
-    case effEditOpen:           ///< [ptr]: system dependent Window pointer, e.g. HWND on Windows  @see AEffEditor::open
+    case effEditOpen: ///< [ptr]: system dependent Window pointer, e.g. HWND on Windows  @see AEffEditor::open
         break;
-    case effEditClose:           ///< no arguments @see AEffEditor::close
+    case effEditClose: ///< no arguments @see AEffEditor::close
         break;
-    case effEditIdle:           ///< no arguments @see AEffEditor::idle
+    case effEditIdle: ///< no arguments @see AEffEditor::idle
         break;
-    case effGetChunk:           ///< [ptr]: void** for chunk data address [index]: 0 for bank, 1 for program  @see AudioEffect::getChunk
+    case effGetChunk: ///< [ptr]: void** for chunk data address [index]: 0 for bank, 1 for program  @see AudioEffect::getChunk
         break;
-    case effSetChunk:           ///< [ptr]: chunk data [value]: byte size [index]: 0 for bank, 1 for program  @see AudioEffect::setChunk
+    case effSetChunk: ///< [ptr]: chunk data [value]: byte size [index]: 0 for bank, 1 for program  @see AudioEffect::setChunk
         break;
 
         /**************************EXTENDING OPCODES*******************************/
-    case effProcessEvents:        ///< [ptr]: #VstEvents*  @see AudioEffectX::processEvents = effSetChunk + 1        ///< [ptr]: #VstEvents*  @see AudioEffectX::processEventsdes:
+    case effProcessEvents: ///< [ptr]: #VstEvents*  @see AudioEffectX::processEvents = effSetChunk + 1        ///< [ptr]: #VstEvents*  @see AudioEffectX::processEventsdes:
         break;
-    case effCanBeAutomated:        ///< [index]: parameter index [return value]: 1=true, 0=false  @see AudioEffectX::canParameterBeAutomated
+    case effCanBeAutomated: ///< [index]: parameter index [return value]: 1=true, 0=false  @see AudioEffectX::canParameterBeAutomated
         break;
-    case effString2Parameter:    ///< [index]: parameter index [ptr]: parameter string [return value]: true for success  @see AudioEffectX::string2parameter
+    case effString2Parameter: ///< [index]: parameter index [ptr]: parameter string [return value]: true for success  @see AudioEffectX::string2parameter
         break;
-    case effGetProgramNameIndexed:    ///< [index]: program index [ptr]: buffer for program name, limited to #kVstMaxProgNameLen [return value]: true for success  @see AudioEffectX::getProgramNameIndexed
+    case effGetProgramNameIndexed: ///< [index]: program index [ptr]: buffer for program name, limited to #kVstMaxProgNameLen [return value]: true for success  @see AudioEffectX::getProgramNameIndexed
         break;
-    case effGetInputProperties:        ///< [index]: input index [ptr]: #VstPinProperties* [return value]: 1 if supported  @see AudioEffectX::getInputProperties
+    case effGetInputProperties: ///< [index]: input index [ptr]: #VstPinProperties* [return value]: 1 if supported  @see AudioEffectX::getInputProperties
         break;
-    case effGetOutputProperties:    ///< [index]: output index [ptr]: #VstPinProperties* [return value]: 1 if supported  @see AudioEffectX::getOutputProperties
+    case effGetOutputProperties: ///< [index]: output index [ptr]: #VstPinProperties* [return value]: 1 if supported  @see AudioEffectX::getOutputProperties
         break;
-    case effGetPlugCategory:        ///< [return value]: category  @see VstPlugCategory @see AudioEffectX::getPlugCategory
+    case effGetPlugCategory: ///< [return value]: category  @see VstPlugCategory @see AudioEffectX::getPlugCategory
         break;
-    case effOfflineNotify:            ///< [ptr]: #VstAudioFile array [value]: count [index]: start flag  @see AudioEffectX::offlineNotify
+    case effOfflineNotify: ///< [ptr]: #VstAudioFile array [value]: count [index]: start flag  @see AudioEffectX::offlineNotify
         break;
-    case effOfflinePrepare:            ///< [ptr]: #VstOfflineTask array [value]: count  @see AudioEffectX::offlinePrepare
+    case effOfflinePrepare: ///< [ptr]: #VstOfflineTask array [value]: count  @see AudioEffectX::offlinePrepare
         break;
-    case effOfflineRun:                ///< [ptr]: #VstOfflineTask array [value]: count  @see AudioEffectX::offlineRun
+    case effOfflineRun: ///< [ptr]: #VstOfflineTask array [value]: count  @see AudioEffectX::offlineRun
         break;
 
-    case effProcessVarIo:            ///< [ptr]: #VstVariableIo*  @see AudioEffectX::processVariableIo
+    case effProcessVarIo: ///< [ptr]: #VstVariableIo*  @see AudioEffectX::processVariableIo
         break;
-    case effSetSpeakerArrangement:    ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::setSpeakerArrangement
+    case effSetSpeakerArrangement: ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::setSpeakerArrangement
         break;
-    case effSetBypass:                ///< [value]: 1 = bypass, 0 = no bypass  @see AudioEffectX::setBypass
+    case effSetBypass: ///< [value]: 1 = bypass, 0 = no bypass  @see AudioEffectX::setBypass
         break;
-    case effGetEffectName:            ///< [ptr]: buffer for effect name, limited to #kVstMaxEffectNameLen  @see AudioEffectX::getEffectName
+    case effGetEffectName: ///< [ptr]: buffer for effect name, limited to #kVstMaxEffectNameLen  @see AudioEffectX::getEffectName
         break;
-    case effGetVendorString:        ///< [ptr]: buffer for effect vendor string, limited to #kVstMaxVendorStrLen  @see AudioEffectX::getVendorString
-        strncpy((char*)ptr, plug->getPluginInfo()->creater.c_str(), std::min<size_t>(plug->getPluginInfo()->creater.size(),kVstMaxVendorStrLen));
+    case effGetVendorString: ///< [ptr]: buffer for effect vendor string, limited to #kVstMaxVendorStrLen  @see AudioEffectX::getVendorString
+        strncpy(static_cast<char*>(ptr), plug->getPluginInfo()->creater.c_str(), std::min<size_t>(plug->getPluginInfo()->creater.size(), kVstMaxVendorStrLen));
         return true;
-    case effGetProductString:        ///< [ptr]: buffer for effect vendor string, limited to #kVstMaxProductStrLen  @see AudioEffectX::getProductString
-        strncpy((char*)ptr, plug->getPluginInfo()->name.c_str(), std::min<size_t>(plug->getPluginInfo()->name.size(), kVstMaxProductStrLen));
+    case effGetProductString: ///< [ptr]: buffer for effect vendor string, limited to #kVstMaxProductStrLen  @see AudioEffectX::getProductString
+        strncpy(static_cast<char*>(ptr), plug->getPluginInfo()->name.c_str(), std::min<size_t>(plug->getPluginInfo()->name.size(), kVstMaxProductStrLen));
         return true;
-    case effGetVendorVersion:        ///< [return value]: vendor-specific version  @see AudioEffectX::getVendorVersion
+    case effGetVendorVersion: ///< [return value]: vendor-specific version  @see AudioEffectX::getVendorVersion
         break;
-    case effVendorSpecific:            ///< no definition, vendor specific handling  @see AudioEffectX::vendorSpecific
+    case effVendorSpecific: ///< no definition, vendor specific handling  @see AudioEffectX::vendorSpecific
         break;
-    case effCanDo:                    ///< [ptr]: "can do" string [return value]: 0: "don't know" -1: "no" 1: "yes"  @see AudioEffectX::canDo
+    case effCanDo: ///< [ptr]: "can do" string [return value]: 0: "don't know" -1: "no" 1: "yes"  @see AudioEffectX::canDo
         //strcmp((const char*)ptr, "dididing");
         return 0;
-    case effGetTailSize:            ///< [return value]: tail size (for example the reverb time of a reverb plug-in); 0 is default (return 1 for 'no tail')
+    case effGetTailSize: ///< [return value]: tail size (for example the reverb time of a reverb plug-in); 0 is default (return 1 for 'no tail')
         return 1;
-    case effGetParameterProperties:    ///< [index]: parameter index [ptr]: #VstParameterProperties* [return value]: 1 if supported  @see AudioEffectX::getParameterProperties
+    case effGetParameterProperties: ///< [index]: parameter index [ptr]: #VstParameterProperties* [return value]: 1 if supported  @see AudioEffectX::getParameterProperties
         break;
-    case effGetVstVersion:            ///< [return value]: VST version  @see AudioEffectX::getVstVersion
+    case effGetVstVersion: ///< [return value]: VST version  @see AudioEffectX::getVstVersion
         return kVstVersion;
 
         //#if VST_2_1_EXTENSIONS
-    case effEditKeyDown:            ///< [index]: ASCII character [value]: virtual key [opt]: modifiers [return value]: 1 if key used  @see AEffEditor::onKeyDown
+    case effEditKeyDown: ///< [index]: ASCII character [value]: virtual key [opt]: modifiers [return value]: 1 if key used  @see AEffEditor::onKeyDown
         break;
-    case effEditKeyUp:                ///< [index]: ASCII character [value]: virtual key [opt]: modifiers [return value]: 1 if key used  @see AEffEditor::onKeyUp
+    case effEditKeyUp: ///< [index]: ASCII character [value]: virtual key [opt]: modifiers [return value]: 1 if key used  @see AEffEditor::onKeyUp
         break;
-    case effSetEditKnobMode:        ///< [value]: knob mode 0: circular, 1: circular relativ, 2: linear (CKnobMode in VSTGUI)  @see AEffEditor::setKnobMode
-        break;
-
-    case effGetMidiProgramName:        ///< [index]: MIDI channel [ptr]: #MidiProgramName* [return value]: number of used programs, 0 if unsupported  @see AudioEffectX::getMidiProgramName
-        break;
-    case effGetCurrentMidiProgram:    ///< [index]: MIDI channel [ptr]: #MidiProgramName* [return value]: index of current program  @see AudioEffectX::getCurrentMidiProgram
-        break;
-    case effGetMidiProgramCategory:    ///< [index]: MIDI channel [ptr]: #MidiProgramCategory* [return value]: number of used categories, 0 if unsupported  @see AudioEffectX::getMidiProgramCategory
-        break;
-    case effHasMidiProgramsChanged:    ///< [index]: MIDI channel [return value]: 1 if the #MidiProgramName(s) or #MidiKeyName(s) have changed  @see AudioEffectX::hasMidiProgramsChanged
-        break;
-    case effGetMidiKeyName:            ///< [index]: MIDI channel [ptr]: #MidiKeyName* [return value]: true if supported, false otherwise  @see AudioEffectX::getMidiKeyName
+    case effSetEditKnobMode: ///< [value]: knob mode 0: circular, 1: circular relativ, 2: linear (CKnobMode in VSTGUI)  @see AEffEditor::setKnobMode
         break;
 
-    case effBeginSetProgram:        ///< no arguments  @see AudioEffectX::beginSetProgram
+    case effGetMidiProgramName: ///< [index]: MIDI channel [ptr]: #MidiProgramName* [return value]: number of used programs, 0 if unsupported  @see AudioEffectX::getMidiProgramName
         break;
-    case effEndSetProgram:            ///< no arguments  @see AudioEffectX::endSetProgram
+    case effGetCurrentMidiProgram: ///< [index]: MIDI channel [ptr]: #MidiProgramName* [return value]: index of current program  @see AudioEffectX::getCurrentMidiProgram
+        break;
+    case effGetMidiProgramCategory: ///< [index]: MIDI channel [ptr]: #MidiProgramCategory* [return value]: number of used categories, 0 if unsupported  @see AudioEffectX::getMidiProgramCategory
+        break;
+    case effHasMidiProgramsChanged: ///< [index]: MIDI channel [return value]: 1 if the #MidiProgramName(s) or #MidiKeyName(s) have changed  @see AudioEffectX::hasMidiProgramsChanged
+        break;
+    case effGetMidiKeyName: ///< [index]: MIDI channel [ptr]: #MidiKeyName* [return value]: true if supported, false otherwise  @see AudioEffectX::getMidiKeyName
+        break;
+
+    case effBeginSetProgram: ///< no arguments  @see AudioEffectX::beginSetProgram
+        break;
+    case effEndSetProgram: ///< no arguments  @see AudioEffectX::endSetProgram
         break;
         //#endif // VST_2_1_EXTENSIONS
 
         //#if VST_2_3_EXTENSIONS
-    case effGetSpeakerArrangement:    ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::getSpeakerArrangement
+    case effGetSpeakerArrangement: ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::getSpeakerArrangement
         break;
-    case effShellGetNextPlugin:        ///< [ptr]: buffer for plug-in name, limited to #kVstMaxProductStrLen [return value]: next plugin's uniqueID  @see AudioEffectX::getNextShellPlugin
-        break;
-
-    case effStartProcess:            ///< no arguments  @see AudioEffectX::startProcess
-        break;
-    case effStopProcess:            ///< no arguments  @see AudioEffectX::stopProcess
-        break;
-    case effSetTotalSampleToProcess:///< [value]: number of samples to process, offline only!  @see AudioEffectX::setTotalSampleToProcess
-        break;
-    case effSetPanLaw:                ///< [value]: pan law [opt]: gain  @see VstPanLawType @see AudioEffectX::setPanLaw
+    case effShellGetNextPlugin: ///< [ptr]: buffer for plug-in name, limited to #kVstMaxProductStrLen [return value]: next plugin's uniqueID  @see AudioEffectX::getNextShellPlugin
         break;
 
-    case effBeginLoadBank:            ///< [ptr]: #VstPatchChunkInfo* [return value]: -1: bank can't be loaded, 1: bank can be loaded, 0: unsupported  @see AudioEffectX::beginLoadBank
+    case effStartProcess: ///< no arguments  @see AudioEffectX::startProcess
         break;
-    case effBeginLoadProgram:        ///< [ptr]: #VstPatchChunkInfo* [return value]: -1: prog can't be loaded, 1: prog can be loaded, 0: unsupported  @see AudioEffectX::beginLoadProgram
+    case effStopProcess: ///< no arguments  @see AudioEffectX::stopProcess
+        break;
+    case effSetTotalSampleToProcess: ///< [value]: number of samples to process, offline only!  @see AudioEffectX::setTotalSampleToProcess
+        break;
+    case effSetPanLaw: ///< [value]: pan law [opt]: gain  @see VstPanLawType @see AudioEffectX::setPanLaw
+        break;
+
+    case effBeginLoadBank: ///< [ptr]: #VstPatchChunkInfo* [return value]: -1: bank can't be loaded, 1: bank can be loaded, 0: unsupported  @see AudioEffectX::beginLoadBank
+        break;
+    case effBeginLoadProgram: ///< [ptr]: #VstPatchChunkInfo* [return value]: -1: prog can't be loaded, 1: prog can be loaded, 0: unsupported  @see AudioEffectX::beginLoadProgram
         break;
         //#endif // VST_2_3_EXTENSIONS
 
         //#if VST_2_4_EXTENSIONS
-    case effSetProcessPrecision:             ///< [value]: @see VstProcessPrecision  @see AudioEffectX::setProcessPrecision
+    case effSetProcessPrecision: ///< [value]: @see VstProcessPrecision  @see AudioEffectX::setProcessPrecision
         break;
-    case effGetNumMidiInputChannels:         ///< [return value]: number of used MIDI input channels (1-15)  @see AudioEffectX::getNumMidiInputChannels
+    case effGetNumMidiInputChannels: ///< [return value]: number of used MIDI input channels (1-15)  @see AudioEffectX::getNumMidiInputChannels
         break;
-    case effGetNumMidiOutputChannels:            ///< [return value]: number of used MIDI output channels (1-15)  @see AudioEffectX::getNumMidiOutputChannels
-            break;
-            //#endif // VST_2_4_EXTENSIONS
+    case effGetNumMidiOutputChannels: ///< [return value]: number of used MIDI output channels (1-15)  @see AudioEffectX::getNumMidiOutputChannels
+        break;
+        //#endif // VST_2_4_EXTENSIONS
     }
+    return 0;
 }
 #include <iostream>
 // -----------------------------------------------------------------------
 extern "C" {
-    const AEffect* VSTPluginMain(audioMasterCallback audioMaster) {
-        //PluginController plugin = GlobalData().getPlugin(0);
-        // old version
-        if (audioMaster(nullptr, audioMasterVersion, 0, 0, nullptr, 0.0f) == 0)
-            return nullptr;
+const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
+{
+    //PluginController plugin = GlobalData().getPlugin(0);
+    // old version
+    if (audioMaster(nullptr, audioMasterVersion, 0, 0, nullptr, 0.0f) == 0)
+        return nullptr;
 
-        // first internal init
-      //  vst_dispatcherCallback(nullptr, -1729, 0xdead, 0xf00d, &plugin, 0.0f);
-        auto plug = GlobalData().getPlugin(0);
-        AEffect* const effect(new AEffect);
-        // std::memset(effect, 0, sizeof(AEffect));
-        effect->magic = kEffectMagic;
-        effect->dispatcher = vst_dispatcherCallback;
+    // first internal init
+    //  vst_dispatcherCallback(nullptr, -1729, 0xdead, 0xf00d, &plugin, 0.0f);
+    auto plug = GlobalData().getPlugin(0);
+    AEffect* const effect(new AEffect);
+    // std::memset(effect, 0, sizeof(AEffect));
+    effect->magic = kEffectMagic;
+    effect->dispatcher = vst_dispatcherCallback;
 
-        /******************INFORMATION*****************/
-        effect->uniqueID = NULL;
-        effect->version = 0;
-        effect->numInputs = plug->getPortComponent()->getNumberOfInputPorts();
-        effect->numOutputs = plug->getPortComponent()->getNumberOfOutputPorts();
-        effect->numParams = 0;
-        effect->numPrograms = 0;
-        //  effect->
-           // vst fields
+    /******************INFORMATION*****************/
+    effect->uniqueID = 0;
+    effect->version = 0;
+    effect->numInputs = static_cast<int>(plug->getPortComponent()->getNumberOfInputPorts());
+    effect->numOutputs = static_cast<int>(plug->getPortComponent()->getNumberOfOutputPorts());
+    effect->numParams = 0;
+    effect->numPrograms = 0;
+    //  effect->
+    // vst fields
 
-         // effect->uniqueID = //plugin->getUniqueId();
-          //effect->version = plugin->getPluginInfo().ver;
-          //effect->numParams = plugin->getParameterCount();
-         // effect->numPrograms = 1;
-          //  effect->numInputs = DISTRHO_PLUGIN_NUM_INPUTS;
-          //  effect->numOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
+    // effect->uniqueID = //plugin->getUniqueId();
+    //effect->version = plugin->getPluginInfo().ver;
+    //effect->numParams = plugin->getParameterCount();
+    // effect->numPrograms = 1;
+    //  effect->numInputs = DISTRHO_PLUGIN_NUM_INPUTS;
+    //  effect->numOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
 
     //  int numParams = 0;
-      //bool outputsReached = false;
+    //bool outputsReached = false;
 
-     /* for (uint32_t i = 0, count = plugin->getParameterCount(); i < count; ++i)
+    /* for (uint32_t i = 0, count = plugin->getParameterCount(); i < count; ++i)
       {
           if (plugin->isParameterInput(i))
           {
@@ -922,16 +916,15 @@ extern "C" {
           outputsReached = true;
       }*/
 
+    // plugin fields
+    // effect->numParams = numParams;
+    //   effect->numPrograms = 1;
+    //  effect->numInputs = DISTRHO_PLUGIN_NUM_INPUTS;
+    //  effect->numOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
 
-      // plugin fields
-          // effect->numParams = numParams;
-           //   effect->numPrograms = 1;
-          //  effect->numInputs = DISTRHO_PLUGIN_NUM_INPUTS;
-          //  effect->numOutputs = DISTRHO_PLUGIN_NUM_OUTPUTS;
-
-            // plugin flags
-          //effect->flags |= effFlagsCanReplacing;
-          /*#if DISTRHO_PLUGIN_IS_SYNTH
+    // plugin flags
+    //effect->flags |= effFlagsCanReplacing;
+    /*#if DISTRHO_PLUGIN_IS_SYNTH
               effect->flags |= effFlagsIsSynth;
           #endif
           #if DISTRHO_PLUGIN_HAS_UI
@@ -941,69 +934,68 @@ extern "C" {
               effect->flags |= effFlagsProgramChunks;
           #endif*/
 
-          // static calls
-        effect->processReplacing = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {
-            auto plug = GlobalData().getPlugin(0);
-            int inputIndex = 0;
-            for (Port& p : plug->getPortComponent()->getInputPorts()) {
-                p.sampleSize = sampleFrames;
-                for (Channel& c : p.channels) {
-                    c.data32 = inputs[inputIndex];
-                    inputIndex++;
-                }
+    // static calls
+    effect->processReplacing = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {
+        auto plug = GlobalData().getPlugin(0);
+        int inputIndex = 0;
+        for (Port& p : plug->getPortComponent()->getInputPorts()) {
+            p.sampleSize = static_cast<size_t>(sampleFrames);
+            for (Channel& c : p.channels) {
+                c.data32 = inputs[inputIndex];
+                inputIndex++;
             }
-            int outputIndex = 0;
-            for (Port& p : plug->getPortComponent()->getOutputPorts()) {
-                p.sampleSize = sampleFrames;
-                for (Channel& c : p.channels) {
-                    c.data32 = outputs[outputIndex];
-                    outputIndex++;
-                }
+        }
+        int outputIndex = 0;
+        for (Port& p : plug->getPortComponent()->getOutputPorts()) {
+            p.sampleSize = static_cast<size_t>(sampleFrames);
+            for (Channel& c : p.channels) {
+                c.data32 = outputs[outputIndex];
+                outputIndex++;
             }
-            plug->processAudio(plug->getPortComponent()->getInputPorts(), plug->getPortComponent()->getOutputPorts());
-        };
+        }
+        plug->processAudio(plug->getPortComponent()->getInputPorts(), plug->getPortComponent()->getOutputPorts());
+    };
 
-        effect->processDoubleReplacing = [](AEffect* effect, double** inputs, double** outputs, int32_t sampleFrames) {
-            auto plug = GlobalData().getPlugin(0);
-            int inputIndex = 0;
-            for (Port& p : plug->getPortComponent()->getInputPorts()) {
-                p.sampleSize = sampleFrames;
-                for (Channel& c : p.channels) {
-                    c.data64 = inputs[inputIndex];
-                    inputIndex++;
-                }
+    effect->processDoubleReplacing = [](AEffect* effect, double** inputs, double** outputs, int32_t sampleFrames) {
+        auto plug = GlobalData().getPlugin(0);
+        int inputIndex = 0;
+        for (Port& p : plug->getPortComponent()->getInputPorts()) {
+            p.sampleSize = static_cast<size_t>(sampleFrames);
+            for (Channel& c : p.channels) {
+                c.data64 = inputs[inputIndex];
+                inputIndex++;
             }
-            int outputIndex = 0;
-            for (Port& p : plug->getPortComponent()->getOutputPorts()) {
-                p.sampleSize = sampleFrames;
-                for (Channel& c : p.channels) {
-                    c.data64 = outputs[outputIndex];
-                    outputIndex++;
-                }
+        }
+        int outputIndex = 0;
+        for (Port& p : plug->getPortComponent()->getOutputPorts()) {
+            p.sampleSize = static_cast<size_t>(sampleFrames);
+            for (Channel& c : p.channels) {
+                c.data64 = outputs[outputIndex];
+                outputIndex++;
             }
-            plug->processAudio(plug->getPortComponent()->getInputPorts(), plug->getPortComponent()->getOutputPorts());
-        };
-        effect->flags |= effFlagsCanReplacing | effFlagsCanDoubleReplacing;
-        if (GlobalData().getPlugin(0)->getPluginInfo()->hasUI)
-            effect->flags |= effFlagsHasEditor;
+        }
+        plug->processAudio(plug->getPortComponent()->getInputPorts(), plug->getPortComponent()->getOutputPorts());
+    };
+    effect->flags |= effFlagsCanReplacing | effFlagsCanDoubleReplacing;
+    if (GlobalData().getPlugin(0)->getPluginInfo()->hasUI)
+        effect->flags |= effFlagsHasEditor;
 
-        //if synth
-        //   effect->flags |= effFlagsIsSynth
-        //if no sound when no input
-        //effFlagsNoSoundInStop = 1 << 9,            ///< plug-in does not produce sound when input is all silence
-        effect->process = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) { //Deprecated. So use fallbackbehaviour.
-            effect->processReplacing(effect, inputs, outputs, sampleFrames);
-        };
+    //if synth
+    //   effect->flags |= effFlagsIsSynth
+    //if no sound when no input
+    //effFlagsNoSoundInStop = 1 << 9,            ///< plug-in does not produce sound when input is all silence
+    effect->process = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) { //Deprecated. So use fallbackbehaviour.
+        effect->processReplacing(effect, inputs, outputs, sampleFrames);
+    };
 
-        effect->getParameter = [](AEffect* effect, int32_t index)->float {return 0; };
-        effect->setParameter = [](AEffect* effect, int32_t index, float value) {};
+    effect->getParameter = [](AEffect* effect, int32_t index) -> float { return 0; };
+    effect->setParameter = [](AEffect* effect, int32_t index, float value) {};
 
+    // pointers
 
-        // pointers
+    // done
+    // effect->object = obj;
 
-        // done
-       // effect->object = obj;
-
-        return effect;
-    }
+    return effect;
+}
 }
