@@ -2,7 +2,10 @@
 /**
  * Used for Loading the Shared library and run testcases
  **/
-#include "TestLoading.hpp"
+#include "tools/LibLoading.hpp"
+#include "UnitTools.hpp"
+using namespace XPlug;
+#include "catch2/catch.hpp"
 #ifdef _WIN32
 #define SYMBOL_EXPORT_TEST_LIB "test_components/simple_symbol_export"
 #else
@@ -16,16 +19,21 @@
 TEST_CASE("Symbolload checking", "[symbol]")
 {
 
-    auto lib = LoadTestLib(SYMBOL_EXPORT_TEST_LIB);
-    auto test_function = LoadTestFunc<int (*)()>(lib, "test_function");
+    auto lib = LoadLib(SYMBOL_EXPORT_TEST_LIB);
+    REQUIRE_MESSAGE(lib != NULL, GetErrorStr());
+    
+    auto test_function = LoadFunc<int (*)()>(lib, "test_function");
+    REQUIRE_MESSAGE(test_function != nullptr, GetErrorStr());
     REQUIRE(test_function() == 2);
 
     SECTION("MODULE LOADING TEST FUNCTION LOADING")
     {
-        auto static_test_function = LoadTestFunc<int (*)(int)>(lib, "static_test_function");
+        auto static_test_function = LoadFunc<int (*)(int)>(lib, "static_test_function");
+        REQUIRE_MESSAGE(static_test_function != nullptr, GetErrorStr());
         REQUIRE(static_test_function(2) == 2 + 5);
         //Load Hidden function
-        auto static_test_function2 = LoadTestFunc<int (*)(int)>(lib, "static_test_function2");
+        auto static_test_function2 = LoadFunc<int (*)(int)>(lib, "static_test_function2");
+        REQUIRE_MESSAGE(static_test_function2 != nullptr, GetErrorStr());
         REQUIRE(static_test_function2(2) == 2 + 5);
     }
 }

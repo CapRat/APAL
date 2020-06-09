@@ -17,7 +17,8 @@ docker-build-linux-x64:
   image: dockcross/linux-x64 
   stage: build
   script:
-    - git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
+    #- git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
+    - cmake -P install.cmake
     - mkdir build
     - cd build
     - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..
@@ -56,7 +57,8 @@ docker-build-win64:
   image: dockcross/windows-static-x64
   stage: build
   script:
-    - git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
+    # - git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
+    - cmake -P install.cmake  
     - mkdir build
     - cd build
     - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release ..

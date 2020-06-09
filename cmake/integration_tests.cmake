@@ -1,32 +1,39 @@
 find_package(pluginval)
 find_package(TortureTester)
-
+find_package(VST3)
 # Run pluginval tests with given TARGET. pluginval must be available as target or be installed.
 function(run_vst2_test TARGET)
     if(TARGET pluginval)
-        add_test(NAME ${TARGET}_pluginval_test COMMAND pluginval 
-        --validate-in-process  
-        --output-dir ${PROJECT_BINARY_DIR}/logs 
-        --strictnessLevel 5
-       #--skip-gui-tests
-        --validate $<TARGET_FILE:${TARGET}> )
+        add_test(NAME ${TARGET}_pluginval_vst2_test COMMAND pluginval
+                         # --validate-in-process
+                         # --output-dir ${PROJECT_BINARY_DIR}/logs
+                         # --strictness-level 5
+                         #--skip-gui-tests
+                          " \"  --validate-in-process --validate $<TARGET_FILE:${TARGET}> --strictness-level 10 \"" )
       else()
-      message(WARNING "No ${TARGET}_pluginval_test is added, tue to no installed Pluginval. ")
+      message(WARNING "No ${TARGET}_pluginval_test is added, due to no installed Pluginval. ")
     endif(TARGET pluginval)
 endfunction(run_vst2_test TARGET)
 
 # Run pluginval tests with given TARGET. pluginval must be available as target or be installed.
 function(run_vst3_test TARGET)
     if(TARGET pluginval)
-        add_test(NAME ${TARGET}_pluginval_test COMMAND pluginval
-        --validate-in-process
-        --output-dir ${PROJECT_BINARY_DIR}/logs
-        --strictnessLevel 5
-       #--skip-gui-tests
-        --validate $<TARGET_FILE:${TARGET}> )
+       # add_test(NAME ${TARGET}_pluginval_vst3_test 
+       # COMMAND pluginval --validate-in-process
+       #                   --output-dir ${PROJECT_BINARY_DIR}/logs
+       #                   --strictnessLevel 5
+       #                  #--skip-gui-tests
+       #                   --validate $<TARGET_FILE:${TARGET}> )
+       #                   --validate $<TARGET_FILE:${TARGET}> )
       else()
       message(WARNING "No ${TARGET}_pluginval_test is added, tue to no installed Pluginval. ")
     endif(TARGET pluginval)
+    
+    if(TARGET vst3_validator)
+         add_test(NAME ${TARGET}_vst3_validator_test COMMAND vst3_validator $<TARGET_FILE:${TARGET}> -e )
+      else()
+      message(WARNING "No ${TARGET}_vst3_validator_test is added, tue to no installed Pluginval. ")
+    endif(TARGET vst3_validator)
 endfunction(run_vst3_test TARGET)
 
 function(run_ladspa_tests TARGET)

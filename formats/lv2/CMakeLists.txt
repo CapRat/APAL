@@ -1,0 +1,9 @@
+include(symbol_export)
+
+find_package(LV2 REQUIRED)
+add_library(lv2  "lv2.cpp")
+set_target_properties(lv2 PROPERTIES POSITION_INDEPENDENT_CODE  True)
+target_link_libraries(lv2 XPlug)
+target_include_directories(lv2 PRIVATE ${LV2_INCLUDE_DIRS})
+EXPORT_SYMBOLS(lv2 FUNCTION_NAMES lv2_descriptor lv2_lib_descriptor)
+install(TARGETS lv2 EXPORT XPlugExport DESTINATION lib)

@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 3.0.0)
 project(XPlug)
 
 ##########INCLUDES############
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake )
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 
 #########PACKAGE INCLUDES#########
@@ -22,8 +22,10 @@ option(XPLUG_BUILD_TESTS "Build and installs tests,which can be reused and are u
 
 #########################Set Supported Format Variables###########################
 ## Here add maybe an detect if feature is build ready macro or function.
+find_package(VST3)
+
 option(XPLUG_VST2_SUPPORT "Support vor VST2" ON)
-option(XPLUG_VST3_SUPPORT "Support vor VST3" ON)
+option(XPLUG_VST3_SUPPORT "Support vor VST3" ${VST3_FOUND})
 option(XPLUG_LADSPA_SUPPORT "Support vor LADSPA" ON)
 option(XPLUG_LV2_SUPPORT "Support vor LV2" ON)
 option(XPLUG_AU_SUPPORT "Support vor AU" OFF)
@@ -38,12 +40,13 @@ set_version(1 0 0)
 
 use_cxx(11)
 
-
 #####################BUILD######################
 add_subdirectory(formats)
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(deps)
+
+
 add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES} )
 
 

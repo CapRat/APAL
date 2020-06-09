@@ -306,6 +306,7 @@ struct _AEffect
 	int32_t version;
 	// processReplacing 50-53
 	void (* processReplacing) (struct _AEffect *, float **, float **, int);
+	void (* processDoubleReplacing)(struct _AEffect *, double **, double **, int);
 };
 
 typedef struct _AEffect AEffect;

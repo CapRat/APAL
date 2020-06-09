@@ -1,10 +1,11 @@
 add_library(VolumePlugin MODULE VolumePlugin.cpp )
-target_link_libraries(VolumePlugin PUBLIC  XPlug ladspa vst2 lv2)
+target_link_libraries(VolumePlugin PUBLIC  XPlug ladspa vst2 lv2 vst3)
 
 if(XPLUG_BUILD_TESTS)
 include(integration_tests)
 DLOAD_PLUGINVAL()
 RUN_VST2_TEST(VolumePlugin)
+RUN_VST3_TEST(VolumePlugin)
 RUN_LADSPA_TESTS(VolumePlugin)
 RUN_LV2_TESTS(VolumePlugin)
 endif(XPLUG_BUILD_TESTS)

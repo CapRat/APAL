@@ -4,49 +4,47 @@
 #include <memory>
 #include <vector>
 
+namespace XPlug {
+
+    class IPlugin;
+    //class PluginController;
+    typedef std::shared_ptr<IPlugin> PluginPtr;
+
+    class GlobalDataType {
+    private:
+
+        std::vector<PluginPtr> registeredPlugins;
+    public:
+
+        /***************Register Plugin functions****************/
+
+        /**
+         * @brief Function, to register a pluign.
+         * @param plugin  Plugin to register, this should be a plugin, written by the
+         * @return index of the added Plugin. This way more Plugin can be added in one dll.
+        */
+        size_t registerPlugin(PluginPtr plugin); // re
+
+        /**
+         * @brief Returns the number of current registered Plugins. In most cases this should be one
+         * @return Number of registered Plugins.
+         */
+        size_t getNumberOfRegisteredPlugins();
+
+        /**
+         * @brief getPlugin Gets the Plugin at the given index. Index should not be greater than @see getNumberOfRegisteredPlugins
+         * @param index Index, which Plugin should be chosen.
+         * @return A pointer to a Plugin.
+         */
+        PluginPtr getPlugin(size_t index);
+
+        //PluginController getPlugin(size_t index);
+    };
 
 
-class IPlugin;
-//class PluginController;
-typedef std::shared_ptr<IPlugin> PluginPtr;
+    GlobalDataType& GlobalData();
 
-class GlobalDataType{
-private :
-	
-	std::vector<PluginPtr> registeredPlugins;
-public:
-
-	/***************Register Plugin functions****************/
-	/**
-	 * @ brief Function, to register a pluign.
-	 *
-	 * @ param plugin Plugin to register, this should be a plugin, written by the user.
-	 *
-	 * @ return index of the added Plugin. This way more Plugin can be added in one dll. 
-	 */
-	size_t registerPlugin(PluginPtr plugin); // re
-	
-	/**
-	 * @ brief Returns the number of current registered Plugins. In most cases this should be one
-	 *
-	 * @ return Number of registered Plugins.
-	 */
-	size_t getNumberOfRegisteredPlugins();
-	
-	/**
-	 * @ brief 
-	 *
-	 * @ param index
-	 *
-	 * @ return 
-	 */
-	PluginPtr getPlugin(size_t index);
-
-	//PluginController getPlugin(size_t index);
-};
-
-
-GlobalDataType& GlobalData();
+}
 
 extern "C" {
 VERSION XPlugGetVersion();
