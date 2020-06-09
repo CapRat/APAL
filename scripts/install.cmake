@@ -1,4 +1,4 @@
-SET(BUILD_CONFIG Debug CACHE  INTERNAL "")
+SET(BUILD_CONFIG Release CACHE  INTERNAL "")
 SET(BUILD_DIR ${CMAKE_CURRENT_LIST_DIR} CACHE  INTERNAL "")
 if(NOT INSTALL_PREFIX)
 if(WIN32)
@@ -8,6 +8,5 @@ SET(INSTALL_PREFIX "/usr/local"  CACHE  INTERNAL "")
 endif(WIN32)
 endif(NOT INSTALL_PREFIX)
 
-message("ARGS")
 include(${CMAKE_CURRENT_LIST_DIR}/install_plugintorture.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/install_vst3sdk.cmake)

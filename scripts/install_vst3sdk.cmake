@@ -13,10 +13,10 @@ elseif(UNIX)
 SET(INSTALL_PREFIX "/usr/local")
 endif(WIN32)
 endif(NOT INSTALL_PREFIX)
-execute_process(COMMAND git clone --recursive https://github.com/steinbergmedia/vst3sdk.git WORKING_DIRECTORY ${BUILD_DIR} COMMAND_ECHO STDOUT) 
+execute_process(COMMAND git clone --recursive https://github.com/steinbergmedia/vst3sdk.git WORKING_DIRECTORY ${BUILD_DIR})
 file(MAKE_DIRECTORY ${BUILD_DIR}/vst3sdk/build)
-execute_process(COMMAND cmake -DCMAKE_BUILD_TYPE=${BUILD_CONFIG} .. WORKING_DIRECTORY ${BUILD_DIR}/vst3sdk/build COMMAND_ECHO STDERR) 
-execute_process(COMMAND cmake --build . --config ${BUILD_CONFIG}  WORKING_DIRECTORY ${BUILD_DIR}/vst3sdk/build COMMAND_ECHO STDERR) 
+execute_process(COMMAND cmake -DCMAKE_BUILD_TYPE=${BUILD_CONFIG} .. WORKING_DIRECTORY ${BUILD_DIR}/vst3sdk/build )
+execute_process(COMMAND cmake --build . --config ${BUILD_CONFIG}  WORKING_DIRECTORY ${BUILD_DIR}/vst3sdk/build )
 
 set(INSTALL_DIR ${INSTALL_PREFIX}/vst3sdk)
 
@@ -54,7 +54,7 @@ file(COPY ${BUILD_DIR}/vst3sdk/pluginterfaces
  ${BUILD_DIR}/vst3sdk/base
 DESTINATION ${INSTALL_DIR}/include FILES_MATCHING PATTERN *.h)
 
-file(COPY ${BUILD_DIR}/vst3sdk/LICENSE.txt  ${BUILD_DIR}/vst3sdk/Readme.md
+file(COPY ${BUILD_DIR}/vst3sdk/LICENSE.txt  ${BUILD_DIR}/vst3sdk/README.md
 #${BUILD_DIR}/vst3sdk/doc 
 DESTINATION ${INSTALL_DIR})
 
