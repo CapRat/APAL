@@ -21,7 +21,7 @@ endif(NOT INSTALL_PREFIX)
 # RELATIVE_PATH - if given, the filestucture will remain, otherwise not.
 # FILE_PATTERN list of filepatterns, got by GLOB_RECURSE
 function(xinstall)
-    set(options )
+    set(options FORCE_OVERWRITE)
     set(oneValueArgs DESTINATION  INSTALL_PREFIX RELATIVE_PATH)
     set(multiValueArgs FILE_PATTERNS)
     cmake_parse_arguments(XINSTALL "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
@@ -43,13 +43,14 @@ function(xinstall)
         get_filename_component(XINSTALL_DEST_FILEPATH ${XINSTALL_DEST_FILEPATH} ABSOLUTE)
         get_filename_component(XINSTALL_FILEDIR  ${XINSTALL_DEST_FILEPATH} DIRECTORY)
         if(NOT EXISTS ${XINSTALL_FILEDIR})
-            message(STATUS "Create dir: ${XINSTALL_FILEDIR}")
             file(MAKE_DIRECTORY ${XINSTALL_FILEDIR})    
         endif(NOT EXISTS ${XINSTALL_FILEDIR})
 
         message(STATUS "Installing: ${XINSTALL_DEST_FILEPATH}")
-        file(REMOVE  ${XINSTALL_DEST_FILEPATH})
-	    file(RENAME  ${XINSTALL_SRC_FILEPATH}  ${XINSTALL_DEST_FILEPATH} )
+        if(FORCE_OVERWRITE)
+            file(REMOVE ${XINSTALL_DEST_FILEPATH})
+        endif(FORCE_OVERWRITE)
+        file(COPY ${XINSTALL_SRC_FILEPATH} DESTINATION ${XINSTALL_FILEDIR})
     endforeach(XINSTALL_FILEPATH ${XINSTALL_FILEPATHS})
 endfunction(xinstall)
 
@@ -84,16 +85,16 @@ if(NOT SKIP_VST3)
     xinstall(INSTALL_PREFIX ${VST3_INSTALL_PREFIX} DESTINATION include/ RELATIVE_PATH ${BUILD_DIR}/vst3sdk/ FILE_PATTERNS ${BUILD_DIR}/vst3sdk/*.h)
 
     xinstall(INSTALL_PREFIX ${VST3_INSTALL_PREFIX} DESTINATION bin/ FILE_PATTERNS
-	    ${BUILD_DIR}/vst3sdk/build/bin/*/*ImageStitcher* 
-	    ${BUILD_DIR}/vst3sdk/build/bin/*/*validator*
-	    ${BUILD_DIR}/vst3sdk/build/bin/*/*uidesccompressor*
-	    ${BUILD_DIR}/vst3sdk/build/bin/*/*editorhost*)
+        ${BUILD_DIR}/vst3sdk/build/bin/*/*ImageStitcher* 
+        ${BUILD_DIR}/vst3sdk/build/bin/*/*validator*
+        ${BUILD_DIR}/vst3sdk/build/bin/*/*uidesccompressor*
+        ${BUILD_DIR}/vst3sdk/build/bin/*/*editorhost*)
 
     #Installin library files
     xinstall(INSTALL_PREFIX ${VST3_INSTALL_PREFIX} DESTINATION lib/ FILE_PATTERNS
-    ${BUILD_DIR}/vst3sdk/build/lib/*vstgui_uidescription*	${BUILD_DIR}/vst3sdk/build/lib/*vstgui*
-    ${BUILD_DIR}/vst3sdk/build/lib/*vstgui_standalone*		${BUILD_DIR}/vst3sdk/build/lib/*sdk*
-    ${BUILD_DIR}/vst3sdk/build/lib/*vstgui_support*			${BUILD_DIR}/vst3sdk/build/lib/*base*
+    ${BUILD_DIR}/vst3sdk/build/lib/*vstgui_uidescription*  ${BUILD_DIR}/vst3sdk/build/lib/*vstgui*
+    ${BUILD_DIR}/vst3sdk/build/lib/*vstgui_standalone*     ${BUILD_DIR}/vst3sdk/build/lib/*sdk*
+    ${BUILD_DIR}/vst3sdk/build/lib/*vstgui_support*        ${BUILD_DIR}/vst3sdk/build/lib/*base*
     ${BUILD_DIR}/vst3sdk/build/lib/*pluginterfaces*)
     file(COPY ${BUILD_DIR}/vst3sdk/LICENSE.txt  ${BUILD_DIR}/vst3sdk/README.md DESTINATION ${VST3_INSTALL_PREFIX}) #Just to be sure, copy readme and license
     file(REMOVE_RECURSE ${BUILD_DIR}/vst3sdk/)
