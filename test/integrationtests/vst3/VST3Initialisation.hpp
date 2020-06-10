@@ -4,9 +4,10 @@
 #include <vector>
 #include "tools/LibLoading.hpp"
 #include "../XValidate.hpp"
-#include <ivstaudioprocessor.h>
-#include <ivsteditcontroller.h>
-#include <ivstprocesscontext.h>
+
+#include <vst/ivstaudioprocessor.h>
+#include <vst/ivsteditcontroller.h>
+#include <vst/ivstprocesscontext.h>
 
 void test_function_loading();
 

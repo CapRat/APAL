@@ -16,7 +16,7 @@ namespace XPlug {
     {
         HMODULE lastLib = LoadLibraryA(libName);
         if (lastLib == NULL) {
-            static const char const NO_LIB_LOAD_MSG[] = "Could not load library: ";
+            static const char NO_LIB_LOAD_MSG[] = "Could not load library: ";
             free((void*)lastError);
             lastError= (char*)malloc(sizeof(NO_LIB_LOAD_MSG) + strlen(libName));
             strcpy(lastError, NO_LIB_LOAD_MSG);
@@ -29,7 +29,7 @@ namespace XPlug {
     {
         FARPROC lastFunc = GetProcAddress(static_cast<HMODULE>(lib), fncName);
         if (lastFunc == NULL) {
-            static const char const NO_FNC_LOAD_MSG[] = "Could not load function: ";
+            static const char NO_FNC_LOAD_MSG[] = "Could not load function: ";
             free((void*)lastError);
             lastError = (char*)malloc(sizeof(NO_FNC_LOAD_MSG) + strlen(fncName));
             strcpy(lastError, NO_FNC_LOAD_MSG);

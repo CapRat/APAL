@@ -1,6 +1,6 @@
 #ifndef VST3_EDIT_CONTROLLER_IMPL_HPP
 #define VST3_EDIT_CONTROLLER_IMPL_HPP
-#include "ivsteditcontroller.h"
+#include <vst/ivsteditcontroller.h>
 using namespace Steinberg;
 using namespace Vst;
 class VST3EditControllerImpl : public Steinberg::Vst::IEditController{

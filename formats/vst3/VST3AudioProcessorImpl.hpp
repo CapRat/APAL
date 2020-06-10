@@ -1,6 +1,6 @@
 #ifndef VST3_AUDIO_PROCESSOR_IMPL_HPP
 #define VST3_AUDIO_PROCESSOR_IMPL_HPP
-#include "ivstaudioprocessor.h"
+#include <vst/ivstaudioprocessor.h>
 #include "Component.hpp"
 using namespace Steinberg;
 using namespace Vst;

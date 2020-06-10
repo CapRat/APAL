@@ -1,7 +1,7 @@
   find_path(LV2_INCLUDE_DIR
       NAMES core/lv2.h
-      PATHS ${CMAKE_CURRENT_LIST_DIR}/../deps/lv2
-      PATH_SUFFIXES include lv2 include core
+      PATHS ${CMAKE_CURRENT_LIST_DIR}/../deps
+      PATH_SUFFIXES include lv2 include/lv2 core lv2/lv2
   )
 
 find_package(PackageHandleStandardArgs)

@@ -1,6 +1,6 @@
 #ifndef COMPONENT_HPP
 #define COMPONENT_HPP
-#include "pluginterfaces/vst/ivstcomponent.h"
+#include <vst/ivstcomponent.h>
 using namespace Steinberg;
 using namespace Vst;
 class Component : public IComponent

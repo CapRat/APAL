@@ -1,6 +1,6 @@
 #include "VST3AudioProcessorImpl.hpp"
 #include "VST3EditControllerImpl.hpp"
-#include "vstspeaker.h"
+#include <vst/vstspeaker.h>
 #include "interfaces/IPlugin.hpp"
 #include "GlobalData.hpp"
 #include <interfaces/IPlugin.hpp>

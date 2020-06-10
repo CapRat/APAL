@@ -61,9 +61,9 @@ endif(${XPLUG_BUILD_EXAMPLES})
 #############RUN The tests for Example Plugins, if they are build###############
 if(XPLUG_VST2_SUPPORT)
     SET(XVALIDATE_LIBRARIES ${XVALIDATE_LIBRARIES} vst2)
-    
 endif(XPLUG_VST2_SUPPORT)
 if(XPLUG_VST3_SUPPORT)
+    SET(XVALIDATE_LIBRARIES ${XVALIDATE_LIBRARIES} vst3)
     add_subdirectory(vst3)
 endif(XPLUG_VST3_SUPPORT)
 if(XPLUG_LADSPA_SUPPORT)
