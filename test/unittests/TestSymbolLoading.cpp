@@ -20,7 +20,7 @@ TEST_CASE("Symbolload checking", "[symbol]")
 {
 
     auto lib = LoadLib(SYMBOL_EXPORT_TEST_LIB);
-    REQUIRE_MESSAGE(lib != NULL, GetErrorStr());
+    REQUIRE_MESSAGE(lib != nullptr, GetErrorStr());
     
     auto test_function = LoadFunc<int (*)()>(lib, "test_function");
     REQUIRE_MESSAGE(test_function != nullptr, GetErrorStr());
