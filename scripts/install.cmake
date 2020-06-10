@@ -76,7 +76,7 @@ endif(NOT SKIP_LV2)
 if(NOT SKIP_VST3)
     execute_process(COMMAND git clone --recursive https://github.com/steinbergmedia/vst3sdk.git WORKING_DIRECTORY ${BUILD_DIR}) #Clone VST3
     file(MAKE_DIRECTORY ${BUILD_DIR}/vst3sdk/build)
-    execute_process(COMMAND cmake -DCMAKE_BUILD_TYPE=${BUILD_CONFIG} -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF -DSMTG_RUN_VST_VALIDATOR=OFF .. WORKING_DIRECTORY ${BUILD_DIR}/vst3sdk/build )  #Configure VST3
+    execute_process(COMMAND cmake -DCMAKE_BUILD_TYPE=${BUILD_CONFIG} -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF -DSMTG_RUN_VST_VALIDATOR=OFF -DSMTG_ADD_VSTGUI=OFF .. WORKING_DIRECTORY ${BUILD_DIR}/vst3sdk/build )  #Configure VST3
     execute_process(COMMAND cmake --build . --config ${BUILD_CONFIG}  WORKING_DIRECTORY ${BUILD_DIR}/vst3sdk/build ) #BuildVST3
 
     set(VST3_INSTALL_PREFIX ${INSTALL_PREFIX}/vst3sdk)

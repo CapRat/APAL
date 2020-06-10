@@ -33,6 +33,8 @@ docker-build-linux-x64:
 docker-test-linux-x64 :
   image: dockcross/linux-x64    
   stage: test
+  before_script:
+    - echo Y | apt install libasound2
   script:
     - cd build
     - ctest --verbose
