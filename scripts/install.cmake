@@ -68,7 +68,7 @@ endif(NOT SKIP_TORTURE)
 ######################## INSTALLING LV2 ##########################
 if(NOT SKIP_LV2)
     execute_process(COMMAND git clone  https://github.com/lv2/lv2.git WORKING_DIRECTORY ${BUILD_DIR})
-    xinstall(INSTALL_PREFIX ${INSTALL_PREFIX}/lv2 RELATIVE_PATH ${BUILD_DIR}/lv2 FILE_PATTERNS ${BUILD_DIR}/lv2/lv2/*.h)
+    xinstall(INSTALL_PREFIX ${INSTALL_PREFIX}/lv2 RELATIVE_PATH ${BUILD_DIR}/lv2/lv2/ DESTINATION include/lv2 FILE_PATTERNS ${BUILD_DIR}/lv2/lv2/*.h)
     file(REMOVE_RECURSE ${BUILD_DIR}/lv2/)
 endif(NOT SKIP_LV2)
 
