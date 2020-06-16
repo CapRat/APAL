@@ -4,7 +4,9 @@
 #include "interfaces/IPlugin.hpp"
 #include "GlobalData.hpp"
 #include <interfaces/IPlugin.hpp>
+#include <interfaces/IAudioPort.hpp>
 using namespace XPlug;
+
 
 VST3AudioProccessorImpl::VST3AudioProccessorImpl() {
     processSetup.maxSamplesPerBlock = 1024;
@@ -48,10 +50,9 @@ it should modify its buses arrangements and return kResultFalse. */
 
  tresult PLUGIN_API VST3AudioProccessorImpl::setBusArrangements(SpeakerArrangement* inputs, int32 numIns, SpeakerArrangement* outputs, int32 numOuts)
 {
-
     if (numIns < 0 || numOuts < 0)
         return kInvalidArgument;
-    if (numIns == GlobalData().getPlugin(plugIndex)->getPortComponent()->getNumberOfInputPorts() && numOuts == GlobalData().getPlugin(plugIndex)->getPortComponent()->getNumberOfOutputPorts()) {
+    if (numIns == GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeInputPorts() && numOuts == GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeOutputPorts()) {
         for (int in = 0; in < numIns; in++) {
             if (inputs[in] != SpeakerArr::kMono)
                 return kResultFalse;
@@ -161,33 +162,38 @@ called) */
 }
 
 /** The Process call, where all information (parameter changes, event, audio buffer) are passed. */
-
+#include <vst/ivstevents.h>
  tresult PLUGIN_API VST3AudioProccessorImpl::process(ProcessData& data)
 {
      auto portComp= GlobalData().getPlugin(plugIndex)->getPortComponent();
-     if (data.numInputs != portComp->getNumberOfInputPorts() || data.numOutputs != portComp->getNumberOfOutputPorts())
+     if (data.numInputs != portComp->sizeInputPorts() || data.numOutputs != portComp->sizeOutputPorts())
          return kResultFalse;
 
      for (int i = 0; i < data.numInputs; i++) {
-         if (data.inputs[i].numChannels != portComp->getInputPorts()[i].channels.size())
+         auto p = dynamic_cast<IAudioPort*>(portComp->inputPortAt(i));
+         if (data.inputs[i].numChannels !=p->size())
              return kResultFalse;
-         portComp->getInputPorts()[i].sampleSize = data.numSamples;
+         p->setSampleSize(data.numSamples);
          for (int channelIndex = 0; channelIndex < data.inputs[i].numChannels; channelIndex++) {
-             portComp->getInputPorts()[i].channels[channelIndex].data32 = data.inputs[i].channelBuffers32[channelIndex];
-             portComp->getInputPorts()[i].channels[channelIndex].data64 = data.inputs[i].channelBuffers64[channelIndex];
+             static IAudioChannel::AudioChannelData channelData;
+             channelData = { data.inputs[i].channelBuffers32[channelIndex] , data.inputs[i].channelBuffers64[channelIndex] };
+             p->typesafeAt(channelIndex)->feed(&channelData);
          }
      }
      for (int i = 0; i < data.numOutputs; i++) {
-         portComp->getOutputPorts()[i].sampleSize = data.numSamples;
-         if (data.outputs[i].numChannels != portComp->getOutputPorts()[i].channels.size())
+         auto p = dynamic_cast<IAudioPort * >(portComp->outputPortAt(i));
+        
+         if (data.outputs[i].numChannels != p->size())
              return kResultFalse;
+         p->setSampleSize(data.numSamples);
          for (int channelIndex = 0; channelIndex < data.outputs[0].numChannels; channelIndex++) {
-             portComp->getOutputPorts()[i].channels[channelIndex].data32 = data.outputs[0].channelBuffers32[channelIndex];
-             portComp->getOutputPorts()[i].channels[channelIndex].data64 = data.outputs[0].channelBuffers64[channelIndex];
+             static IAudioChannel::AudioChannelData channelData2;
+             channelData2 = { data.inputs[i].channelBuffers32[channelIndex] , data.inputs[i].channelBuffers64[channelIndex] };
+             p->typesafeAt(channelIndex)->feed(&channelData2);
          }
      }
       
-     GlobalData().getPlugin(0)->processAudio(portComp->getInputPorts(), portComp->getOutputPorts());
+     GlobalData().getPlugin(0)->processAudio();
     //return kNotImplemented;
     return kResultOk;
 }

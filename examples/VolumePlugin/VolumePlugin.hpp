@@ -6,7 +6,7 @@ class VolumePlugin :public LazyPlugin {
 public:
 	VolumePlugin();
 	// Geerbt über IPlugin
-	virtual void processAudio(const std::vector<Port>& inputs, std::vector<Port>& outputs) override;
+	virtual void processAudio() override;
 	virtual void init() override;
 	virtual void deinit() override;
 	virtual void activate() override;

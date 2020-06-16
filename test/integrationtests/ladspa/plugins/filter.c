@@ -96,14 +96,14 @@ activateSimpleFilter(LADSPA_Handle Instance) {
    can get away with a single function in this case. */
 static void 
 connectPortToSimpleFilter(LADSPA_Handle Instance,
-			  unsigned long Port,
+			  unsigned long IPort,
 			  LADSPA_Data * DataLocation) {
   
   SimpleFilter * psFilter;
 
   psFilter = (SimpleFilter *)Instance;
 
-  switch (Port) {
+  switch (IPort) {
   case SF_CUTOFF:
     psFilter->m_pfCutoff = DataLocation;
     break;

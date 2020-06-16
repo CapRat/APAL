@@ -53,7 +53,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
     desc->connect_port = [](LADSPA_Handle instance, unsigned long portIndex, LADSPA_Data* DataLocation) {
         auto data = static_cast<LADSPAHandleDataType*>(instance);
         if (portIndex < getChannelCount(data->plug)) { // portIndex is in or outputPort
-            getChannelFromIndex(data->plug, portIndex)->data32 = DataLocation;
+            getChannelFromIndex(data->plug, portIndex)->feed({ DataLocation,nullptr });
         } else {
             //Not SUpported yet
         }
@@ -64,9 +64,9 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
     char** portNamesCArray = new char*[desc->PortCount * sizeof(const char*)];
     auto portDescripors = new LADSPA_PortDescriptor[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
     auto rangeHints = new LADSPA_PortRangeHint[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
-    iteratePorts(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](Port& p, size_t portIndex) {
-        for (size_t i = 0; i < p.channels.size(); i++) {
-            std::string name = p.name + (p.channels[i].name != "" ? p.channels[i].name : std::to_string(i));
+    iterateAudioPorts(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](IAudioPort* p, size_t portIndex) {
+        for (size_t i = 0; i < p->size(); i++) {
+            std::string name = p->getPortName().to_string() + (p->typesafeAt(i)->getName()!= "" ? static_cast<std::string>(p->typesafeAt(i)->getName()): std::to_string(i));
             portNamesCArray[curIndex] = new char[name.length() + 1];
             std::strcpy(portNamesCArray[curIndex], name.c_str());
             rangeHints[curIndex] = { 0, 0, 0 };
@@ -90,7 +90,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
 
     desc->run = [](LADSPA_Handle instance, unsigned long SampleCount) {
         auto data = static_cast<LADSPAHandleDataType*>(instance);
-        data->plug->processAudio(data->plug->getPortComponent()->getInputPorts(), data->plug->getPortComponent()->getOutputPorts());
+        data->plug->processAudio();
     };
 
     /*    desc->run_adding = [](LADSPA_Handle instance, unsigned long SampleCount) {

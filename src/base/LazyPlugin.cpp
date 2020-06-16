@@ -1,6 +1,6 @@
 #include <base/LazyPlugin.hpp>
 using namespace XPlug;
-/*void XPlug::LazyPlugin::processAudio(const std::vector<Port>& inputs, const std::vector<Port>& outputs)
+/*void XPlug::LazyPlugin::processAudio(const std::vector<IPort>& inputs, const std::vector<IPort>& outputs)
 {
 }*/
 
@@ -9,11 +9,12 @@ XPlug::LazyPlugin::LazyPlugin()
     
 }
 
-XPlug::LazyPlugin::LazyPlugin(std::vector<Port> ports)
+XPlug::LazyPlugin::LazyPlugin(std::vector<std::unique_ptr<IPort>> ports)
 {
-    for (Port& p : ports) {
-        this->portComponent.addPort(p);
+    for (int i = 0; i < ports.size(); i++) {
+        this->portComponent.addPort(std::move(ports[i]));
     }
+
 }
 
 void XPlug::LazyPlugin::init()

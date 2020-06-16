@@ -4,6 +4,17 @@
 #include <exception>
 #include <string>
 #include <vector>
+
+#ifdef defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
+#include <string_view>
+#else
+#include "compatibility/string_view.hpp"
+namespace std {
+    using namespace nonstd;
+    using namespace sv_lite;
+}
+
+#endif
 namespace XPlug {
 struct NotImplementedException : public std::exception {
     const char* what() const noexcept

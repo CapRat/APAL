@@ -76,7 +76,7 @@ endif(XPLUG_LV2_SUPPORT)
 add_executable(XValidate 
     XValidate.cpp 
     XValidate.hpp
-   ${XVALIDETE_SOURCES}
+   ${XVALIDATE_SOURCES}
     )
-target_include_directories(XValidate PRIVATE ${XVALIDATE_INCLUDE_DIRS})
-target_link_libraries(XValidate PRIVATE Catch2::Catch2 XPlug ${XVALIDATE_LIBRARIES})
+target_include_directories(XValidate PRIVATE ${XVALIDATE_INCLUDE_DIRS} ${CMAKE_CURRENT_LIST_DIR}/../)
+target_link_libraries(XValidate PRIVATE XPlug ${XVALIDATE_LIBRARIES})

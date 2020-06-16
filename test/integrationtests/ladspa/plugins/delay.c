@@ -133,13 +133,13 @@ activateSimpleDelayLine(LADSPA_Handle Instance) {
 /* Connect a port to a data location. */
 static void 
 connectPortToSimpleDelayLine(LADSPA_Handle Instance,
-			     unsigned long Port,
+			     unsigned long IPort,
 			     LADSPA_Data * DataLocation) {
 
   SimpleDelayLine * psSimpleDelayLine;
 
   psSimpleDelayLine = (SimpleDelayLine *)Instance;
-  switch (Port) {
+  switch (IPort) {
   case SDL_DELAY_LENGTH:
     psSimpleDelayLine->m_pfDelay = DataLocation;
     break;

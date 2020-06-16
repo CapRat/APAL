@@ -6,5 +6,6 @@ SET(XPLUG_INCLUDE_FILES  ${XPLUG_INCLUDE_FILES} ${PLUGIN_HEADER}
     ${CMAKE_CURRENT_LIST_DIR}/interfaces/IPlugin.hpp
     ${CMAKE_CURRENT_LIST_DIR}/interfaces/IPortComponent.hpp
     ${CMAKE_CURRENT_LIST_DIR}/base/LazyPlugin.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/base/SimplePortComponent.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/base/DynamicPortComponent.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/base/StaticPortComponent.hpp
 PARENT_SCOPE)

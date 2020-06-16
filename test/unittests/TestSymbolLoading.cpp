@@ -5,7 +5,7 @@
 #include "tools/LibLoading.hpp"
 #include "UnitTools.hpp"
 using namespace XPlug;
-#include "catch2/catch.hpp"
+#include "catch.hpp"
 #ifdef _WIN32
 #define SYMBOL_EXPORT_TEST_LIB "test_components/simple_symbol_export"
 #else

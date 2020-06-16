@@ -1,14 +1,14 @@
 #ifndef LAZY_PLUGIN 
 #define LAZY_PLUGIN
 #include <interfaces/IPlugin.hpp>
-#include "SimplePortComponent.hpp"
+#include "DynamicPortComponent.hpp"
 namespace XPlug  {
     class LazyPlugin :public IPlugin {
     public:
         LazyPlugin();
-        LazyPlugin(std::vector<Port> ports);
+        LazyPlugin(std::vector<std::unique_ptr<IPort>> ports);
+
         // Geerbt über IPlugin
-        //virtual void processAudio(const std::vector<Port>& inputs, const std::vector<Port>& outputs) override;
         virtual void init() override;
         virtual void deinit() override;
         virtual void activate() override;
@@ -19,8 +19,10 @@ namespace XPlug  {
         virtual void setParameter(void*) override;
         virtual IPortComponent* getPortComponent() override;
 
-    private:
-        SimplePortComponent portComponent;
+    protected:
+        DynamicPortComponent portComponent;
+       
     };
+
 }
 #endif //! LAZY_PLUGIN 

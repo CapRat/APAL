@@ -60,9 +60,9 @@ instantiateNoiseSource(const LADSPA_Descriptor * Descriptor,
 /* Connect a port to a data location. */
 static void 
 connectPortToNoiseSource(LADSPA_Handle Instance,
-			 unsigned long Port,
+			 unsigned long IPort,
 			 LADSPA_Data * DataLocation) {
-  switch (Port) {
+  switch (IPort) {
   case NOISE_AMPLITUDE:
     ((NoiseSource *)Instance)->m_pfAmplitudeValue = DataLocation;
     break;

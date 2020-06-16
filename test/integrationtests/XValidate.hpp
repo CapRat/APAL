@@ -1,6 +1,6 @@
 #ifndef XVALIDATE_HPP
 #define XVALIDATE_HPP
-#include <catch2/catch.hpp>
+#include <catch.hpp>
 #include <string>
 #define CHECK_MESSAGE(cond, msg) \
     {                            \

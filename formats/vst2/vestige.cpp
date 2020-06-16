@@ -3,6 +3,7 @@
 #include <GlobalData.hpp>
 #include <algorithm>
 #include <cstring>
+#include <tools/PluginUtils.hpp>
 using namespace XPlug;
 
 float vst_getParameter(const int32_t index)
@@ -887,8 +888,8 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
     /******************INFORMATION*****************/
     effect->uniqueID = 0;
     effect->version = 0;
-    effect->numInputs = static_cast<int>(plug->getPortComponent()->getNumberOfInputPorts());
-    effect->numOutputs = static_cast<int>(plug->getPortComponent()->getNumberOfOutputPorts());
+    effect->numInputs = static_cast<int>(plug->getPortComponent()->sizeInputPorts());
+    effect->numOutputs = static_cast<int>(plug->getPortComponent()->sizeOutputPorts());
     effect->numParams = 0;
     effect->numPrograms = 0;
     //  effect->
@@ -938,43 +939,49 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
     effect->processReplacing = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {
         auto plug = GlobalData().getPlugin(0);
         int inputIndex = 0;
-        for (Port& p : plug->getPortComponent()->getInputPorts()) {
-            p.sampleSize = static_cast<size_t>(sampleFrames);
-            for (Channel& c : p.channels) {
-                c.data32 = inputs[inputIndex];
-                inputIndex++;
-            }
-        }
         int outputIndex = 0;
-        for (Port& p : plug->getPortComponent()->getOutputPorts()) {
-            p.sampleSize = static_cast<size_t>(sampleFrames);
-            for (Channel& c : p.channels) {
-                c.data32 = outputs[outputIndex];
-                outputIndex++;
+        XPlug::iterateAudioPorts(plug.get(), [sampleFrames,&inputs,&inputIndex,&outputs,&outputIndex](IAudioPort* p, size_t) {
+            p->setSampleSize(static_cast<size_t>(sampleFrames));
+            if (p->getDirection() == PortDirection::Input) {
+                for (size_t i = 0; i < p->size(); i++) {
+                    p->typesafeAt(i)->feed({ inputs[inputIndex],nullptr });
+                    inputIndex++;
+                }
             }
-        }
-        plug->processAudio(plug->getPortComponent()->getInputPorts(), plug->getPortComponent()->getOutputPorts());
+            else {
+                for (size_t i = 0; i < p->size(); i++) {
+                    p->typesafeAt(i)->feed({ outputs[outputIndex],nullptr });
+                    outputIndex++;
+                }
+            }
+            return false;
+            });
+        
+        plug->processAudio();
     };
 
     effect->processDoubleReplacing = [](AEffect* effect, double** inputs, double** outputs, int32_t sampleFrames) {
         auto plug = GlobalData().getPlugin(0);
         int inputIndex = 0;
-        for (Port& p : plug->getPortComponent()->getInputPorts()) {
-            p.sampleSize = static_cast<size_t>(sampleFrames);
-            for (Channel& c : p.channels) {
-                c.data64 = inputs[inputIndex];
-                inputIndex++;
-            }
-        }
         int outputIndex = 0;
-        for (Port& p : plug->getPortComponent()->getOutputPorts()) {
-            p.sampleSize = static_cast<size_t>(sampleFrames);
-            for (Channel& c : p.channels) {
-                c.data64 = outputs[outputIndex];
-                outputIndex++;
+        XPlug::iterateAudioPorts(plug.get(), [sampleFrames, inputs, &inputIndex, outputs, &outputIndex](IAudioPort* p, size_t) {
+            p->setSampleSize(static_cast<size_t>(sampleFrames));
+            if (p->getDirection() == PortDirection::Input) {
+                for (size_t i = 0; i < p->size(); i++) {
+                    p->typesafeAt(i)->feed({ nullptr, inputs[inputIndex] });
+                    inputIndex++;
+                }
             }
-        }
-        plug->processAudio(plug->getPortComponent()->getInputPorts(), plug->getPortComponent()->getOutputPorts());
+            else {
+                for (size_t i = 0; i < p->size(); i++) {
+                    p->typesafeAt(i)->feed({ nullptr, outputs[outputIndex] });
+                    outputIndex++;
+                }
+            }
+            return false;
+            });
+
+        plug->processAudio();
     };
     effect->flags |= effFlagsCanReplacing | effFlagsCanDoubleReplacing;
     if (GlobalData().getPlugin(0)->getPluginInfo()->hasUI)

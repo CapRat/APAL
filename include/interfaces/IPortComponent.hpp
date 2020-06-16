@@ -1,91 +1,58 @@
 #ifndef I_PORT_COMPONENT_HPP
 #define I_PORT_COMPONENT_HPP
-#include <string>
-#include <vector>
+
+#include "IPort.hpp"
 namespace XPlug {
 
-enum class PortDirection {
-    Input,
-    Output
-    // Sidechain
-};
-/**
-     * @brief Types of Ports
+    /**
+     * @brief Component for Porthandling. This Interface and the implementation handles multiple IPorts.
+     * The creation and adding ports, is handled by the implementation.
+     * Virtually this Component holds 3 Arrays. The Input, outputs and inandoutputs ports. The meaning of the indexes is implemntationdependent.
+     * So look there, if you want to know, which indecies are meaningful for which port.
      */
-enum class PortType {
-    None, //Why ever u want to do this.
-    Audio, // Normal Audio Port
-    MIDI, // MidiPort
-};
+    class IPortComponent {
+    public:
 
-struct Channel {
-public:
-    ///  Channel() = default;
-    //  Channel(const Channel&) = delete; // Remove CopyConstructor. This data should not been copied for performance resons.
 
-    /**
-         * @brief Role of Channel, like Midichannel 15 or LeftSpeaker.
+        /**
+         * @brief Size of all Ports, included in the component
+         * @return number of all stored Ports in this component.
          */
-    uint64_t channelRole;
+        virtual size_t size() = 0;
 
-    /**
-         * @brief maybesupport a cool name here? Not yet supported.
+        /**
+         * @brief gets the portelement with given index.
+         * @param index index of port. Meaning is implementationdependent. Index could not be equal or higher than \ref size().
+         * @return pointer to IPort implementation.
          */
-    std::string name;
+        virtual IPort* at(size_t index) = 0;
 
-    /**
-         * @brief 32 bit data. Currently represented as normal float.
+        /**
+         * @brief  Size of all input port in this component.
+         * @return number of all input ports.
          */
-    float* data32;
+        virtual size_t sizeInputPorts() = 0;
 
-    /**
-         * @brief 64 bit data. Currently represented as normal double.
+        /**
+         * @brief gets the input portelement with given index.
+         * @param index Index of port. Meaning is implementationdependent. Index could not be equal or higher than \ref sizeInputPorts().
+         * @return pointer to IPort implementation.
          */
-    double* data64;
-};
-/**
-     * @brief Representation of in and outputs of an plugin. An Port has multiple Channels.
-     */
-struct Port {
-public:
-    //Port() = default;
-    //  Port(const Port&) = delete;// Remove CopyConstructor. This data should not been copied for performance resons.
+        virtual IPort* inputPortAt(size_t index) = 0;
 
-    /**
-         * @brief  Indicates the Port with a given Name.
+        /**
+         * @brief  Size of all output port in this component.
+         * @return number of all output ports.
          */
-    std::string name;
+        virtual size_t sizeOutputPorts() = 0;
 
-    /**
-         * @brief Indicates, what is the Role of the Port.
+        /**
+         * @brief gets the output portelement with given index.
+         * @param index Index of port. Meaning is implementationdependent. Index could not be equal or higher than \ref sizeOutputPorts().
+         * @return pointer to IPort implementation.
          */
-    PortType type;
-
-    /**
-         * @brief Direction of Port(in or out)
-         */
-    PortDirection direction;
-
-    /**
-         * @brief Size of samples for each Channel.
-         */
-    size_t sampleSize;
-
-    /**
-         * @brief Container for all different Channels.
-         */
-    std::vector<Channel> channels;
-};
-
-class IPortComponent {
-public:
-    virtual size_t getNumberOfAllPorts() = 0;
-    virtual size_t getNumberOfInputPorts() = 0;
-    virtual size_t getNumberOfOutputPorts() = 0;
-
-    virtual std::vector<Port>& getInputPorts() = 0;
-    virtual std::vector<Port>& getOutputPorts() = 0;
-};
+        virtual IPort* outputPortAt(size_t index) = 0;
+    };
 }
 
 #endif //! I_PORT_COMPONENT_HPP

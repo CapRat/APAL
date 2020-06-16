@@ -1,6 +1,7 @@
 include(symbol_export)
 find_package(VST2)
 add_library(vst2 "vestige.h" "vestige.cpp" "vst_def.hpp")
+target_compile_features(vst2 PUBLIC cxx_std_11)
 if(VST2_FOUND)
     target_include_directories(vst2 PRIVATE ${VST2_INCLUDE_DIRS})
     target_compile_definitions(vst2 PRIVATE USE_VST2_SDK)

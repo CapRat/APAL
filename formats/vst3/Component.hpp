@@ -3,6 +3,8 @@
 #include <vst/ivstcomponent.h>
 using namespace Steinberg;
 using namespace Vst;
+
+
 class Component : public IComponent
 {
 public:

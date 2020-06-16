@@ -1,19 +1,22 @@
 #include "VolumePlugin.hpp"
 REGISTER_PLUGIN(VolumePlugin);
-
-VolumePlugin::VolumePlugin() : LazyPlugin({ Port{"In0" ,PortType::Audio,PortDirection::Input ,0,{Channel{0,"Channel nr1",NULL,NULL} }} ,
-                                            Port{"Out0",PortType::Audio,PortDirection::Output,0,{Channel{0,"Channel nr1",NULL,NULL} }}
-    })
+#include <base/Ports.hpp>
+VolumePlugin::VolumePlugin()
 {
+    this->portComponent.addPort(std::make_unique<MonoPort>("In0", PortType::Audio, PortDirection::Input));
+    this->portComponent.addPort(std::make_unique<MonoPort>("Out0", PortType::Audio, PortDirection::Output));
 }
 
-void VolumePlugin::processAudio(const std::vector<Port>& inputs, std::vector<Port>& outputs)
+void VolumePlugin::processAudio()
 {
-    for (int i = 0; i < inputs[0].channels.size(); i++) {
-        for (int s = 0; s < inputs[0].sampleSize; s++) {
-           // outputs[0].channels[i].data32[s] = inputs[0].channels[i].data32[s];
-           // outputs[0].channels[i].data64[s] = inputs[0].channels[i].data64[s];
-            outputs[0].channels[i].data32[s] = inputs[0].channels[i].data32[s]*0.5;
+    auto in0 = dynamic_cast<IAudioPort*>( this->getPortComponent()->inputPortAt(0));
+    auto out0 = dynamic_cast<IAudioPort*>(this->getPortComponent()->outputPortAt(0));
+    for (int i = 0; i < in0->size(); i++) {
+        IAudioChannel::AudioChannelData inData,outData;
+        in0->typesafeAt(i)->get(&inData);
+        in0->typesafeAt(i)->get(&outData);
+        for (int s = 0; s < in0->getSampleSize(); s++) {
+             inData.data32[s]=outData.data32[s] * 0.5f;
            /* if (outputs[0].channels[i].data64 != nullptr) {
                 outputs[0].channels[i].data64[s] = inputs[0].channels[i].data64[s] * 0.5;
             }*/

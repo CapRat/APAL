@@ -71,7 +71,7 @@ initialise_sine_table() {
 static LADSPA_Handle instantiateSineOscillator(const LADSPA_Descriptor *,
                                                unsigned long SampleRate);
 static void connectPortToSineOscillator(LADSPA_Handle Instance,
-                                        unsigned long Port,
+                                        unsigned long IPort,
                                         LADSPA_Data * DataLocation);
 static void activateSineOscillator(void * pvHandle);
 static void runSineOscillator_FreqAudio_AmpAudio(LADSPA_Handle Instance,
@@ -119,7 +119,7 @@ private:
   friend LADSPA_Handle instantiateSineOscillator(const LADSPA_Descriptor *,
 						 unsigned long SampleRate);
   friend void connectPortToSineOscillator(LADSPA_Handle Instance,
-					  unsigned long Port,
+					  unsigned long IPort,
 					  LADSPA_Data * DataLocation);
   friend void activateSineOscillator(void * pvHandle);
   friend void runSineOscillator_FreqAudio_AmpAudio(LADSPA_Handle Instance,
@@ -146,9 +146,9 @@ instantiateSineOscillator(const LADSPA_Descriptor *,
 
 static void 
 connectPortToSineOscillator(LADSPA_Handle Instance,
-                            unsigned long Port,
+                            unsigned long IPort,
                             LADSPA_Data * DataLocation) {
-  switch (Port) {
+  switch (IPort) {
   case OSC_FREQUENCY:
     ((SineOscillator *)Instance)->m_pfFrequency = DataLocation;
     break;

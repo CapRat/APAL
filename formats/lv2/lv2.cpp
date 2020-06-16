@@ -1,5 +1,6 @@
-#include "core/lv2.h"
-#include "interfaces/IPlugin.hpp"
+#include <core/lv2.h>
+#include <midi/midi.h>
+#include <interfaces/IPlugin.hpp>
 #include "GlobalData.hpp"
 #include <tools/PluginUtils.hpp>
 #include <vector>
@@ -47,10 +48,11 @@ extern "C" {
             auto data = static_cast<LV2HandleDataType*>(instance); 
             data->plug->deactivate();
         };
-        desc->connect_port = [](LV2_Handle instance, uint32_t Port, void* DataLocation) {
+        desc->connect_port = [](LV2_Handle instance, uint32_t IPort, void* DataLocation) {
             auto data = static_cast<LV2HandleDataType*>(instance);
             if (DataLocation != nullptr) {
-                getChannelFromIndex(data->plug, Port);
+        
+                getChannelFromIndex(data->plug, IPort)->feed({ (float*)DataLocation,(double*)DataLocation });
             }
         };
     
@@ -71,11 +73,13 @@ extern "C" {
         desc->run = [](LV2_Handle instance, uint32_t SampleCount) {
             auto data = static_cast<LV2HandleDataType*>(instance); 
             //TODO not nice. Maybe write a function, which does this, but is RT Capable (non mem allocation and blocking ist allowed.
-            iteratePorts(data->plug, [SampleCount](Port& p, size_t index) {
-                p.sampleSize = SampleCount;
+            iteratePorts(data->plug, [SampleCount](IPort* p, size_t index) {
+                if (p->getType() == PortType::Audio) {
+                    dynamic_cast<IAudioPort*>(p)->setSampleSize(SampleCount);
+                }
                 return false;
                 });
-            data->plug->processAudio(data->plug->getPortComponent()->getInputPorts(), data->plug->getPortComponent()->getOutputPorts());
+            data->plug->processAudio();
         };
 
         desc->extension_data = [](const char* uri)-> const void* {

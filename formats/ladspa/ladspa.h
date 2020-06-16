@@ -172,7 +172,7 @@ typedef int LADSPA_PortDescriptor;
 
 /*****************************************************************************/
 
-/* Plugin Port Range Hints: 
+/* Plugin IPort Range Hints: 
 
    The host may wish to provide a representation of data entering or
    leaving a plugin (e.g. to generate a GUI automatically). To make
@@ -464,7 +464,7 @@ typedef struct _LADSPA_Descriptor {
      However, overlapped buffers or use of a single buffer for both
      audio and control data may result in unexpected behaviour. */
    void (*connect_port)(LADSPA_Handle Instance,
-                        unsigned long Port,
+                        unsigned long IPort,
                         LADSPA_Data * DataLocation);
 
   /* This member is a function pointer that initialises a plugin

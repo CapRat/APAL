@@ -75,9 +75,9 @@ int32 PLUGIN_API Component::getBusCount(MediaType type, BusDirection dir)
 {
     if (type == kAudio) {
         if (dir == kInput)
-            return XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->getNumberOfInputPorts();
+            return XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeInputPorts();
         else if (dir)
-            return XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->getNumberOfOutputPorts();
+            return XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeOutputPorts();
     }
     else {
         return 0;//other mediatypes not supported yet
@@ -97,23 +97,25 @@ int32 PLUGIN_API Component::getBusCount(MediaType type, BusDirection dir)
 
 tresult PLUGIN_API Component::getBusInfo(MediaType type, BusDirection dir, int32 index, BusInfo& bus)
 {
-    std::vector<XPlug::Port> ports;
-    if (dir == kInput)
-        ports = XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->getInputPorts();
-    else if (dir)
-        ports = XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->getOutputPorts();
-
-    if (index < 0 || index >=ports.size())
+    XPlug::IPort* p=nullptr;
+    if (index < 0 || (
+        (dir == kInput&& index >= XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeInputPorts()) ||
+        (dir==kOutput && index >= XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeOutputPorts())
+        ))
         return kInvalidArgument;
+    if (dir == kInput)
+        p = XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->inputPortAt(index);
+    else if (dir == kOutput)
+        p = XPlug::GlobalData().getPlugin(plugIndex)->getPortComponent()->outputPortAt(index);
+
+    
     bus.mediaType = type;
     bus.direction = dir;
     
-    ports[index].channels;
-    bus.channelCount = ports[index].channels.size();
-    
+    bus.channelCount = p->size();
 
-    for (int i = 0; i < sizeof(bus.name)&& i< ports[index].name.size(); i++) {
-        bus.name[i] = ports[index].name[i];
+    for (int i = 0; i < sizeof(bus.name)&& i< p->getPortName().size(); i++) {
+        bus.name[i] = p->getPortName()[i];
     }
     //kAux not supported yet.
     bus.busType = kMain;

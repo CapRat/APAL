@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0.0)
+cmake_minimum_required (VERSION 3.1.3)
 project(XPlug)
 
 ##########INCLUDES############
@@ -7,10 +7,12 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 #########PACKAGE INCLUDES#########
 find_package(Jack)
+find_package(VST3)
+find_package(LV2)
+find_package(Backport QUIET)
 
 #include(DPFFunctions) ## for Function use documentation look into DPFFuncitons or in the Examples.
 include(version NO_POLICY_SCOPE)
-include(cxx_handling)
 include(symbol_export)
 include(GenerateExportHeader)
 
@@ -22,8 +24,7 @@ option(XPLUG_BUILD_TESTS "Build and installs tests,which can be reused and are u
 
 #########################Set Supported Format Variables###########################
 ## Here add maybe an detect if feature is build ready macro or function.
-find_package(VST3)
-find_package(LV2)
+
 option(XPLUG_VST2_SUPPORT "Support vor VST2" ON)
 option(XPLUG_VST3_SUPPORT "Support vor VST3" ${VST3_FOUND})
 option(XPLUG_LADSPA_SUPPORT "Support vor LADSPA" ON)
@@ -38,7 +39,6 @@ option(XPLUG_INSTALL "Install Xplug and Examples, if Build" ON)
 
 set_version(1 0 0)
 
-use_cxx(11)
 
 #####################BUILD######################
 add_subdirectory(formats)
@@ -47,10 +47,11 @@ add_subdirectory(src)
 add_subdirectory(deps)
 
 
-add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES} )
+add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES}  "include/base/StaticPortComponent.hpp" )
 
-target_link_libraries(XPlug PUBLIC ${CMAKE_DL_LIBS})
+target_link_libraries(XPlug PUBLIC ${CMAKE_DL_LIBS} "$<$<NOT:$<COMPILE_FEATURES:cxx_std_17>>:Backport::Backport>")
 set_target_properties(XPlug PROPERTIES POSITION_INDEPENDENT_CODE  True VERSION  ${XPlug_VERSION_MAJOR})
+target_compile_features(XPlug PUBLIC cxx_std_11)
 
 EXPORT_SYMBOLS(XPlug FUNCTION_NAMES "XPlugGetVersion" )
 GENERATE_EXPORT_HEADER(XPlug)

@@ -60,13 +60,13 @@ instantiateAmplifier(const LADSPA_Descriptor * Descriptor,
 /* Connect a port to a data location. */
 static void 
 connectPortToAmplifier(LADSPA_Handle Instance,
-		       unsigned long Port,
+		       unsigned long IPort,
 		       LADSPA_Data * DataLocation) {
 
   Amplifier * psAmplifier;
 
   psAmplifier = (Amplifier *)Instance;
-  switch (Port) {
+  switch (IPort) {
   case AMP_CONTROL:
     psAmplifier->m_pfControlValue = DataLocation;
     break;
