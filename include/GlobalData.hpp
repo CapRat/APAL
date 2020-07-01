@@ -46,6 +46,8 @@ namespace XPlug {
 
 }
 
+typedef XPlug::GlobalDataType& (*globalDataFncPtr)();
+
 extern "C" {
 VERSION XPlugGetVersion();
 }

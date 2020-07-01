@@ -6,15 +6,16 @@ using namespace XPlug;
 
 XPlug::LazyPlugin::LazyPlugin()
 {
-    
+    this->inf = PluginInfo{ "No Name Plugin" ,"a random dude from the internet","a random dude from the internet","","urn://LazyPlugin/ToLazyToInit", false };
 }
 
 XPlug::LazyPlugin::LazyPlugin(std::vector<std::unique_ptr<IPort>> ports)
 {
+    this->inf = PluginInfo{ "No Name Plugin" ,"a random dude from the internet","a random dude from the internet","","urn://LazyPlugin/ToLazyToInit", false };
     for (int i = 0; i < ports.size(); i++) {
         this->portComponent.addPort(std::move(ports[i]));
     }
-
+    this->featureComp.detectFeatures(this->getPortComponent());
 }
 
 void XPlug::LazyPlugin::init()
@@ -35,26 +36,15 @@ void XPlug::LazyPlugin::deactivate()
 
 PluginInfo* XPlug::LazyPlugin::getPluginInfo()
 {
-    static PluginInfo* inf = new PluginInfo{ "No Name Plugin" ,"a random dude from the internet","a random dude from the internet","","urn://LazyPlugin/ToLazyToInit", false };
-    return inf;
-}
-
-size_t XPlug::LazyPlugin::getParameterCount()
-{
-    return size_t();
-}
-
-void* XPlug::LazyPlugin::getParameter()
-{
-    return nullptr;
-}
-
-void XPlug::LazyPlugin::setParameter(void*)
-{
+   // static PluginInfo* inf = new PluginInfo{ "No Name Plugin" ,"a random dude from the internet","a random dude from the internet","","urn://LazyPlugin/ToLazyToInit", false };
+    return &inf;
 }
 
 
 IPortComponent* XPlug::LazyPlugin::getPortComponent()
 {
     return &portComponent;
+}
+IFeatureComponent* XPlug::LazyPlugin::getFeatureComponent() {
+    return &featureComp;
 }

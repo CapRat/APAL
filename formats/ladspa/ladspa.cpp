@@ -1,8 +1,10 @@
 #include "ladspa.h"
 #include <cstring>
 #include <interfaces/IPlugin.hpp>
-#include <tools/PluginUtils.hpp>
+#include <interfaces/IAudioPort.hpp>
+#include <tools/PortHandling.hpp>
 #include <vector>
+
 using namespace XPlug;
 
 static std::vector<LADSPA_Descriptor*> ladspaDescriptorArray;
@@ -49,11 +51,11 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
 
     desc->Properties = 0; // LADSPA_PROPERTY_HARD_RT_CAPABLE and other stuff, not supported yet.
     /*********************PORT HANDLING*********************/
-    desc->PortCount = getChannelCount(plug.get());
+    desc->PortCount = getAudioChannelCount(plug.get());
     desc->connect_port = [](LADSPA_Handle instance, unsigned long portIndex, LADSPA_Data* DataLocation) {
         auto data = static_cast<LADSPAHandleDataType*>(instance);
-        if (portIndex < getChannelCount(data->plug)) { // portIndex is in or outputPort
-            getChannelFromIndex(data->plug, portIndex)->feed({ DataLocation,nullptr });
+        if (portIndex < getAudioChannelCount(data->plug)) { // portIndex is in or outputPort
+            getAudioChannelFromIndex(data->plug, portIndex)->feed( DataLocation,nullptr);
         } else {
             //Not SUpported yet
         }
@@ -64,9 +66,9 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
     char** portNamesCArray = new char*[desc->PortCount * sizeof(const char*)];
     auto portDescripors = new LADSPA_PortDescriptor[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
     auto rangeHints = new LADSPA_PortRangeHint[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
-    iterateAudioPorts(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](IAudioPort* p, size_t portIndex) {
+    iteratePortsFiltered<IAudioPort>(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](IAudioPort* p, size_t portIndex) {
         for (size_t i = 0; i < p->size(); i++) {
-            std::string name = p->getPortName().to_string() + (p->typesafeAt(i)->getName()!= "" ? static_cast<std::string>(p->typesafeAt(i)->getName()): std::to_string(i));
+            std::string name = p->getPortName().to_string() + (p->at(i)->getName()!= "" ? static_cast<std::string>(p->at(i)->getName()): std::to_string(i));
             portNamesCArray[curIndex] = new char[name.length() + 1];
             std::strcpy(portNamesCArray[curIndex], name.c_str());
             rangeHints[curIndex] = { 0, 0, 0 };
@@ -83,7 +85,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
     /************************INFORMATION***************************/
     desc->Copyright = plug->getPluginInfo()->copyright.c_str();
     desc->Label = nullptr;
-    desc->Maker = plug->getPluginInfo()->creater.c_str();
+    desc->Maker = plug->getPluginInfo()->creater.name.c_str();
     desc->Name = plug->getPluginInfo()->name.c_str();
     //desc->Name = "Hans peter";
     desc->UniqueID = 278375745;

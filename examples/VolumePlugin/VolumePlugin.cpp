@@ -1,54 +1,49 @@
-#include "VolumePlugin.hpp"
-REGISTER_PLUGIN(VolumePlugin);
+#include <base/LazyPlugin.hpp>
 #include <base/Ports.hpp>
-VolumePlugin::VolumePlugin()
-{
-    this->portComponent.addPort(std::make_unique<MonoPort>("In0", PortType::Audio, PortDirection::Input));
-    this->portComponent.addPort(std::make_unique<MonoPort>("Out0", PortType::Audio, PortDirection::Output));
-}
-
-void VolumePlugin::processAudio()
-{
-    auto in0 = dynamic_cast<IAudioPort*>( this->getPortComponent()->inputPortAt(0));
-    auto out0 = dynamic_cast<IAudioPort*>(this->getPortComponent()->outputPortAt(0));
-    for (int i = 0; i < in0->size(); i++) {
-        IAudioChannel::AudioChannelData inData,outData;
-        in0->typesafeAt(i)->get(&inData);
-        in0->typesafeAt(i)->get(&outData);
-        for (int s = 0; s < in0->getSampleSize(); s++) {
-             inData.data32[s]=outData.data32[s] * 0.5f;
-           /* if (outputs[0].channels[i].data64 != nullptr) {
-                outputs[0].channels[i].data64[s] = inputs[0].channels[i].data64[s] * 0.5;
-            }*/
-        }
+#include <tools/PortHandling.hpp>
+using namespace XPlug;
+class VolumePlugin :public LazyPlugin {
+public:
+    VolumePlugin()
+    {
+        this->portComponent.addPort(std::make_unique<MonoPort>("In0", PortType::Audio, PortDirection::Input));
+        this->portComponent.addPort(std::make_unique<MonoPort>("Out0", PortType::Audio, PortDirection::Output));
+        this->inf.name = "VolumePlugin";
     }
 
- /*   for (int i = 0; i < inputs[0].channels.size(); i++) {
-        outputs[0].channels[i].data32 = inputs[0].channels[i].data32;
-        outputs[0].channels[i].data64 = inputs[0].channels[i].data64;
-    }*/
-     
-}
+    // Geerbt über IPlugin
+    virtual void processAudio() override
+    {
+        auto in0 = getAudioInputPortAt(this, 0);
+        auto out0 = getAudioOutputPortAt(this, 0);
+        for (int i = 0; i < in0->size(); i++) {
+            for (int s = 0; s < in0->getSampleSize(); s++) {
+                out0->at(i)->getData32()[s] = in0->at(i)->getData32()[s] * 0.5f;
+                /* if (outputs[0].channels[i].data64 != nullptr) {
+                     outputs[0].channels[i].data64[s] = inputs[0].channels[i].data64[s] * 0.5;
+                 }*/
+            }
+        }
 
-void VolumePlugin::init()
-{
-}
+        /*   for (int i = 0; i < inputs[0].channels.size(); i++) {
+               outputs[0].channels[i].data32 = inputs[0].channels[i].data32;
+               outputs[0].channels[i].data64 = inputs[0].channels[i].data64;
+           }*/
 
-void VolumePlugin::deinit()
-{
-}
+    }
+    virtual void init() override {
 
-void VolumePlugin::activate()
-{
-}
+    }
+    virtual void deinit() override {
 
-void VolumePlugin::deactivate()
-{
-}
-/*
-PluginInfo* VolumePlugin::getPluginInfo()
-{
-	return PluginInfo();
-}
+    }
+    virtual void activate() override {
 
-*/
+    }
+    virtual void deactivate() override {
+
+    }
+    //virtual PluginInfo* getPluginInfo() override;
+
+};
+REGISTER_PLUGIN(VolumePlugin);

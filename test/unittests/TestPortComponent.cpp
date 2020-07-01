@@ -3,6 +3,7 @@
 #include <interfaces/IPlugin.hpp>
 #include "base/LazyPlugin.hpp"
 #include <base/Ports.hpp>
+#include <tools/PortHandling.hpp>
 #include "UnitTools.hpp"
 using namespace XPlug;
 
@@ -39,10 +40,10 @@ TEST_CASE("test changing of portcomponent values") {
 	auto plug = getTestPortCompPlug();
 	REQUIRE_MESSAGE(plug != nullptr,"Error, cant initialize Testplugin");
 	float testData[] = { 0.1f,0.2f,0.3f };
-	IAudioChannel::AudioChannelData d;
-	static_cast<IAudioChannel*>(plug->getPortComponent()->at(0)->at(0))->feed({ testData,nullptr });
-	static_cast<IAudioChannel*>(plug->getPortComponent()->at(0)->at(0))->get(&d);
-	REQUIRE_MESSAGE((d.data32 == testData), "Error, cant change Values of Channels. Maybe there are reference Problems? Make sure correct refferences are passed.");
+	auto in0 = getAudioInputPortAt(plug.get(), 0);
+	//auto out0 = getAudioOutputPortAt(plug.get(), 0);
+	in0->at(0)->feed(testData, nullptr);
+	REQUIRE_MESSAGE((in0->at(0)->getData32() == testData), "Error, cant change Values of Channels. Maybe there are reference Problems? Make sure correct refferences are passed.");
 	INFO("Static Initialisation Works");
 
 }

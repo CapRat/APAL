@@ -268,11 +268,11 @@ ON_LOAD_ROUTINE {
     pcPortNames[AMP_CONTROL]
       = strdup("Gain");
     pcPortNames[AMP_INPUT1]
-      = strdup("Input (Left)");
+      = strdup("Input (FrontLeft)");
     pcPortNames[AMP_OUTPUT1]
       = strdup("Output (Left)");
     pcPortNames[AMP_INPUT2]
-      = strdup("Input (Right)");
+      = strdup("Input (FrontRight)");
     pcPortNames[AMP_OUTPUT2]
       = strdup("Output (Right)");
     psPortRangeHints = ((LADSPA_PortRangeHint *)

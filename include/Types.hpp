@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#ifdef defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
+#if (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L
 #include <string_view>
 #else
 #include "compatibility/string_view.hpp"
@@ -22,7 +22,6 @@ struct NotImplementedException : public std::exception {
         return "functionality is not implemented yet.";
     }
 };
-
 //std::array<float, 5> x;
 //template <size_t size>
 //typedef std::array<float,size> audio_data;

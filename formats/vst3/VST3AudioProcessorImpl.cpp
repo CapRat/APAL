@@ -5,6 +5,9 @@
 #include "GlobalData.hpp"
 #include <interfaces/IPlugin.hpp>
 #include <interfaces/IAudioPort.hpp>
+#include <tools/PortHandling.hpp>
+
+#include <cmath>
 using namespace XPlug;
 
 
@@ -39,6 +42,27 @@ VST3AudioProccessorImpl::~VST3AudioProccessorImpl()
     return Component::release();
 }
 
+ Speaker SpeakerPositionToSpeaker(SpeakerPosition pos) {
+     auto posAsInt = static_cast<std::underlying_type<SpeakerPosition>::type>(pos);
+     if (static_cast<std::underlying_type<SpeakerPosition>::type>(pos) < kSpeakerM)
+         return static_cast<Speaker>(pos);
+     else
+         throw NotImplementedException();
+ }
+
+ SpeakerArrangement SpeakerConfigToSpeakerArrangement(SpeakerConfiguration conf) {
+     if(conf == SpeakerConfiguration::Mono)
+         return SpeakerArr::kMono;
+     return static_cast<SpeakerArrangement>(conf);
+ }
+
+ SpeakerConfiguration SpeakerArrangementToSpeakerConfig(SpeakerArrangement arr) {
+     if (arr == SpeakerArr::kMono)
+         return SpeakerConfiguration::Mono;
+     else 
+         return static_cast<SpeakerConfiguration>(arr);
+ }
+
 /** Try to set (from host) a predefined arrangement for inputs and outputs.
 The host should always deliver the same number of input and output buses than the Plug-in needs
 (see \ref IComponent::getBusCount).
@@ -52,13 +76,14 @@ it should modify its buses arrangements and return kResultFalse. */
 {
     if (numIns < 0 || numOuts < 0)
         return kInvalidArgument;
-    if (numIns == GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeInputPorts() && numOuts == GlobalData().getPlugin(plugIndex)->getPortComponent()->sizeOutputPorts()) {
-        for (int in = 0; in < numIns; in++) {
-            if (inputs[in] != SpeakerArr::kMono)
+    auto plug = GlobalData().getPlugin(plugIndex).get();
+    if (numIns == getNumberOfPorts<IAudioPort>(plug,PortDirection::Input) && numOuts == getNumberOfPorts<IAudioPort>(plug, PortDirection::Output)) {
+        for (size_t in = 0; in < numIns; in++) {
+            if (SpeakerArrangementToSpeakerConfig(inputs[in])!=getAudioInputPortAt(plug,in)->getConfig())
                 return kResultFalse;
         }
         for (int out = 0; out < numOuts; out++) {
-            if (outputs[out] != SpeakerArr::kMono)
+            if (SpeakerArrangementToSpeakerConfig(outputs[out]) != getAudioOutputPortAt(plug, out)->getConfig())
                 return kResultFalse;
         }
         return kResultTrue;
@@ -87,6 +112,8 @@ it should modify its buses arrangements and return kResultFalse. */
 
 }
 
+
+
 /** Gets the bus arrangement for a given direction (input/output) and index.
 Note: IComponent::getInfo () and IAudioProcessor::getBusArrangement () should be always return the same
 information about the buses arrangements. */
@@ -105,7 +132,7 @@ information about the buses arrangements. */
     }
     return kResultFalse;*/
 
-    arr = SpeakerArr::kMono;
+    arr = SpeakerConfigToSpeakerArrangement(getAudioPortAt(GlobalData().getPlugin(plugIndex).get(), static_cast<size_t>(index), dir == kInput ? PortDirection::Input : PortDirection::Output)->getConfig());
     return kResultTrue;
 }
 
@@ -161,39 +188,110 @@ called) */
     return kNotImplemented;
 }
 
+ static int x = 0;
 /** The Process call, where all information (parameter changes, event, audio buffer) are passed. */
 #include <vst/ivstevents.h>
  tresult PLUGIN_API VST3AudioProccessorImpl::process(ProcessData& data)
 {
-     auto portComp= GlobalData().getPlugin(plugIndex)->getPortComponent();
-     if (data.numInputs != portComp->sizeInputPorts() || data.numOutputs != portComp->sizeOutputPorts())
+     auto plug = GlobalData().getPlugin(plugIndex).get();
+     if (data.numInputs != getNumberOfPorts<IAudioPort>(plug, PortDirection::Input) ||
+         data.numOutputs != getNumberOfPorts<IAudioPort>(plug, PortDirection::Output))
          return kResultFalse;
-
-     for (int i = 0; i < data.numInputs; i++) {
-         auto p = dynamic_cast<IAudioPort*>(portComp->inputPortAt(i));
-         if (data.inputs[i].numChannels !=p->size())
-             return kResultFalse;
+     size_t inputIndex = 0;
+     size_t outputIndex = 0;
+     iteratePortsFiltered<IAudioPort>(plug, [&inputIndex, &outputIndex, &data](IAudioPort* p, size_t ind) {
          p->setSampleSize(data.numSamples);
-         for (int channelIndex = 0; channelIndex < data.inputs[i].numChannels; channelIndex++) {
-             static IAudioChannel::AudioChannelData channelData;
-             channelData = { data.inputs[i].channelBuffers32[channelIndex] , data.inputs[i].channelBuffers64[channelIndex] };
-             p->typesafeAt(channelIndex)->feed(&channelData);
+         AudioBusBuffers& b = p->getDirection() == PortDirection::Input ? data.inputs[inputIndex++] : data.outputs[outputIndex++];
+         if (b.numChannels != p->size()) return false;
+         for (int channelIndex = 0; channelIndex < b.numChannels; channelIndex++) {
+             p->at(channelIndex)->feed(b.channelBuffers32[channelIndex], b.channelBuffers64[channelIndex]);
          }
-     }
-     for (int i = 0; i < data.numOutputs; i++) {
-         auto p = dynamic_cast<IAudioPort * >(portComp->outputPortAt(i));
-        
-         if (data.outputs[i].numChannels != p->size())
-             return kResultFalse;
-         p->setSampleSize(data.numSamples);
-         for (int channelIndex = 0; channelIndex < data.outputs[0].numChannels; channelIndex++) {
-             static IAudioChannel::AudioChannelData channelData2;
-             channelData2 = { data.inputs[i].channelBuffers32[channelIndex] , data.inputs[i].channelBuffers64[channelIndex] };
-             p->typesafeAt(channelIndex)->feed(&channelData2);
-         }
-     }
+         return false;
+         });
+   /*  iteratePortsFiltered<IMidiPort>(plug, PortDirection::Output, [&data](IMidiPort*p, size_t) {
       
-     GlobalData().getPlugin(0)->processAudio();
+         return false;
+         })*/
+     if (plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) && data.inputEvents!=nullptr) {
+         for (int i = 0; i < data.inputEvents->getEventCount(); i++) {
+             Event ev;
+             MidiMessage msg;
+            
+             data.inputEvents->getEvent(i, ev);
+             auto cPort = getPortAt<IMidiPort>(plug, ev.busIndex,PortDirection::Input);//TODO: Validate , wather this is absolute index, or index just out of events.
+             //  kNoteOnEvent  kNoteOffEvent  kDataEvent   kPolyPressureEvent  kNoteExpressionValueEvent   kNoteExpressionTextEvent  kChordEvent kScaleEvent  kLegacyMIDICCOutEven
+             switch (ev.type) {
+             case ev.kNoteOnEvent:
+                 msg[0] = static_cast<uint8_t>(MidiEvents::NoteOn)  | static_cast<uint8_t>(ev.noteOn.channel) ;
+                 msg[1] = ev.noteOn.pitch;
+                 msg[2] = std::floor(ev.noteOn.velocity >= 1.0 ? 128 : ev.noteOn.velocity * 127.0); //map to 0-127, due to 7 bits midi representation
+                 break;
+             case ev.kNoteOffEvent:
+                 msg[0] = static_cast<uint8_t>(MidiEvents::NoteOff) | static_cast<uint8_t>(ev.noteOff.channel);
+                 msg[1] = ev.noteOff.pitch;
+                 msg[2] = std::floor(ev.noteOff.velocity >= 1.0 ? 128 : ev.noteOff.velocity * 127.0); //map to 0-127, due to 7 bits midi representation
+                 break;
+             default:
+                 throw NotImplementedException();
+             /*case :
+                 break;*/
+             }
+             cPort->feed(std::move(msg));
+         }
+     }
+    
+     plug->processAudio();
+     if (plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput) && data.outputEvents != nullptr) {
+         iteratePortsFiltered<IMidiPort>(plug, PortDirection::Output, [&data](IMidiPort* p, size_t ind) {
+             while (!p->empty()) {
+                 Event e;
+                 e.flags = e.kIsLive;
+                 e.sampleOffset = 0;
+                 e.busIndex = ind;
+                 e.ppqPosition = 0;
+                 auto msg = p->get();
+                 auto midiCmd = static_cast<MidiEvents>(msg[0] &0xF0);
+                 uint8_t chan = msg[0] & 0x0F;
+                 switch (midiCmd) {
+                 case MidiEvents::NoteOff:
+                     e.type = e.kNoteOffEvent;
+                     e.noteOff.channel = chan;
+                     e.noteOff.pitch = msg[1];
+                     e.noteOff.velocity = msg[2] / 127.0f;
+                     e.noteOff.noteId = -1;
+                     e.noteOff.tuning = 0;
+                     break;
+                 case MidiEvents::NoteOn:
+                     e.type = e.kNoteOnEvent;
+                     e.noteOn.channel = chan;
+                     e.noteOn.pitch = msg[1];
+                     e.noteOn.velocity = msg[2] / 127.0f;
+                     e.noteOn.noteId = -1;
+                     e.noteOn.tuning = 0;
+                     e.noteOn.length = -1;
+                     break;
+                 case MidiEvents::ControlChange:
+                     e.type = e.kLegacyMIDICCOutEvent;
+                     e.midiCCOut.channel = chan;
+                     e.midiCCOut.controlNumber = msg[1];
+                     e.midiCCOut.value = msg[2];
+                     e.midiCCOut.value2 = msg[2];
+                     //  e.midiCCOut.value = msg[1];
+                     //  e.midiCCOut.value2 = msg[2];//no dont use this...
+                     break;
+                 }
+                 data.outputEvents->addEvent(e);
+                 
+                 
+             }
+             return false;
+             });
+     }
+        /* while (!p->empty()) {
+             auto ev = p->get()
+         }
+         return false;
+         });*/
     //return kNotImplemented;
     return kResultOk;
 }

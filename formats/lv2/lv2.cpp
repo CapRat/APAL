@@ -1,15 +1,66 @@
-#include <core/lv2.h>
-#include <midi/midi.h>
+#include <lv2/core/lv2.h>
+#include <lv2/port-groups/port-groups.h>
+#include <lv2/midi/midi.h>
+#include <lv2/atom/atom.h>
+#include <lv2/atom/util.h>
+#include <lv2/urid/urid.h>
 #include <interfaces/IPlugin.hpp>
 #include "GlobalData.hpp"
-#include <tools/PluginUtils.hpp>
+#include <tools/PortHandling.hpp>
 #include <vector>
 #include <unordered_map>
 using namespace XPlug;
+struct MidiHandle {
+    LV2_Atom_Sequence* midiDataLocation;
+    IMidiPort* connectedMidiPort;
+    LV2_URID midi_MidiEventID;
+    
+};
+/**
+ * @brief Treats the MidiHandle, at it would be an input. (Put MidiMsg in Pipe)
+ * @param in 
+*/
+inline void handleInput(MidiHandle* in) {
+    LV2_ATOM_SEQUENCE_FOREACH(in->midiDataLocation, ev) {
+        if (ev->body.type == in->midi_MidiEventID) {
+            const uint8_t* const msg = (const uint8_t*)(ev + 1);
+            in->connectedMidiPort->feed({ msg[0],msg[1],msg[2] });
+        }
+    }
+}
+
+// Struct for a 3 byte MIDI event, used for writing notes
+typedef struct {
+    LV2_Atom_Event event;
+    MidiMessage msg;
+} MIDINoteEvent;
+/**
+ * @brief Treats the MidiHandle, at it would be an output. (fetches things from the Pipe to the output)
+ * @param in
+*/
+inline void handleOutput(MidiHandle* out) {
+    const uint32_t out_capacity = out->midiDataLocation->atom.size;
+    // Write an empty Sequence header to the output
+    lv2_atom_sequence_clear(out->midiDataLocation);
+    out->midiDataLocation->atom.type = out->midi_MidiEventID;
+    while (!out->connectedMidiPort->empty()) {
+        MIDINoteEvent ev;
+        // Could simply do fifth.event = *ev here instead...
+        ev.event.time.frames =0;  // Same time
+        ev.event.body.type = out->midi_MidiEventID;    // Same type
+        ev.event.body.size = sizeof(MIDINoteEvent);    // Same size
+        ev.msg = out->connectedMidiPort->get();
+        lv2_atom_sequence_append_event(
+            out->midiDataLocation, out_capacity, &ev.event);
+    }
+}
+
 
 struct LV2HandleDataType {
     IPlugin* plug;
     const LV2_Descriptor* lv2Desc;
+    LV2_URID_Map* map;
+    std::vector<MidiHandle> midiHandles;
 };
 
 
@@ -50,16 +101,37 @@ extern "C" {
         };
         desc->connect_port = [](LV2_Handle instance, uint32_t IPort, void* DataLocation) {
             auto data = static_cast<LV2HandleDataType*>(instance);
-            if (DataLocation != nullptr) {
-        
-                getChannelFromIndex(data->plug, IPort)->feed({ (float*)DataLocation,(double*)DataLocation });
+            auto midiPort = dynamic_cast<IMidiPort*>(data->plug->getPortComponent()->at(IPort));
+            if (midiPort != nullptr && (
+                (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiInput)&&midiPort->getDirection()==PortDirection::Input ) ||
+                (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput) && midiPort->getDirection() == PortDirection::Output)
+                )) {
+                 data->midiHandles.push_back( MidiHandle{
+                    (LV2_Atom_Sequence*)DataLocation,
+                    midiPort,
+                    data->map->map(data->map->handle, LV2_MIDI__MidiEvent)
+                });
             }
+            else {
+                getAudioChannelFromIndex(data->plug, IPort)->feed((float*)DataLocation, (double*)DataLocation);
+            }
+        //  midiData->body.
         };
     
         desc->instantiate = [](const LV2_Descriptor* descriptor, double SampleRate, const char* bundlePath, const LV2_Feature* const* features)->LV2_Handle {
             auto index = URI_INDEX_MAP[std::string(descriptor->URI)];
             GlobalData().getPlugin(index)->init();
-            return new LV2HandleDataType{GlobalData().getPlugin(index).get(),descriptor };
+            auto lv2Handle = new LV2HandleDataType{ GlobalData().getPlugin(index).get(),descriptor };
+            for (int i = 0; features[i]; ++i) {
+                if (!strcmp(features[i]->URI, LV2_URID__map)) {
+                    lv2Handle->map = (LV2_URID_Map*)features[i]->data;
+                    break;
+                }
+            }
+            if (!lv2Handle->map) {
+                return NULL;
+            }
+            return lv2Handle;
         };
 
         desc->cleanup = [](LV2_Handle instance) {
@@ -73,10 +145,8 @@ extern "C" {
         desc->run = [](LV2_Handle instance, uint32_t SampleCount) {
             auto data = static_cast<LV2HandleDataType*>(instance); 
             //TODO not nice. Maybe write a function, which does this, but is RT Capable (non mem allocation and blocking ist allowed.
-            iteratePorts(data->plug, [SampleCount](IPort* p, size_t index) {
-                if (p->getType() == PortType::Audio) {
-                    dynamic_cast<IAudioPort*>(p)->setSampleSize(SampleCount);
-                }
+            iteratePortsFiltered<IAudioPort>(data->plug, [SampleCount](IAudioPort* p, size_t index) {
+                p->setSampleSize(SampleCount);
                 return false;
                 });
             data->plug->processAudio();

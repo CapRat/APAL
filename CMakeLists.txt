@@ -53,7 +53,7 @@ target_link_libraries(XPlug PUBLIC ${CMAKE_DL_LIBS} "$<$<NOT:$<COMPILE_FEATURES:
 set_target_properties(XPlug PROPERTIES POSITION_INDEPENDENT_CODE  True VERSION  ${XPlug_VERSION_MAJOR})
 target_compile_features(XPlug PUBLIC cxx_std_11)
 
-EXPORT_SYMBOLS(XPlug FUNCTION_NAMES "XPlugGetVersion" )
+EXPORT_SYMBOLS(XPlug FUNCTION_NAMES "XPlugGetVersion")
 GENERATE_EXPORT_HEADER(XPlug)
 GENERATE_VERSION_HEADER(XPlug VISIBILITY PRIVATE)
 target_include_directories(XPlug PUBLIC  

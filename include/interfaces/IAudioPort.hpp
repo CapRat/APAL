@@ -1,40 +1,17 @@
 #ifndef IAUDIO_PORT_HPP
 #define IAUDIO_PORT_HPP
 #include <interfaces/IPort.hpp>
+#include <interfaces/Speaker.hpp>
 namespace XPlug {
-
-
-
-    /**
-      * @brief Enum, which represents different Positions of speakers.
-      */
-    enum SpeakerPosition : uint64_t {
-        Undefined =  0,
-        Left = 1 << 0,
-        Right = 1 << 1,
-        Center = 1 << 2,
-        RearLeft = 1 << 3,
-        RearRight = 1 << 4,
-    };
-
-    enum class SpeakerConfiguration : uint64_t {
-        Undefined = SpeakerPosition::Undefined,
-        Mono = SpeakerPosition::Center,
-        Stereo = SpeakerPosition::Left | SpeakerPosition::Right,
-        Surround5_1 = Stereo | SpeakerPosition::Center | SpeakerPosition::RearLeft | SpeakerPosition::RearRight,
-    };
-
     /**
      * @brief Class, which implements AudioChannel
      */
-    class IAudioChannel :public IChannel {
+    class IAudioChannel {
     public:
-
-        struct AudioChannelData {
-            float* data32;
-            double* data64;
-        };
-
+        /**
+         * @brief Virtual distructor, so implementing classes can also be destroyed correctly.
+         */
+        virtual ~IAudioChannel() = default;
         /**
          * @brief Gets the name of the current Channel.
          * @return the name of the current Channel
@@ -52,27 +29,14 @@ namespace XPlug {
          * @brief Typesafe implementation of \ref IChannel::feed.
          * @param data typesafe param
          */
-        virtual void feed(AudioChannelData data) = 0;
+        virtual void feed(float* data32, double* data64) = 0;
 
         /**
          * @brief Typesafe implementation of \ref IChannel::get.
          * @param data typesafe param
          */
-        virtual AudioChannelData get() = 0;
-
-        // Geerbt über IChannel
-        inline virtual void feed(void* data) final {feed(*static_cast<AudioChannelData*>(data)); }
-
-        /**
-         * @brief This Method implements, not typical for interface, an Method. But thats ok, because its just changes the Castoperator to make it typesafe.
-         *          So this method is just like an typesafe version of the Interface \ref IChannel::get .
-         * @param getData data to cast to void and forward to IChannel::feed(void*);
-         */
-        inline virtual void get(void* getData) final { 
-            auto data = get();
-            static_cast<AudioChannelData*>(getData)->data32 = data.data32;
-            static_cast<AudioChannelData*>(getData)->data64 = data.data64;
-        }
+        virtual float* getData32() = 0;
+        virtual double* getData64() = 0;
     };
 
 
@@ -82,7 +46,10 @@ namespace XPlug {
      */
     class IAudioPort :public IPort {
     public:
-
+        /**
+         * @brief Virtual distructor, so implementing classes can also be destroyed correctly.
+         */
+        virtual ~IAudioPort() = default;
         /**
          * @brief Get more detailed config data.
          * @return SpeakerConfiguration of the Audioport.
@@ -103,14 +70,20 @@ namespace XPlug {
          */
         virtual void setSampleSize(size_t sampleSize) = 0;
 
-        inline virtual IChannel* at(size_t index) final { return typesafeAt(index); }
 
         /**
          * @brief Typesafe implementation of at. Must have this strange name, because you cant overlaod functions, which just differ in returntype.
          * @param index
          * @return
         */
-        virtual IAudioChannel* typesafeAt(size_t index) = 0;
+        virtual IAudioChannel* at(size_t index) = 0;
+        /**
+         * @brief returns the numbers of channels in this Port.
+         * @return
+         */
+        virtual size_t size() = 0;
+
+
     };
 }
 

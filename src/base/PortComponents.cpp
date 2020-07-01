@@ -1,4 +1,4 @@
-#include <base/DynamicPortComponent.hpp>
+#include <base/PortComponents.hpp>
 #include <Types.hpp>
 using namespace XPlug;
 XPlug::DynamicPortComponent::DynamicPortComponent(std::vector<std::unique_ptr<IPort>> inputPorts, std::vector<std::unique_ptr<IPort>> outputPorts)

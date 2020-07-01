@@ -9,7 +9,8 @@ namespace XPlug {
 
     VERSION XPlugGetVersion()
     {
-        static const struct VERSION XPlug_VERSION = { XPlug_VERSION_MAJOR, XPlug_VERSION_MINOR, XPlug_VERSION_PATCH, XPlug_VERSION_TWEAK, XPlug_VERSION_STRING };
+       // struct my_struct s2 = { "string literal" };
+        static const struct VERSION XPlug_VERSION = { XPlug_VERSION_MAJOR, XPlug_VERSION_MINOR, XPlug_VERSION_PATCH, XPlug_VERSION_TWEAK, "test"};
         return XPlug_VERSION;
     }
 
@@ -36,4 +37,11 @@ namespace XPlug {
         return  this->registeredPlugins.at(index);
     }
     */
+}
+
+VERSION XPlugGetVersion() {
+    return XPlug_VERSION;
+}
+XPlug::GlobalDataType& XPlugGlobalData() {
+    return XPlug::GlobalData();
 }

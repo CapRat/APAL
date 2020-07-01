@@ -3,9 +3,11 @@
 #include <Types.hpp>
 namespace XPlug {
     enum class PortDirection {
-        Input,
-        Output
-        // Sidechain
+       // None = 0,
+        Input = 1 << 0,
+        Output=1<<1
+        // Bidirectional=1<<2,
+        // Sidechain = 1<<3
     };
 
     /**
@@ -17,25 +19,6 @@ namespace XPlug {
         MIDI, // MidiPort
     };
 
-    /**
-     * @brief Feeds Data to the Channel. Should just be called from format implementations. See \ref IAudioChannel for more data.
-     * @param data data to feed. If 64 bitprocessing is supported, it can be castet to double*. If not, it can be castet to float*
-     */
-    class IChannel {
-    public:
-        /**
-         * @brief Inputs Data. The Data is a void ptr, wich can be cast to corresponding Type
-         * @param data 
-         */
-        virtual void feed(void* data)=0;
-
-        /**
-         * @brief  Set given DataPtr to the requestet return value.
-         * @param getData 
-         */
-        virtual void get(void* getData) = 0;
-    };
-
 
     /**
      * @brief Representation of in and outputs of an plugin. An IPort has multiple Channels, which can be accessed though at.
@@ -43,6 +26,12 @@ namespace XPlug {
      */
     class IPort {
     public:
+
+        /**
+         * @brief Virtual distructor, so implementing classes can also be destroyed correctly.
+         */
+        virtual ~IPort() = default;
+
         /**
          * @brief Indicates the IPort with a given Name.
          * @return the name of the IPort
@@ -50,7 +39,7 @@ namespace XPlug {
         virtual std::string_view getPortName() = 0;
 
         /**
-         * @brief Indicates, what is the Role of the IPort. see \ref PortType for possible values.
+         * @brief Indicates, what is the Role of the IPort. see \ref PortType for possible values. 
          * @return Enum type, which represents the role of the port.
          */
         virtual PortType getType() = 0;
@@ -60,19 +49,59 @@ namespace XPlug {
          * @return  Enum type, which represents the direction of the port.
          */
         virtual PortDirection getDirection() = 0;
+    };
+    enum class MidiEvents :uint8_t {
+        NoteOff = 0b1000 << 4,
+        NoteOn = 0b1001 <<4,
+        PolyphonicKeyPressure = 0b1010 << 4,
+        ControlChange = 0b1011 << 4,
+        ChannelModeMessage = ControlChange,
+        ProgramChange = 0b1100 << 4,
+        ChannelPressure = 0b1101 << 4,
+        PitchBendChange = 0b1101 << 4,
+    };
+    typedef std::array<uint8_t,3> MidiMessage ;
+   
+    /**
+     * @brief MidiPort, which manage mutliple MidiEvents.
+    */
+    class IMidiPort :public IPort {
+    public:
         /**
-         * @brief returns the numbers of channels in this Port.
-         * @return
+         * @brief Virtual distructor, so implementing classes can also be destroyed correctly.
          */
-        virtual size_t size() = 0;
+        virtual ~IMidiPort() = default;
+        /**
+         * @brief Adds an MidiMessage to the Ports, which can be stored. The MidiMessage is moved, so the container takes responsibility.
+         * @param msg  Message to store.
+        */
+        virtual void feed(MidiMessage&& msg) = 0;
+        /**
+         * @brief Gets the actual MidiMessage, but not removes them
+         * @return MidiMessage to do things with.
+        */
+        virtual MidiMessage peek() = 0;
 
         /**
-         * @brief Gets the Channel on given index.
-         * @param index Index of Channel. Meaning is implementationdependent. Index could not be equal or higher than \ref size().
-         * @return Pointer to Channel on given index.
-         */
-        virtual IChannel* at(size_t index) = 0;
+         * @brief Gets the actual MidiMessage and removes them from the Port.
+         * @return removed MidiMessage
+        */
+        virtual MidiMessage get() = 0;
+
+        /**
+         * @brief signals, that no MidiMessage is present.
+         * @return true, if pipe is empty, false if pipe is not empty.
+        */
+        virtual bool empty() = 0;
+
+        /**
+         * @brief gets the size of items in the pipe
+         * @return  size of items in the pipe
+        */
+        virtual size_t size() = 0;
     };
+
+
 }
 
 

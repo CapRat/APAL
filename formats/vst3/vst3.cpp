@@ -1,3 +1,8 @@
+/**
+ * In the VST3 Implementation, Calls to midi out should be done in processAudio, because after the Function, Data from output ports are written to the given Port.
+ */
+
+
 #define INIT_CLASS_IID
 #include "VST3AudioProcessorImpl.hpp"
 #include "VST3EditControllerImpl.hpp"
@@ -49,8 +54,6 @@ extern "C" {
         }
         return true;
     }
-
-
 }
 
 #include "public.sdk/source/main/pluginfactory.h"
@@ -70,8 +73,8 @@ extern "C" {
             auto inf = plug->getPluginInfo();
             static PFactoryInfo factoryInfo =
             {
-                plug->getPluginInfo()->creater.c_str(),
-                "http://www.mywebpage.com",
+                plug->getPluginInfo()->creater.name.c_str(),
+                plug->getPluginInfo()->creater.url.c_str(),
                 "mailto:myemail@address.com",
                 PFactoryInfo::kNoFlags
             };
@@ -83,8 +86,8 @@ extern "C" {
                 PClassInfo::kManyInstances,//cardinality
                 kVstAudioEffectClass, //category
                 plug->getPluginInfo()->name.c_str(), //name
-                NULL, // class flags
-                "Fx|Delay", //subcategory
+                0, // class flags
+                PlugType::kFx, //subcategory
                 0, //vendor
                 "1.0.0.0", //version
                 kVstVersionString //sdkversion
@@ -96,7 +99,7 @@ extern "C" {
                 PClassInfo::kManyInstances,//cardinality
                 kVstComponentControllerClass, //category
                 controllerName.c_str(), //name
-                NULL, // class flags
+                0, // class flags
                 "", //subcategory
                 0, //vendor
                 "1.0.0.0", //version

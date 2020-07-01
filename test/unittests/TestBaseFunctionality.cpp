@@ -1,4 +1,4 @@
-#include "catch.hpp"
+#include <catch.hpp>
 //#include <interfaces/IPlugin.hpp>
 #include <GlobalData.hpp>
 #include "base/LazyPlugin.hpp"

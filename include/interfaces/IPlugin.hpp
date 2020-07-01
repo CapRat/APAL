@@ -5,6 +5,7 @@
 
 #include "GlobalData.hpp"
 #include "interfaces/IPortComponent.hpp"
+#include "interfaces/IFeatureComponent.hpp"
 #include <memory>
 #include <string>
 namespace XPlug {
@@ -24,16 +25,27 @@ namespace XPlug {
 /**
  * Simple Macro, which uses PluginRegistrator. Use this Macro in a Sourcefile.
  */
-#define REGISTER_PLUGIN(PluginClassName) static PluginRegistrator<PluginClassName> instance = PluginRegistrator<PluginClassName>()
+#define REGISTER_PLUGIN(PluginClassName) static PluginRegistrator<PluginClassName> \
+                    instance##PluginClassName = PluginRegistrator<PluginClassName>()
 #define EMPTY_STRING ""
+    
+    //Creator/Vendor/Developer Information
+    struct CreatorInfo {
+        std::string name=EMPTY_STRING;
+        //Url to vendor general hp
+        std::string url= EMPTY_STRING;
+    };
 
     struct PluginInfo {
         PluginInfo(std::string name = "", std::string description = "", std::string copyright = "", std::string creater = "", std::string url = "", bool hasUI = false)
         {
+            CreatorInfo inf;
+            inf.name = creater;
+            inf.url = url;
             this->name = name;
             this->description = description;
             this->copyright = copyright;
-            this->creater = creater;
+            this->creater = inf;
             this->url = url;
             this->hasUI = hasUI;
         }
@@ -55,7 +67,7 @@ namespace XPlug {
         /**
          * @brief Creator or Vendor from the Plugin
          */
-        std::string creater = EMPTY_STRING;
+        CreatorInfo creater ;
         /**
          * @brief URL of the current Plugin. In LV2 its used for identification. In other formats it should be just an url to get help and information from.
          */
@@ -73,7 +85,7 @@ namespace XPlug {
         virtual ~IPlugin() = default;
 
         /**
-         * @brief Procssing Audio. Bevor this function is called, Data in Port
+         * @brief Procssing Audio and Midi data. 
          */
         virtual void processAudio() = 0;
 
@@ -82,15 +94,17 @@ namespace XPlug {
 
         virtual void activate() = 0; // activate the plugin(resume from deactivate)
         virtual void deactivate() = 0; // deactivates the plugin (put it to sleep)
+
         //virtual void registerPlugin() = 0;
 
         virtual PluginInfo* getPluginInfo() = 0;
-
+/*  
         virtual size_t getParameterCount() = 0;
         virtual void* getParameter() = 0;
-        virtual void setParameter(void*) = 0;
+        virtual void setParameter(void*) = 0;*/
 
         virtual IPortComponent* getPortComponent() = 0;
+        virtual IFeatureComponent* getFeatureComponent() = 0;
     };
 
     typedef std::shared_ptr<IPlugin> PluginPtr;

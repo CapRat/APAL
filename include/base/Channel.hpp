@@ -1,4 +1,4 @@
-#ifndef CHANNEL_HPPP
+#ifndef CHANNEL_HPP
 #define CHANNEL_HPP
 #include <interfaces/IPort.hpp>
 namespace XPlug {

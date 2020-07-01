@@ -8,6 +8,9 @@
 #ifdef USE_VST2_SDK
 // Use Official VST2 Sdk
 #include "aeffectx.h"
+#ifndef audioMasterWantMidi
+#define audioMasterWantMidi __audioMasterWantMidiDeprecated
+#endif //!audioMasterWantMidi
 //# include "vst/aeffectx.h"
 #else
 #define VESTIGE_HEADER
@@ -54,6 +57,12 @@
 #define effSetProcessPrecision 77
 #define effGetNumMidiInputChannels 78
 #define effGetNumMidiOutputChannels 79
+
+struct VstSpeakerArrangement
+{
+	int32_t type;						
+	int32_t numChannels;
+};
 
 // used for vestige and sdk compatibility
 enum VstStringConstants
