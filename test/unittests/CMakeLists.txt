@@ -22,7 +22,7 @@ add_executable(unit_tests ${CMAKE_CURRENT_BINARY_DIR}/catch_main.cpp
     "base/TestPortComponents.cpp"
     "base/TestInfoComponents.cpp"
     "base/TestPorts.cpp"
-    "base/testPluginBases.cpp"
+    "base/TestPluginBases.cpp"
     "TestGlobalData.cpp"
     )
 
