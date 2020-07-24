@@ -5,8 +5,7 @@ using namespace XPlug;
 AudioChannel::AudioChannel(std::string channelname, SpeakerPosition pos) {
     this->channelname = channelname;
     this->pos = pos;
-    this->data32 = nullptr;
-    this->data64 = nullptr;
+    this->data= nullptr;
 }
 // Geerbt über IAudioChannel
 std::string_view AudioChannel::getName() 
@@ -21,58 +20,22 @@ void AudioChannel::setRole(SpeakerPosition pos)
 {
      return this->pos;
 }
-void AudioChannel::feed(float* data32, double* data64)
+void AudioChannel::feed(float* data)
 {
-    this->data32 = data32;
-    this->data64 = data64;
+    this->data = data;
 }
 
- float* XPlug::AudioChannel::getData32()
+ float* XPlug::AudioChannel::getData()
  {
-     return this->data32;
+     return this->data;
  }
- double* XPlug::AudioChannel::getData64()
- {
-     return this->data64;
- }
-XPlug::BasePort::BasePort(std::string name, PortType type, PortDirection dir )
-{
-    this->name = std::move(name);
-    this->type = type;
-    this->dir = dir;
-    this->sampleSize = 0;
-}
 
-inline std::string_view XPlug::BasePort::getPortName()
-{
-    return std::string_view(this->name.c_str(), this->name.size());
-}
-
-inline PortType XPlug::BasePort::getType()
-{
-    return this->type;
-}
-
-inline PortDirection XPlug::BasePort::getDirection()
-{
-    return this->dir;
-}
-
-inline size_t XPlug::BasePort::getSampleSize()
-{
-    return this->sampleSize;
-}
-
-inline void XPlug::BasePort::setSampleSize(size_t sampleSize)
-{
-    this->sampleSize = sampleSize;
-}
-struct XPlug::DynamicAudioPort::impl {
+/*struct XPlug::DynamicAudioPort::impl {
     std::string name;
     std::vector<std::unique_ptr<IAudioChannel>> channels;
     SpeakerConfiguration configData;
 };
-XPlug::DynamicAudioPort::DynamicAudioPort(std::string name, PortType type, PortDirection dir, std::vector<std::unique_ptr<IAudioChannel>> channels) : BasePort(std::move(name), type, dir)
+XPlug::DynamicAudioPort::DynamicAudioPort(std::string name, PortDirection dir, std::vector<std::unique_ptr<IAudioChannel>> channels) : BasePort(std::move(name), dir)
 {
     this->pImpl->configData = SpeakerConfiguration::Undefined;
     this->pImpl->channels = std::move(channels);
@@ -93,13 +56,12 @@ inline IAudioChannel* XPlug::DynamicAudioPort::at(size_t index) {
 SpeakerConfiguration XPlug::DynamicAudioPort::getConfig()
 {
     return pImpl->configData;
-}
+}*/
 
 
-XPlug::QueueMidiPort::QueueMidiPort(std::string name, PortType type, PortDirection dir)
+XPlug::QueueMidiPort::QueueMidiPort(std::string name, PortDirection dir)
 {
     this->name = name;
-    this->type = type;
     this->dir = dir;
 }
 
@@ -108,9 +70,9 @@ std::string_view XPlug::QueueMidiPort::getPortName()
     return std::string_view(this->name.c_str(), this->name.size());
 }
 
-PortType XPlug::QueueMidiPort::getType()
+inline PortType XPlug::QueueMidiPort::getType()
 {
-    return this->type;
+    return PortType::MIDI;
 }
 
 PortDirection XPlug::QueueMidiPort::getDirection()

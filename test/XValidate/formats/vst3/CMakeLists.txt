@@ -1,0 +1,7 @@
+if(XPLUG_VST3_SUPPORT)
+    find_package(VST3 REQUIRED)
+    target_include_directories(XValidate PUBLIC ${VST3_INCLUDE_DIRS})
+    target_sources(XValidate PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/VST3TestSuite.cpp)
+    cmake_policy(SET CMP0079 NEW)
+    target_link_libraries(XValidate PUBLIC ${VST3_LIBRARIES})
+endif(XPLUG_VST3_SUPPORT)

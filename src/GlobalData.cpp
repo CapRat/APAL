@@ -1,4 +1,5 @@
-#include "GlobalData.hpp"
+#include <GlobalData.hpp>
+#include <interfaces/IPlugin.hpp>
 namespace XPlug {
     GlobalDataType& GlobalData()
     {
@@ -29,14 +30,17 @@ namespace XPlug {
 
     PluginPtr GlobalDataType::getPlugin(size_t index)
     {
-        return   this->registeredPlugins.at(index);
+        return this->registeredPlugins.at(index);
     }
-    /*
-    PluginController GlobalDataType::getPlugin(size_t index)
+
+    PluginPtr GlobalDataType::getPlugin(std::string name)
     {
-        return  this->registeredPlugins.at(index);
+        for (auto plug : this->registeredPlugins) {
+            if (plug->getInfoComponent()->getPluginName() == name)
+                return plug;
+        }
+        return nullptr;
     }
-    */
 }
 
 VERSION XPlugGetVersion() {

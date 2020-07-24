@@ -1,6 +1,6 @@
 #ifndef SIMPLE_PORT_COMPONENT_HPP
 #define SIMPLE_PORT_COMPONENT_HPP
-#include <interfaces/IPortComponent.hpp>
+#include <interfaces/Ports/IPortComponent.hpp>
 #include <memory>
 namespace XPlug {
     /**
@@ -11,23 +11,30 @@ namespace XPlug {
     class DynamicPortComponent :public IPortComponent {
     public:
         DynamicPortComponent() = default;
-        DynamicPortComponent(std::vector<std::unique_ptr<IPort>> inputPorts, std::vector<std::unique_ptr<IPort>> outputPorts);
+        inline DynamicPortComponent(std::initializer_list<std::shared_ptr<IPort>> ports) { this->ports.insert(this->ports.end(), ports.begin(), ports.end()); }
         // Geerbt über IPortComponent
-        virtual size_t size() override;
-        virtual size_t sizeInputPorts() ;
-        virtual size_t sizeOutputPorts() ;
-        virtual IPort* at(size_t index) override;
-        virtual IPort* inputPortAt(size_t index);
-        virtual IPort* outputPortAt(size_t index) ;
-        virtual void addPort(std::unique_ptr<IPort> p);
-    private:
-        std::vector<std::unique_ptr<IPort>> inputPorts;
-        std::vector<std::unique_ptr<IPort>> outputPorts;
+        inline virtual size_t size() override { return ports.size(); };
+        inline virtual IPort* at(size_t index) override { return ports[index].get();}
 
+        inline virtual void addPort(std::shared_ptr<IPort> p) { this->ports.push_back(std::move(p)); };
+    private:
+        std::vector<std::shared_ptr<IPort>> ports;
     };
 
-    template<size_t inputPortsSize, size_t outputPortsSize>
+    template<size_t numberOfPorts>
     class StaticPortComponent :public IPortComponent {
+    public:
+        StaticPortComponent(std::initializer_list<std::shared_ptr<IPort>> ports) { std::copy( ports.begin(), ports.end(),this->ports.begin()); }
+        // Geerbt über IPortComponent
+        inline virtual size_t size() override { return numberOfPorts; }
+        inline virtual IPort* at(size_t index) override { return ports[index].get(); }
+    protected:
+        std::array<std::shared_ptr<IPort>, numberOfPorts> ports;
+    };
+
+
+  /*  template<size_t inputPortsSize, size_t outputPortsSize>
+    class StaticPortDirectionSplittedPortComponent :public IPortComponent {
     public:
         StaticPortComponent(std::array<std::unique_ptr<IPort>, inputPortsSize> inputs, std::array<std::unique_ptr<IPort>, outputPortsSize> outputs) {
             this->inputPorts = std::move(inputs);
@@ -36,14 +43,14 @@ namespace XPlug {
         // Geerbt über IPortComponent
         inline virtual size_t size() override { return inputPortsSize + outputPortsSize; }
         inline virtual IPort* at(size_t index) override { return index < inputPortsSize ? inputPorts[index].get() : outputPorts[index - inputPortsSize].get; }
-        inline virtual size_t sizeInputPorts()  { return inputPortsSize; }
-        inline virtual IPort* inputPortAt(size_t index)  { return inputPorts[index].get(); }
-        inline virtual size_t sizeOutputPorts()  { return outputPortsSize; }
-        inline virtual IPort* outputPortAt(size_t index)  { return outputPorts[index].get(); }
+        inline virtual size_t sizeInputPorts() { return inputPortsSize; }
+        inline virtual IPort* inputPortAt(size_t index) { return inputPorts[index].get(); }
+        inline virtual size_t sizeOutputPorts() { return outputPortsSize; }
+        inline virtual IPort* outputPortAt(size_t index) { return outputPorts[index].get(); }
     protected:
         std::array<std::unique_ptr<IPort>, inputPortsSize> inputPorts;
         std::array<std::unique_ptr<IPort>, outputPortsSize> outputPorts;
-    };
+    };*/
 }
 
 

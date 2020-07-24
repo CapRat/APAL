@@ -1,12 +1,17 @@
 #include <tools/StringTools.hpp>
 
+std::string XPlug::replaceInString(std::string strToChange, const std::string itemToReplace, const std::string substitute)
+{
+    while (strToChange.find(itemToReplace) != std::string::npos)
+        strToChange.replace(strToChange.find(itemToReplace), 1, substitute);
+    return strToChange;
+}
+
 /*
 *Get File Name from a Path with or without extension
 */
 std::string XPlug::getFileName(std::string filePath, bool withExtension, char seperator)
 {
-    while (filePath.find("\\") != std::string::npos)
-        filePath.replace(filePath.find("\\"), 1, "/");
     // Get last dot position
     std::size_t dotPos = filePath.rfind('.');
     std::size_t sepPos = filePath.rfind(seperator);
@@ -14,5 +19,5 @@ std::string XPlug::getFileName(std::string filePath, bool withExtension, char se
     {
         return filePath.substr(sepPos + 1, (!withExtension && dotPos != std::string::npos ? dotPos : filePath.size()) - sepPos - 1);
     }
-    return "";
+    return filePath;
 }

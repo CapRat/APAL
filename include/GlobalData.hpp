@@ -3,7 +3,7 @@
 #include "XPlug_version.h"
 #include <memory>
 #include <vector>
-
+#include <string>
 namespace XPlug {
 
     class IPlugin;
@@ -37,6 +37,13 @@ namespace XPlug {
          * @return A pointer to a Plugin.
          */
         PluginPtr getPlugin(size_t index);
+
+        /**
+         * @brief Gets the Plugin with given Name. 
+         * @param name Name of the Plugin (which is stored in \see IInfoComponent)
+         * @return PluginPtr to plugin.
+        */
+        PluginPtr getPlugin(std::string name);
 
         //PluginController getPlugin(size_t index);
     };

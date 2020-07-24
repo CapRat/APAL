@@ -11,7 +11,7 @@ public:
 	virtual void deinit() override;
 	virtual void activate() override;
 	virtual void deactivate() override;
-	//virtual PluginInfo* getPluginInfo() override;
+	//virtual PluginInfo* getInfoComponent() override;
 
 };
 

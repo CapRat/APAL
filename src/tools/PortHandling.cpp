@@ -1,28 +1,16 @@
 #include <tools/PortHandling.hpp>
 using namespace XPlug;
-
-void XPlug::iteratePorts(IPlugin* plug, std::function<bool(XPlug::IPort*, size_t)> iterFunc) {
-    for (size_t i = 0; i < plug->getPortComponent()->size(); i++) {
-        if (iterFunc(plug->getPortComponent()->at(i), i))return;
-    }
-}
-
-
-
-size_t XPlug::getAudioChannelCount(IPlugin* plug, XPlug::PortDirection dir) {
-    size_t size=0;
-    iteratePortsFiltered<IAudioPort>(plug, dir, [&size](IAudioPort* p, size_t) { size += p->size(); return false;  });
-    return size;
-}
-size_t XPlug::getAudioChannelCount(IPlugin* plug) {
+size_t XPlug::getAudioChannelCount(IPlugin* plug, XPlug::PortDirection dir)
+{
     size_t size = 0;
-    iteratePortsFiltered<IAudioPort>(plug, [&size](IAudioPort* p, size_t) { size += p->size(); return false;  });
+    iteratePorts<IAudioPort>(plug, dir, [&size](IAudioPort* p, size_t) { size += p->size(); return false;  });
     return size;
 }
+
 void XPlug::iterateAudioChannels(IPlugin* plug, std::function<bool(XPlug::IAudioChannel*, size_t)> iterFunc)
 {
     size_t counter = 0;
-    iteratePortsFiltered<IAudioPort>(plug, [&counter, &iterFunc](IAudioPort* p, size_t index) {
+    iteratePorts<IAudioPort>(plug, [&counter, &iterFunc](IAudioPort* p, size_t index) {
         for (size_t i = 0; i < p->size(); i++) {
             if (iterFunc(p->at(i), counter)) return true;
             counter++;
@@ -30,9 +18,8 @@ void XPlug::iterateAudioChannels(IPlugin* plug, std::function<bool(XPlug::IAudio
         return false;
         });
 }
-
-
-IAudioChannel* XPlug::getAudioChannelFromIndex(IPlugin* plug, size_t index) {
+IAudioChannel* XPlug::getAudioChannelFromIndex(IPlugin* plug, size_t index)
+{
     XPlug::IAudioChannel* channel = nullptr;
     iterateAudioChannels(plug, [&channel, index](XPlug::IAudioChannel* c, size_t channelIndex) {
         if (index == channelIndex) {
@@ -43,6 +30,17 @@ IAudioChannel* XPlug::getAudioChannelFromIndex(IPlugin* plug, size_t index) {
         });
     return channel;
 }
-
-
-class PortComponentCacheImpl;
+void XPlug::iteratePortsFlat(IPlugin* plug, std::function<bool(XPlug::IPort*p, size_t ind)> iterFunc)
+{
+    size_t index = 0;
+    for (int i = 0; i < plug->getPortComponent()->size(); i++) {
+        auto aPort = dynamic_cast<IAudioPort*>(plug->getPortComponent()->at(i));
+        if (aPort == nullptr) {
+            if (iterFunc(plug->getPortComponent()->at(i), index++)) return;
+        }
+        else {
+            for (int j = 0; j < aPort->size(); j++)
+                if (iterFunc(plug->getPortComponent()->at(i), index++)) return;
+        }
+    }
+}

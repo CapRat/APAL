@@ -14,7 +14,7 @@ endif(XPLUG_VST3_SUPPORT)
 
 if(XPLUG_LV2_SUPPORT)
     target_link_libraries(MidiForwarder PUBLIC  lv2)
-    add_custom_command(TARGET MidiForwarder  POST_BUILD COMMAND TTLGenerator ARGS $<TARGET_FILE:MidiForwarder> BYPRODUCTS manifest.ttl MidiForwarder.ttl )
+   # add_custom_command(TARGET MidiForwarder  POST_BUILD COMMAND TTLGenerator ARGS $<TARGET_FILE:MidiForwarder> BYPRODUCTS manifest.ttl MidiForwarder.ttl )
 endif(XPLUG_LV2_SUPPORT)
 
 if(XPLUG_BUILD_TESTS)

@@ -4,7 +4,7 @@
 #include "interfaces/IPlugin.hpp"
 #include "GlobalData.hpp"
 #include <interfaces/IPlugin.hpp>
-#include <interfaces/IAudioPort.hpp>
+#include <interfaces/Ports/IAudioPort.hpp>
 #include <tools/PortHandling.hpp>
 
 #include <cmath>
@@ -43,7 +43,7 @@ VST3AudioProccessorImpl::~VST3AudioProccessorImpl()
 }
 
  Speaker SpeakerPositionToSpeaker(SpeakerPosition pos) {
-     auto posAsInt = static_cast<std::underlying_type<SpeakerPosition>::type>(pos);
+    // auto posAsInt = static_cast<std::underlying_type<SpeakerPosition>::type>(pos);
      if (static_cast<std::underlying_type<SpeakerPosition>::type>(pos) < kSpeakerM)
          return static_cast<Speaker>(pos);
      else
@@ -79,11 +79,11 @@ it should modify its buses arrangements and return kResultFalse. */
     auto plug = GlobalData().getPlugin(plugIndex).get();
     if (numIns == getNumberOfPorts<IAudioPort>(plug,PortDirection::Input) && numOuts == getNumberOfPorts<IAudioPort>(plug, PortDirection::Output)) {
         for (size_t in = 0; in < numIns; in++) {
-            if (SpeakerArrangementToSpeakerConfig(inputs[in])!=getAudioInputPortAt(plug,in)->getConfig())
+            if (SpeakerArrangementToSpeakerConfig(inputs[in])!= getPortAt<IAudioPort>(plug,in,PortDirection::Input)->getConfig())
                 return kResultFalse;
         }
         for (int out = 0; out < numOuts; out++) {
-            if (SpeakerArrangementToSpeakerConfig(outputs[out]) != getAudioOutputPortAt(plug, out)->getConfig())
+            if (SpeakerArrangementToSpeakerConfig(outputs[out]) != getPortAt<IAudioPort>(plug, out,PortDirection::Output)->getConfig())
                 return kResultFalse;
         }
         return kResultTrue;
@@ -132,7 +132,7 @@ information about the buses arrangements. */
     }
     return kResultFalse;*/
 
-    arr = SpeakerConfigToSpeakerArrangement(getAudioPortAt(GlobalData().getPlugin(plugIndex).get(), static_cast<size_t>(index), dir == kInput ? PortDirection::Input : PortDirection::Output)->getConfig());
+    arr = SpeakerConfigToSpeakerArrangement(getPortAt<IAudioPort>(GlobalData().getPlugin(plugIndex).get(), static_cast<size_t>(index), dir == kInput ? PortDirection::Input : PortDirection::Output)->getConfig());
     return kResultTrue;
 }
 
@@ -140,10 +140,9 @@ information about the buses arrangements. */
 
  tresult PLUGIN_API VST3AudioProccessorImpl::canProcessSampleSize(int32 symbolicSampleSize)
 {
-    /*if (symbolicSampleSize == 512)
-        return kResultOk;
-    return kResultFalse;*/
-     return kResultOk;
+     if (symbolicSampleSize == SymbolicSampleSizes::kSample32)
+         return kResultOk;
+     return kResultFalse;
 }
 
 /** Gets the current Latency in samples.
@@ -199,19 +198,16 @@ called) */
          return kResultFalse;
      size_t inputIndex = 0;
      size_t outputIndex = 0;
-     iteratePortsFiltered<IAudioPort>(plug, [&inputIndex, &outputIndex, &data](IAudioPort* p, size_t ind) {
+     iteratePorts<IAudioPort>(plug, [&inputIndex, &outputIndex, &data](IAudioPort* p, size_t ind) {
          p->setSampleSize(data.numSamples);
          AudioBusBuffers& b = p->getDirection() == PortDirection::Input ? data.inputs[inputIndex++] : data.outputs[outputIndex++];
          if (b.numChannels != p->size()) return false;
          for (int channelIndex = 0; channelIndex < b.numChannels; channelIndex++) {
-             p->at(channelIndex)->feed(b.channelBuffers32[channelIndex], b.channelBuffers64[channelIndex]);
+             // TODO: hier double processing einfügen, wenn implementiert.
+             p->at(channelIndex)->feed(b.channelBuffers32[channelIndex]);
          }
          return false;
          });
-   /*  iteratePortsFiltered<IMidiPort>(plug, PortDirection::Output, [&data](IMidiPort*p, size_t) {
-      
-         return false;
-         })*/
      if (plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) && data.inputEvents!=nullptr) {
          for (int i = 0; i < data.inputEvents->getEventCount(); i++) {
              Event ev;
@@ -242,12 +238,12 @@ called) */
     
      plug->processAudio();
      if (plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput) && data.outputEvents != nullptr) {
-         iteratePortsFiltered<IMidiPort>(plug, PortDirection::Output, [&data](IMidiPort* p, size_t ind) {
+         iteratePorts<IMidiPort>(plug, PortDirection::Output, [&data](IMidiPort* p, size_t ind) {
              while (!p->empty()) {
                  Event e;
                  e.flags = e.kIsLive;
                  e.sampleOffset = 0;
-                 e.busIndex = ind;
+                 e.busIndex = static_cast<int32_t>(ind);
                  e.ppqPosition = 0;
                  auto msg = p->get();
                  auto midiCmd = static_cast<MidiEvents>(msg[0] &0xF0);

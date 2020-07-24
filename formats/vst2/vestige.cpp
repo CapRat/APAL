@@ -3,6 +3,7 @@
 
 //#include "C:\Users\Benjamin\Downloads\vst_sdk2_4_rev1\vstsdk2.4\pluginterfaces\vst2.x\aeffectx.h"
 #include <GlobalData.hpp>
+#include <interfaces/IPlugin.hpp>
 #include <algorithm>
 #include <cstring>
 #include <tools/PortHandling.hpp>
@@ -227,7 +228,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
 
     case effGetEffectName:
         //return GlobalData().getPlugin(0)->getPluginInfo()->
-        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getPluginInfo()->name.c_str()));
+        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getInfoComponent()->getPluginName().data()));
         //std::strncpy((char*)ptr, GlobalData().getPlugin(0)->getPluginInfo()->name.c_str(), 32);
         return 1;
         /*if (char* const cptr = (char*)ptr)
@@ -238,7 +239,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
         // return 0;
 
     case effGetVendorString:
-        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getPluginInfo()->creater.name.c_str()));
+        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getInfoComponent()->getCreatorName().data()));
         // std::strncpy((char*)ptr, GlobalData().getPlugin(0)->getPluginInfo()->creater.c_str(), 32);
         /*if (char* const cptr = (char*)ptr)
          {
@@ -248,7 +249,7 @@ static intptr_t vst_dispatcherCallback(AEffect* effect, int32_t opcode, int32_t 
         return 0;
 
     case effGetProductString:
-        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getPluginInfo()->description.c_str()));
+        ptr = static_cast<void*>(const_cast<char*>(GlobalData().getPlugin(0)->getInfoComponent()->getPluginDescription().data()));
         // std::strncpy((char*)ptr, GlobalData().getPlugin(0)->getPluginInfo()->description.c_str(), 32);
         /*if (char* const cptr = (char*)ptr)
           {
@@ -815,18 +816,18 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
     case effSetSpeakerArrangement: ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::setSpeakerArrangement
         if (getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Input) == 0 || getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Output) == 0)
             return 0;
-        return ((VstSpeakerArrangement*)value)->numChannels == getAudioPortAt(data->plug, 0, PortDirection::Input )->size() &&
-               ((VstSpeakerArrangement*)ptr  )->numChannels == getAudioPortAt(data->plug, 0, PortDirection::Output)->size();
+        return ((VstSpeakerArrangement*)value)->numChannels == getPortAt<IAudioPort>(data->plug, 0, PortDirection::Input )->size() &&
+               ((VstSpeakerArrangement*)ptr  )->numChannels == getPortAt<IAudioPort>(data->plug, 0, PortDirection::Output)->size();
         break;
     case effSetBypass: ///< [value]: 1 = bypass, 0 = no bypass  @see AudioEffectX::setBypass
         break;
     case effGetEffectName: ///< [ptr]: buffer for effect name, limited to #kVstMaxEffectNameLen  @see AudioEffectX::getEffectName
         break;
     case effGetVendorString: ///< [ptr]: buffer for effect vendor string, limited to #kVstMaxVendorStrLen  @see AudioEffectX::getVendorString
-        strncpy(static_cast<char*>(ptr), data->plug->getPluginInfo()->creater.name.c_str(), std::min<size_t>(data->plug->getPluginInfo()->creater.name.size(), kVstMaxVendorStrLen));
+        strncpy(static_cast<char*>(ptr), data->plug->getInfoComponent()->getCreatorName().data(), std::min<size_t>(data->plug->getInfoComponent()->getCreatorName().size(), kVstMaxVendorStrLen));
         return true;
     case effGetProductString: ///< [ptr]: buffer for effect vendor string, limited to #kVstMaxProductStrLen  @see AudioEffectX::getProductString
-        strncpy(static_cast<char*>(ptr), data->plug->getPluginInfo()->name.c_str(), std::min<size_t>(data->plug->getPluginInfo()->name.size(), kVstMaxProductStrLen));
+        strncpy(static_cast<char*>(ptr), data->plug->getInfoComponent()->getPluginName().data(), std::min<size_t>(data->plug->getInfoComponent()->getPluginName().size(), kVstMaxProductStrLen));
         return true;
     case effGetVendorVersion: ///< [return value]: vendor-specific version  @see AudioEffectX::getVendorVersion
         break;
@@ -922,12 +923,12 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
 void writeMidiOutput(AEffect* effect) {
     auto data = static_cast<VST2ImplementationData*>(effect->user);
     if (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput)) {
-        iteratePortsFiltered<IMidiPort>(data->plug, PortDirection::Output, [&data, &effect](IMidiPort* p, size_t ind) {
+        iteratePorts<IMidiPort>(data->plug, PortDirection::Output, [&data, &effect](IMidiPort* p, size_t ind) {
             while (!p->empty()) {
                 auto midiMsg = p->get();
                 VstMidiEvent vstMidiEvent{ kVstMidiType,sizeof(VstMidiEvent),0,0,0,0,{static_cast<char>(midiMsg[0]),static_cast<char>(midiMsg[1]),static_cast<char>(midiMsg[2]),0 },0,0,0,0 };
                 VstEvents vstEvents{ 1,0,(VstEvent*)&vstMidiEvent };
-                data->audioMaster(effect, audioMasterProcessEvents, ind, 0, &vstEvents, 0);
+                data->audioMaster(effect, audioMasterProcessEvents, static_cast<int32_t>(ind), 0, &vstEvents, 0);
             }
             return false;
             });
@@ -1030,15 +1031,15 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
         auto data = static_cast<VST2ImplementationData*>(effect->user);
         int inputIndex = 0;
         int outputIndex = 0;
-        iteratePortsFiltered<IAudioPort>(data->plug, [sampleFrames,&inputs,&inputIndex,&outputs,&outputIndex](IAudioPort* p, size_t) {
+        iteratePorts<IAudioPort>(data->plug, [sampleFrames,&inputs,&inputIndex,&outputs,&outputIndex](IAudioPort* p, size_t) {
             p->setSampleSize(static_cast<size_t>(sampleFrames));
             for (size_t i = 0; i < p->size(); i++) {
                 if (p->getDirection() == PortDirection::Input) {
-                    p->at(i)->feed(inputs[inputIndex], nullptr);
+                    p->at(i)->feed(inputs[inputIndex]);
                     inputIndex++;
                 }
                 else {
-                    p->at(i)->feed(outputs[outputIndex], nullptr);
+                    p->at(i)->feed(outputs[outputIndex]);
                     outputIndex++;
                 }
             }
@@ -1050,10 +1051,10 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
     };
 
     effect->processDoubleReplacing = [](AEffect* effect, double** inputs, double** outputs, int32_t sampleFrames) {
-        auto data = static_cast<VST2ImplementationData*>(effect->user);
+    /*    auto data = static_cast<VST2ImplementationData*>(effect->user);
         int inputIndex = 0;
         int outputIndex = 0;
-        iteratePortsFiltered<IAudioPort>(data->plug, [sampleFrames, inputs, &inputIndex, outputs, &outputIndex](IAudioPort* p, size_t) {
+        iteratePorts<IAudioPort>(data->plug, [sampleFrames, inputs, &inputIndex, outputs, &outputIndex](IAudioPort* p, size_t) {
             p->setSampleSize(static_cast<size_t>(sampleFrames));
             for (size_t i = 0; i < p->size(); i++) {
                 if (p->getDirection() == PortDirection::Input) {
@@ -1069,10 +1070,10 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
             });
 
         data->plug->processAudio();
-        writeMidiOutput(effect);
+        writeMidiOutput(effect);*/
     };
     effect->flags |= effFlagsCanReplacing | effFlagsCanDoubleReplacing;
-    if (data->plug->getPluginInfo()->hasUI)
+    if (data->plug->getFeatureComponent()->supportsFeature(Feature::GUISupport))
         effect->flags |= effFlagsHasEditor;
 
 

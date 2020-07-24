@@ -1,0 +1,17 @@
+#include "UnitTools.hpp"
+#include "interfaces/InterfaceTestMethods.hpp"
+#include <base/PluginBases.hpp>
+using namespace XPlug;
+class LazyPluginTestClass :public LazyPlugin {
+public:
+    // Geerbt über LazyPlugin
+    virtual void processAudio() override
+    {
+    }
+};
+
+TEST_CASE("Test PluginBases Methods") {
+    LazyPluginTestClass lPlug;
+    testIPlugin(&lPlug);
+    SUCCEED("Valid IPlugin bases");
+}

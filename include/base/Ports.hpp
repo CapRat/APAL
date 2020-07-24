@@ -1,10 +1,11 @@
 #ifndef PORTS_HPP
 #define PORTS_HPP
-#include <interfaces/IPortComponent.hpp>
-#include <interfaces/IAudioPort.hpp>
-#include "Channel.hpp"
+#include <interfaces/Ports/IPortComponent.hpp>
+#include <interfaces/Ports/IAudioPort.hpp>
+#include <interfaces/Ports/IMidiPort.hpp>
 #include <memory>
 #include <queue>
+#include <tools/PortHandling.hpp>
 /******************************Some Port definitions******************************/
 namespace XPlug {
 
@@ -17,87 +18,57 @@ namespace XPlug {
         virtual std::string_view getName() override;
         virtual void setRole(SpeakerPosition pos) override;
         virtual SpeakerPosition getRole() override;
-        virtual void feed(float* data32, double* data64) override;
-        virtual float* getData32() override;
-        virtual double* getData64() override;
+        virtual void feed(float* data) override;
+        virtual float* getData() override;
 
     private:
-        float* data32;
-        double* data64;
+        float* data;
+ 
         std::string channelname;
         SpeakerPosition pos;
     };
     
 
-    /**
-     * @brief  Abstract class, which implements everything, except the channelmanagement.
-     */
-
-    class BasePort :public IAudioPort {
+    template<int number_of_channels, SpeakerConfiguration configuration>
+    class StaticAudioPort :public IAudioPort{
     protected:
+        std::array<std::unique_ptr<IAudioChannel>, number_of_channels> channels;
         std::string name;
-        PortType type;
         PortDirection dir;
         size_t sampleSize;
     public:
-        BasePort(std::string name, PortType type, PortDirection dir);
-        // Geerbt über IPort
-        virtual std::string_view getPortName() override;
-        virtual PortType getType() override;
-        virtual PortDirection getDirection() override;
-        virtual size_t getSampleSize() override;
-        virtual void setSampleSize(size_t sampleSize) override;
-     
-    };
-
-    template<int number_of_channels, SpeakerConfiguration configuration>
-    class StaticAudioPort :public BasePort{
-    protected:
-        std::array<std::unique_ptr<IAudioChannel>, number_of_channels> channels;
-    public:
-        StaticAudioPort(std::string name, PortType type, PortDirection dir) : BasePort(std::move(name), type, dir)
+        StaticAudioPort(std::string name, PortDirection dir) 
         {
+            this->name = std::move(name);
+            this->dir = dir;
             for (int i = 0; i < number_of_channels; i++) 
                 this->channels[i] =std::make_unique<AudioChannel>(name + std::to_string(i), getSpeakerPositionAt<configuration>(i));
         }
+
+        // Geerbt über IAudioPort
         inline virtual size_t size()override  {   return number_of_channels; }
         inline  virtual IAudioChannel* at(size_t index) override {  return this->channels[index].get();}
         inline virtual SpeakerConfiguration getConfig()override {  return configuration;}
+        inline virtual std::string_view getPortName() override {  return std::string_view(this->name.c_str(), this->name.size()); }
+        inline virtual PortType getType() override   { return PortType::Audio; }
+        inline virtual PortDirection getDirection() override  { return this->dir; }
+        inline virtual size_t getSampleSize() override { return this->sampleSize; }
+        inline virtual void setSampleSize(size_t sampleSize) override  { this->sampleSize = sampleSize; }
     };
+
     typedef StaticAudioPort <1, SpeakerConfiguration::Mono> MonoPort;
-
-  //  StaticAudioPort < 1, SpeakerConfiguration::Mono>
-    class DynamicAudioPort :public BasePort {
-    protected:
-        // Pimpl idiom, to avoid implementationdetails in Headerfile.
-        struct impl;
-        std::unique_ptr<impl> pImpl;
-    public:
-
-        /**
-         * @brief Creates a new Port. The SpeakerConfiguration information, are retrained from channel information.
-         * @param name 
-         * @param type 
-         * @param dir 
-         * @param channels 
-         * @return 
-         */
-        DynamicAudioPort(std::string name, PortType type, PortDirection dir, std::vector<std::unique_ptr<IAudioChannel>> channels);
-        // Geerbt über IPort
-        virtual size_t size() override;
-
-        virtual IAudioChannel* at(size_t index) override;
-        virtual SpeakerConfiguration getConfig() override;
-    };
+    typedef StaticAudioPort <2, SpeakerConfiguration::Stereo2_0> StereoPort;
+    typedef StaticAudioPort <3, SpeakerConfiguration::Stereo2_1> StereoWithSubwooferPort;
+    typedef StaticAudioPort <5, SpeakerConfiguration::Surround5_0> Surround5_0Port;
+    typedef StaticAudioPort <6, SpeakerConfiguration::Surround5_1> Surround5_1Port;
 
     class QueueMidiPort :public IMidiPort{
     protected:
         std::string name;
-        PortType type;
         PortDirection dir;
         std::queue<MidiMessage> midiMsgPipe;
     public:
-        QueueMidiPort(std::string name, PortType type, PortDirection dir);
+        QueueMidiPort(std::string name, PortDirection dir);
         // Geerbt über IMidiPort
         virtual std::string_view getPortName() override;
         virtual PortType getType() override;

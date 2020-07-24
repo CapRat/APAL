@@ -1,15 +1,15 @@
-#include <base/LazyPlugin.hpp>
+#include <base/PluginBases.hpp>
 #include <base/Ports.hpp>
 #include <tools/PortHandling.hpp>
 using namespace XPlug;
 class MidiForwarder :public LazyPlugin {
 public:
 	MidiForwarder() {
-		this->portComponent.addPort(std::make_unique<QueueMidiPort>("MidiIn", PortType::MIDI, PortDirection::Input));
-		this->portComponent.addPort(std::make_unique<QueueMidiPort>("MidiOut", PortType::MIDI, PortDirection::Output));
-		this->portComponent.addPort(std::make_unique<QueueMidiPort>("MidiOut2", PortType::MIDI, PortDirection::Output));
-		this->featureComp.detectFeatures(this->getPortComponent());
-		this->inf.name = "MidiForwarder";
+		this->portComponent->addPort(std::make_shared<QueueMidiPort>("MidiIn", PortDirection::Input));
+		this->portComponent->addPort(std::make_shared<QueueMidiPort>("MidiOut", PortDirection::Output));
+		this->portComponent->addPort(std::make_shared<QueueMidiPort>("MidiOut2", PortDirection::Output));
+		this->featureComponent->detectFeatures(this->getPortComponent());
+		this->infoComponent->pluginName = "MidiForwarder";
 	}
 	// Geerbt über IPlugin
 	virtual void processAudio() override {

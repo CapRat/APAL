@@ -4,8 +4,9 @@
 #include "Types.hpp"
 
 #include "GlobalData.hpp"
-#include "interfaces/IPortComponent.hpp"
-#include "interfaces/IFeatureComponent.hpp"
+#include "Ports/IPortComponent.hpp"
+#include "IFeatureComponent.hpp"
+#include "IInfoComponent.hpp"
 #include <memory>
 #include <string>
 namespace XPlug {
@@ -28,56 +29,6 @@ namespace XPlug {
 #define REGISTER_PLUGIN(PluginClassName) static PluginRegistrator<PluginClassName> \
                     instance##PluginClassName = PluginRegistrator<PluginClassName>()
 #define EMPTY_STRING ""
-    
-    //Creator/Vendor/Developer Information
-    struct CreatorInfo {
-        std::string name=EMPTY_STRING;
-        //Url to vendor general hp
-        std::string url= EMPTY_STRING;
-    };
-
-    struct PluginInfo {
-        PluginInfo(std::string name = "", std::string description = "", std::string copyright = "", std::string creater = "", std::string url = "", bool hasUI = false)
-        {
-            CreatorInfo inf;
-            inf.name = creater;
-            inf.url = url;
-            this->name = name;
-            this->description = description;
-            this->copyright = copyright;
-            this->creater = inf;
-            this->url = url;
-            this->hasUI = hasUI;
-        }
-        /**
-         * @brief Name of the Plugin
-         */
-        std::string name = EMPTY_STRING;
-
-        /**
-         * @brief Description or Label of the Plugin
-         */
-        std::string description = EMPTY_STRING;
-
-        /**
-         * @brief Copyright of the Plugin.
-         */
-        std::string copyright = EMPTY_STRING;
-
-        /**
-         * @brief Creator or Vendor from the Plugin
-         */
-        CreatorInfo creater ;
-        /**
-         * @brief URL of the current Plugin. In LV2 its used for identification. In other formats it should be just an url to get help and information from.
-         */
-        std::string url = EMPTY_STRING;
-
-        /**
-         * @brief Value, weather the current Plugin supports an GUI. CUrrently not supported.
-         */
-        bool hasUI = false;
-    };
 
     // Class which is used to get called from implementation files.
     class IPlugin {
@@ -97,7 +48,7 @@ namespace XPlug {
 
         //virtual void registerPlugin() = 0;
 
-        virtual PluginInfo* getPluginInfo() = 0;
+        virtual IInfoComponent* getInfoComponent() = 0;
 /*  
         virtual size_t getParameterCount() = 0;
         virtual void* getParameter() = 0;

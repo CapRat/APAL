@@ -1,7 +1,7 @@
 #include "ladspa.h"
 #include <cstring>
 #include <interfaces/IPlugin.hpp>
-#include <interfaces/IAudioPort.hpp>
+#include <interfaces/Ports/IAudioPort.hpp>
 #include <tools/PortHandling.hpp>
 #include <vector>
 
@@ -51,11 +51,11 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
 
     desc->Properties = 0; // LADSPA_PROPERTY_HARD_RT_CAPABLE and other stuff, not supported yet.
     /*********************PORT HANDLING*********************/
-    desc->PortCount = getAudioChannelCount(plug.get());
+    desc->PortCount = static_cast<unsigned long>(getAudioChannelCount(plug.get()));
     desc->connect_port = [](LADSPA_Handle instance, unsigned long portIndex, LADSPA_Data* DataLocation) {
         auto data = static_cast<LADSPAHandleDataType*>(instance);
         if (portIndex < getAudioChannelCount(data->plug)) { // portIndex is in or outputPort
-            getAudioChannelFromIndex(data->plug, portIndex)->feed( DataLocation,nullptr);
+            getAudioChannelFromIndex(data->plug, portIndex)->feed( DataLocation);
         } else {
             //Not SUpported yet
         }
@@ -66,7 +66,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
     char** portNamesCArray = new char*[desc->PortCount * sizeof(const char*)];
     auto portDescripors = new LADSPA_PortDescriptor[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
     auto rangeHints = new LADSPA_PortRangeHint[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
-    iteratePortsFiltered<IAudioPort>(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](IAudioPort* p, size_t portIndex) {
+    iteratePorts<IAudioPort>(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](IAudioPort* p, size_t portIndex) {
         for (size_t i = 0; i < p->size(); i++) {
             std::string name = p->getPortName().to_string() + (p->at(i)->getName()!= "" ? static_cast<std::string>(p->at(i)->getName()): std::to_string(i));
             portNamesCArray[curIndex] = new char[name.length() + 1];
@@ -83,15 +83,19 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
     desc->PortRangeHints = rangeHints;
 
     /************************INFORMATION***************************/
-    desc->Copyright = plug->getPluginInfo()->copyright.c_str();
+    desc->Copyright = plug->getInfoComponent()->getPluginCopyright().data();
     desc->Label = nullptr;
-    desc->Maker = plug->getPluginInfo()->creater.name.c_str();
-    desc->Name = plug->getPluginInfo()->name.c_str();
+    desc->Maker = plug->getInfoComponent()->getCreatorName().data();
+    desc->Name = plug->getInfoComponent()->getPluginName().data();
     //desc->Name = "Hans peter";
     desc->UniqueID = 278375745;
 
     desc->run = [](LADSPA_Handle instance, unsigned long SampleCount) {
         auto data = static_cast<LADSPAHandleDataType*>(instance);
+        iteratePorts<IAudioPort>(data->plug, [SampleCount](IAudioPort* p, size_t) {
+            p->setSampleSize(SampleCount);
+            return false;
+            });
         data->plug->processAudio();
     };
 

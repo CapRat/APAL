@@ -10,6 +10,12 @@
 #include <vector>
 #include <unordered_map>
 using namespace XPlug;
+struct custom_test_data {
+    int (*get_port_count)(size_t plugIndex);
+    int (*get_port_job)(size_t plugIndex,size_t portIndex);
+};
+
+
 struct MidiHandle {
     LV2_Atom_Sequence* midiDataLocation;
     IMidiPort* connectedMidiPort;
@@ -80,15 +86,14 @@ extern "C" {
     static int currentLV2Index = 0;
     const LV2_Descriptor* lv2_descriptor(uint32_t index)
     {
-        
         if (index < 0 || index >= GlobalData().getNumberOfRegisteredPlugins())
             return NULL;
         PluginPtr plug = GlobalData().getPlugin(index);
 
         auto desc = new LV2_Descriptor();
 
-        desc->URI=plug->getPluginInfo()->url.c_str();
-        URI_INDEX_MAP[plug->getPluginInfo()->url]= index;
+        desc->URI=plug->getInfoComponent()->getPluginURI().data();
+        URI_INDEX_MAP[std::string(plug->getInfoComponent()->getPluginURI())]= index;
 
         //LV2_Descriptor desc = lv2DescriptorArray.at(lv2DescriptorArray.size() - 1);
         desc->activate = [](LV2_Handle instance) {
@@ -101,7 +106,27 @@ extern "C" {
         };
         desc->connect_port = [](LV2_Handle instance, uint32_t IPort, void* DataLocation) {
             auto data = static_cast<LV2HandleDataType*>(instance);
-            auto midiPort = dynamic_cast<IMidiPort*>(data->plug->getPortComponent()->at(IPort));
+            iteratePortsFlat(data->plug, [IPort,DataLocation,&data](XPlug::IPort* p, size_t ind) {
+                if (IPort == ind) {
+                    auto midiPort = dynamic_cast<IMidiPort*>(p);
+                    if (midiPort != nullptr && (
+                        (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) && midiPort->getDirection() == PortDirection::Input) ||
+                        (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput) && midiPort->getDirection() == PortDirection::Output)
+                        )) {
+                        data->midiHandles.push_back(MidiHandle{ (LV2_Atom_Sequence*)DataLocation,midiPort,
+                                                               data->map->map(data->map->handle, LV2_MIDI__MidiEvent)
+                            });
+                    }
+                    else {
+                        auto aPort = dynamic_cast<IAudioPort*>(p);
+                        aPort->at(ind - IPort)->feed((float*)DataLocation);
+                    }
+                    return true;
+                }
+                return false;
+                });
+
+         /*  auto midiPort = dynamic_cast<IMidiPort*>(data->plug->getPortComponent()->at(IPort));
             if (midiPort != nullptr && (
                 (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiInput)&&midiPort->getDirection()==PortDirection::Input ) ||
                 (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput) && midiPort->getDirection() == PortDirection::Output)
@@ -113,8 +138,8 @@ extern "C" {
                 });
             }
             else {
-                getAudioChannelFromIndex(data->plug, IPort)->feed((float*)DataLocation, (double*)DataLocation);
-            }
+                getAudioChannelFromIndex(data->plug, IPort)->feed((float*)DataLocation);
+            }*/
         //  midiData->body.
         };
     
@@ -136,7 +161,7 @@ extern "C" {
 
         desc->cleanup = [](LV2_Handle instance) {
             auto data =static_cast<LV2HandleDataType *>( instance);
-            URI_INDEX_MAP.erase(data->plug->getPluginInfo()->url);
+            URI_INDEX_MAP.erase(std::string(data->plug->getInfoComponent()->getPluginURI()));
             data->plug->deinit();
             delete data->lv2Desc;
             delete data;
@@ -145,14 +170,42 @@ extern "C" {
         desc->run = [](LV2_Handle instance, uint32_t SampleCount) {
             auto data = static_cast<LV2HandleDataType*>(instance); 
             //TODO not nice. Maybe write a function, which does this, but is RT Capable (non mem allocation and blocking ist allowed.
-            iteratePortsFiltered<IAudioPort>(data->plug, [SampleCount](IAudioPort* p, size_t index) {
+            
+            iteratePorts<IAudioPort>(data->plug, [SampleCount](IAudioPort* p, size_t index) {
                 p->setSampleSize(SampleCount);
                 return false;
                 });
+            for (auto mHandle : data->midiHandles)
+                if(mHandle.connectedMidiPort->getDirection()==PortDirection::Input)
+                    handleInput(&mHandle);
             data->plug->processAudio();
+            for (auto mHandle : data->midiHandles)
+                if (mHandle.connectedMidiPort->getDirection() == PortDirection::Output)
+                handleOutput(&mHandle);
         };
 
         desc->extension_data = [](const char* uri)-> const void* {
+            if (strcmp(uri, "urn:custom_test_data") == 0) {
+                static custom_test_data data{ [](size_t plugIndex) {
+                    int counter = 0;
+                    iteratePortsFlat(GlobalData().getPlugin(plugIndex).get(), [&counter](IPort* p, size_t ind) {
+                        counter++;
+                        return false;
+                        });
+                    return counter;
+                } ,
+                    [](size_t plugIndex,size_t portIndex) {
+                        int ret;
+                        iteratePortsFlat(GlobalData().getPlugin(plugIndex).get(),[&ret, portIndex](IPort* p,size_t ind) {
+                            ret = p->getDirection() == PortDirection::Input ? 0 : 1;
+                            if (dynamic_cast<IAudioPort*>(p) == nullptr) 
+                                ret += 2;
+                            return portIndex == ind;
+                        });
+                        return ret;
+                } };
+                return &data;
+            }
             return NULL;
         };
 

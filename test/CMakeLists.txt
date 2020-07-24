@@ -1,4 +1,5 @@
 enable_testing()
-add_subdirectory(integrationtests)
-#add_subdirectory(tools)
+#add_subdirectory(integration)
 add_subdirectory(unittests)
+add_subdirectory(XValidate)
+#add_subdirectory(performance)

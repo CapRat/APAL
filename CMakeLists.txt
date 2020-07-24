@@ -7,8 +7,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 #########PACKAGE INCLUDES#########
 find_package(Jack)
-find_package(VST3)
-find_package(LV2)
 find_package(Backport QUIET)
 
 #include(DPFFunctions) ## for Function use documentation look into DPFFuncitons or in the Examples.
@@ -25,10 +23,7 @@ option(XPLUG_BUILD_TESTS "Build and installs tests,which can be reused and are u
 #########################Set Supported Format Variables###########################
 ## Here add maybe an detect if feature is build ready macro or function.
 
-option(XPLUG_VST2_SUPPORT "Support vor VST2" ON)
-option(XPLUG_VST3_SUPPORT "Support vor VST3" ${VST3_FOUND})
-option(XPLUG_LADSPA_SUPPORT "Support vor LADSPA" ON)
-option(XPLUG_LV2_SUPPORT "Support vor LV2" ${LV2_FOUND})
+
 option(XPLUG_AU_SUPPORT "Support vor AU" OFF)
 option(XPLUG_JACK_SUPPORT "IS JACK SUPPORTED?" ${JACK_FOUND})
 
@@ -47,7 +42,7 @@ add_subdirectory(src)
 add_subdirectory(deps)
 
 
-add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES}  "include/base/StaticPortComponent.hpp" )
+add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES}   )
 
 target_link_libraries(XPlug PUBLIC ${CMAKE_DL_LIBS} "$<$<NOT:$<COMPILE_FEATURES:cxx_std_17>>:Backport::Backport>")
 set_target_properties(XPlug PROPERTIES POSITION_INDEPENDENT_CODE  True VERSION  ${XPlug_VERSION_MAJOR})

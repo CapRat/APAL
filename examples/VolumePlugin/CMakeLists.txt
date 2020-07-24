@@ -14,7 +14,7 @@ endif(XPLUG_VST3_SUPPORT)
 
 if(XPLUG_LV2_SUPPORT)
     target_link_libraries(VolumePlugin PUBLIC  lv2)
-    add_custom_command(TARGET VolumePlugin  POST_BUILD COMMAND TTLGenerator ARGS $<TARGET_FILE:VolumePlugin> manifest.ttl VolumePlugin.ttl )
+ #   add_custom_command(TARGET VolumePlugin  POST_BUILD COMMAND TTLGenerator ARGS $<TARGET_FILE:VolumePlugin> BYPRODUCTS manifest.ttl VolumePlugin.ttl )
 endif(XPLUG_LV2_SUPPORT)
 
 if(XPLUG_BUILD_TESTS)

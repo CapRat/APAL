@@ -1,85 +1,59 @@
 #ifndef PORT_HANDLING_HPP
 #define PORT_HANDLING_HPP
-#include <interfaces/IPortComponent.hpp>
+#include <interfaces/Ports/IPortComponent.hpp>
+#include <interfaces/Ports/IMidiPort.hpp>
 #include <interfaces/IPlugin.hpp>
-#include <interfaces/IAudioPort.hpp>
+#include <interfaces/Ports/IAudioPort.hpp>
 #include <type_traits>
 namespace XPlug {
 
-    /**
-     * @brief Iterate through all ports(first in and then output ports).
-     * @param plug Plugin, which gives us the needed ports to iterate through
-     * @param iterFunc Function, which is called in every iteration process. No Raw fucntionptr, so Lambdas with bounded Values can be used. (See implementation of \ref iterateChannel)
-     *        The iterFunc takes a reference to a IPort, and the current Index of a IPort. If the function returns true, the iteration is abborted.
-     */
-    void iteratePorts(IPlugin* plug, std::function<bool(XPlug::IPort*, size_t)> iterFunc);
 
     /**
      * @brief Iterate through all Ports, which are type of the given template parameter and match the given PortDirection dir. Dynamic Casts can kill the RT Capability here. But not have to.
      * @tparam T Subtype of IPort, which is checked to match, while iterating Ports. So the given function is only triggered, if a Port can be casted to T. The Class name should not contain a Pointer.
      * @param plug Plugin, to iterate through
-     * @param iterFunc Iterfunction, which is called every iteration, when the given parameters match the port.
      * @param dir Portdirection to filter for.
+     * @param iterFunc Iterfunction, which is called every iteration, when the given parameters match the port.
      */
     template<typename T>
-    void iteratePortsFiltered(IPlugin* plug, XPlug::PortDirection dir, std::function<bool(T*, size_t)> iterFunc ) {
+    void iteratePorts(IPlugin* plug, XPlug::PortDirection dir, std::function<bool(T*, size_t)> iterFunc) {
         static_assert(std::is_base_of<IPort, T>::value, "T must derive from IPort.");
         size_t counter = 0;
         for (size_t i = 0; i < plug->getPortComponent()->size(); i++) {
             auto pl = dynamic_cast<T*>(plug->getPortComponent()->at(i));
-            if (pl && pl->getDirection() == dir) {
-                if (iterFunc(pl, counter)) return ;
+            if (pl && (dir == PortDirection::All || pl->getDirection() == dir)) {
+                if (iterFunc(pl, counter)) return;
                 counter++;
             }
         }
     }
-    // Version which does not filter for direction.
+    /**
+     * @brief Aliasfunction for iteratePorts, which doesnt filter the direction.
+     * @tparam T Subtype of IPort, which is checked to match, while iterating Ports. So the given function is only triggered, if a Port can be casted to T. The Class name should not contain a Pointer.
+     * @param plug  Plugin, to iterate through
+     * @param iterFunc Iterfunction, which is called every iteration, when the given parameters match the port.
+    */
     template<typename T>
-    void iteratePortsFiltered(IPlugin* plug, std::function<bool(T*, size_t)> iterFunc) {
-        static_assert(std::is_base_of<IPort, T>::value, "T must derive from IPort.");
-        size_t counter = 0;
-        for (size_t i = 0; i < plug->getPortComponent()->size(); i++) {
-            auto pl = dynamic_cast<T*>(plug->getPortComponent()->at(i));
-            if (pl) {
-                if (iterFunc(pl, counter)) return ;
-                counter++;
-            }
-        }
+    inline void iteratePorts(IPlugin* plug, std::function<bool(T*, size_t)> iterFunc) {
+        iteratePorts<T>(plug, XPlug::PortDirection::All, iterFunc);
     }
+   
 
-    // Version which does not filter for direction.
     template<typename T>
-    T* getPortAt(IPlugin* plug, size_t index) {
-        static_assert(std::is_base_of<IPort, T>::value, "T must derive from IPort.");
-        T* res = nullptr;
-        iteratePortsFiltered<T>(plug, [&res, index](T* p, size_t ind) {
-            if (index == ind) {
-                res = p;
-                return true;
-            }
-            return false;
-            });
-        return res;
-    }
-
-    // Version which does not filter for direction.
-    template<typename T>
-    T* getPortAt(IPlugin* plug, size_t index, PortDirection dir) {
+    T* getPortAt(IPlugin* plug, size_t index, PortDirection dir = PortDirection::All) {
         static_assert(std::is_base_of<IPort, T>::value, "T must derive from IPort.");
         T* res=nullptr;
-        iteratePortsFiltered<T>(plug, dir, [&res, index](T* p, size_t ind) {
+        iteratePorts<T>(plug, dir, [&res, index](T* p, size_t ind) {
             if (index == ind) {
                 res = p;
                 return true;
             }
-            return false; });
+            return false; 
+        });
         return res;
     }
-   
-    inline IAudioPort* getAudioPortAt(IPlugin* plug, size_t index, PortDirection dir) { return getPortAt<IAudioPort>(plug, index, dir); }
-    inline IAudioPort* getAudioInputPortAt(IPlugin* plug, size_t index) { return getAudioPortAt(plug, index, PortDirection::Input); }
-    inline IAudioPort* getAudioOutputPortAt(IPlugin* plug, size_t index) { return getAudioPortAt(plug, index, PortDirection::Output); }
-   
+
+
     /**
      * @brief Gets the size of Ports, which are type of the given template parameter and match the given PortDirection dir. Dynamic Casts can kill the RT Capability here. But not have to.
      * @tparam T Subtype of IPort, which is checked to match, while iterating Ports. So the given function is only triggered, if a Port can be casted to T. The Class name should not contain a Pointer.
@@ -90,47 +64,62 @@ namespace XPlug {
     template<typename T>
     size_t getNumberOfPorts(IPlugin* plug, XPlug::PortDirection dir) {
         size_t size=0;
-        iteratePortsFiltered<T>(plug, dir, [&size](T* port, size_t index) { size++; return false; });
+        iteratePorts<T>(plug, dir, [&size](T* port, size_t index) { size++; return false; });
         return size;
     }
 
 
-    size_t getAudioChannelCount(IPlugin* plug, XPlug::PortDirection dir);
-    size_t getAudioChannelCount(IPlugin* plug);
 
+
+    /**
+     * @brief  Gets the SpeakerPosition from given index. Stereo for example will return with index 0 SpeakerPosition::Left and with index 1 SpeakerPosition::Right.
+     * The Templateparameter is the SpeakerConfiguration to analyze
+     * @param index Index of the SpeakerPosition to get.
+     * @return single Bitmask with only 1 bit set. This can be represented as SpeakerPosition.
+     */
+    template<SpeakerConfiguration c>
+    SpeakerPosition getSpeakerPositionAt(size_t index) {
+        size_t indexCounter = 0;
+        for (int i = 1; i < sizeof(c); i++) {
+            if (static_cast<uint64_t>(c) & ((uint64_t)1 << i)) {//check if bit is set in pos
+                if (indexCounter == index)
+                    return static_cast<SpeakerPosition>(1 << i);
+                indexCounter++;
+            }
+        }
+        return SpeakerPosition::Undefined;
+    }
+
+    /**
+     * @brief Retreives the size of all AudioChannels in a plugin.
+     * @param plug   Plugin, to iterate through
+     * @param dir Direction to filter Channelcount. Default is All, which means that there is no filtering.
+     * @return 
+    */
+    size_t getAudioChannelCount(IPlugin* plug, XPlug::PortDirection dir = PortDirection::All);
+
+    /**
+     * @brief Iterates all Audiochannels in a Plugin. 
+     * @param plug  Plugin, to iterate through
+     * @param iterFunc terfunction, which is called every iteration, when the given parameters match the channel.
+    */
     void iterateAudioChannels(IPlugin* plug, std::function<bool(XPlug::IAudioChannel*, size_t)> iterFunc);
 
     /**
-     * @brief
-     * @param plug
-     * @param index
-     * @return
+     * @brief Gets a channel with a given index. The index are the same, as in \see iterateAudioChannels .
+     * @param plug Plugin, to iterate through
+     * @param index index to get channel from.
+     * @return the channel at given index.
      */
     IAudioChannel* getAudioChannelFromIndex(IPlugin* plug, size_t index);
 
-
-    class PortComponentCacheImpl;
-
     /**
-     * @brief Class for speeding up the use of the IPortComponent, which may not be rly performant. 
-     * This class may change in future to support something like IPortComponentCacheable or sth.
-     * This class provides a way, to call methods for getting specific midi audio in and out, without the need to iterate much.
-     * This class cant exists without given IPortComponent, so make sure if you use this class, that it does not exists anymore, when the component also wont exists.
-     */
-    class PortComponentCache {
-    public:
-        PortComponentCache(IPortComponent* c);
-        IAudioPort* getAudioInPortAt(size_t index);
-        IAudioPort* getAudioOutPortAt(size_t index);
-        IMidiPort* getMidiInPortAt(size_t index);
-        IMidiPort* getMidiOutPortAt(size_t index);
+     * @brief Iterates all the Ports, but iterates over Audioports, like they have an Audioport for each Channel. Thisway Channel indexes can be mapped flat.
+     * @param plug 
+     * @param iterFunc 
+    */
+    void iteratePortsFlat(IPlugin* plug, std::function<bool(XPlug::IPort*, size_t)> iterFunc);
 
-        size_t sizeAudioInPorts();
-        size_t sizeAudioOutPorts();
-        size_t sizeMidiInPorts();
-        size_t sizeMidiOutPorts();
-    private:
-        std::unique_ptr<PortComponentCacheImpl> impl;
-    };
+
 }
 #endif //! PORT_HANDLING_HPP

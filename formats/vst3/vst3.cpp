@@ -69,12 +69,10 @@ extern "C" {
         if (!gPluginFactory)
         {
             auto plug = XPlug::GlobalData().getPlugin(0);
-        //    plug->getPluginInfo()->creater
-            auto inf = plug->getPluginInfo();
             static PFactoryInfo factoryInfo =
             {
-                plug->getPluginInfo()->creater.name.c_str(),
-                plug->getPluginInfo()->creater.url.c_str(),
+                plug->getInfoComponent()->getCreatorName().data(),
+                plug->getInfoComponent()->getCreatorURL().data(),
                 "mailto:myemail@address.com",
                 PFactoryInfo::kNoFlags
             };
@@ -85,7 +83,7 @@ extern "C" {
                 VST3AudioProccessorImpl::cid, //cid
                 PClassInfo::kManyInstances,//cardinality
                 kVstAudioEffectClass, //category
-                plug->getPluginInfo()->name.c_str(), //name
+                plug->getInfoComponent()->getPluginName().data(), //name
                 0, // class flags
                 PlugType::kFx, //subcategory
                 0, //vendor
@@ -93,7 +91,7 @@ extern "C" {
                 kVstVersionString //sdkversion
             );
             gPluginFactory->registerClass(&componentClass, [](void* data)->FUnknown* {return   (IAudioProcessor*)new VST3AudioProccessorImpl(); });
-            static std::string controllerName = plug->getPluginInfo()->name + "Controller";
+            static std::string controllerName = std::string(plug->getInfoComponent()->getPluginName()) + "Controller";
             static PClassInfo2 componentContollerClass(
                 VST3EditControllerImpl::cid, //cid
                 PClassInfo::kManyInstances,//cardinality

@@ -5,7 +5,7 @@
 #include <tools/LibLoading.hpp>
 #include <tools/StringTools.hpp>
 #include "lv2_ttl_generation.hpp"
-
+#include "turtle.hpp"
 using namespace XPlug;
 
 std::string(*getTTLFromPluginPtr)(IPlugin*) = nullptr;
@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
     
     /*********LOAD LIBRARY AND FUNCTIONS********/
     std::string pluginLib(argv[1]);
+    XPlug::replaceInString(pluginLib, "\\", "/");
     auto pluginLibHandle = LoadLib(pluginLib.c_str());
     if (pluginLibHandle == nullptr) {
         std::cerr << GetErrorStr() << std::endl;
