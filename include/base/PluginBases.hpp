@@ -1,5 +1,6 @@
 #ifndef LAZY_PLUGIN 
 #define LAZY_PLUGIN
+#include <memory>
 #include <interfaces/IPlugin.hpp>
 #include "PortComponents.hpp"
 #include "FeatureComponents.hpp"
