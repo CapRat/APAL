@@ -53,7 +53,6 @@ function(run_lv2_tests TARGET)
       add_test(NAME ${TARGET}_torture_lv2_test COMMAND $<TARGET_FILE:TortureTester> 
       --evil
       --lv2
-      --ladspa
       #--profile <profile file>
       --plugin  $<TARGET_FILE:${TARGET}>
       )

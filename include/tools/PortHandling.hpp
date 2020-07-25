@@ -71,24 +71,6 @@ namespace XPlug {
 
 
 
-    /**
-     * @brief  Gets the SpeakerPosition from given index. Stereo for example will return with index 0 SpeakerPosition::Left and with index 1 SpeakerPosition::Right.
-     * The Templateparameter is the SpeakerConfiguration to analyze
-     * @param index Index of the SpeakerPosition to get.
-     * @return single Bitmask with only 1 bit set. This can be represented as SpeakerPosition.
-     */
-    template<SpeakerConfiguration c>
-    SpeakerPosition getSpeakerPositionAt(size_t index) {
-        size_t indexCounter = 0;
-        for (int i = 1; i < sizeof(c); i++) {
-            if (static_cast<uint64_t>(c) & ((uint64_t)1 << i)) {//check if bit is set in pos
-                if (indexCounter == index)
-                    return static_cast<SpeakerPosition>(1 << i);
-                indexCounter++;
-            }
-        }
-        return SpeakerPosition::Undefined;
-    }
 
     /**
      * @brief Retreives the size of all AudioChannels in a plugin.
@@ -103,7 +85,7 @@ namespace XPlug {
      * @param plug  Plugin, to iterate through
      * @param iterFunc terfunction, which is called every iteration, when the given parameters match the channel.
     */
-    void iterateAudioChannels(IPlugin* plug, std::function<bool(XPlug::IAudioChannel*, size_t)> iterFunc);
+    void iterateAudioChannels(IPlugin* plug, std::function<bool(IAudioPort*,IAudioChannel*, size_t)> iterFunc);
 
     /**
      * @brief Gets a channel with a given index. The index are the same, as in \see iterateAudioChannels .

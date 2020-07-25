@@ -7,12 +7,12 @@ size_t XPlug::getAudioChannelCount(IPlugin* plug, XPlug::PortDirection dir)
     return size;
 }
 
-void XPlug::iterateAudioChannels(IPlugin* plug, std::function<bool(XPlug::IAudioChannel*, size_t)> iterFunc)
+void XPlug::iterateAudioChannels(IPlugin* plug, std::function<bool(IAudioPort *, IAudioChannel*, size_t)> iterFunc)
 {
     size_t counter = 0;
     iteratePorts<IAudioPort>(plug, [&counter, &iterFunc](IAudioPort* p, size_t index) {
         for (size_t i = 0; i < p->size(); i++) {
-            if (iterFunc(p->at(i), counter)) return true;
+            if (iterFunc(p,p->at(i), counter)) return true;
             counter++;
         }
         return false;
@@ -21,7 +21,7 @@ void XPlug::iterateAudioChannels(IPlugin* plug, std::function<bool(XPlug::IAudio
 IAudioChannel* XPlug::getAudioChannelFromIndex(IPlugin* plug, size_t index)
 {
     XPlug::IAudioChannel* channel = nullptr;
-    iterateAudioChannels(plug, [&channel, index](XPlug::IAudioChannel* c, size_t channelIndex) {
+    iterateAudioChannels(plug, [&channel, index](IAudioPort* p,IAudioChannel* c, size_t channelIndex) {
         if (index == channelIndex) {
             channel = c;
             return true;

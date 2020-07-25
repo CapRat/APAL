@@ -214,6 +214,13 @@ extern "C" {
 
     const LV2_Lib_Descriptor* lv2_lib_descriptor(const char* bundle_path, const LV2_Feature* const* features)
     {
-        return nullptr;
+        auto lDesc= new LV2_Lib_Descriptor;
+        lDesc->cleanup = [](LV2_Lib_Handle h) {};
+        lDesc->get_plugin = [](LV2_Lib_Handle h, uint32_t index) {
+            return lv2_descriptor(index);
+        };
+        lDesc->size = sizeof(LV2_Lib_Descriptor);
+        lDesc->handle = nullptr;
+        return lDesc;
     }
 }

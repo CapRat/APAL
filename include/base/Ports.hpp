@@ -9,7 +9,6 @@
 /******************************Some Port definitions******************************/
 namespace XPlug {
 
-
     class AudioChannel :public IAudioChannel {
     public:
 
@@ -42,7 +41,7 @@ namespace XPlug {
             this->name = std::move(name);
             this->dir = dir;
             for (int i = 0; i < number_of_channels; i++) 
-                this->channels[i] =std::make_unique<AudioChannel>(name + std::to_string(i), getSpeakerPositionAt<configuration>(i));
+                this->channels[i] =std::make_unique<AudioChannel>(this->name + getSpeakerSuffix<configuration>(i), getSpeakerPositionAt<configuration>(i));
         }
 
         // Geerbt über IAudioPort

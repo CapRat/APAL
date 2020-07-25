@@ -75,5 +75,53 @@ namespace XPlug {
 
     };
 
+    /**
+     * @brief  Gets the SpeakerPosition from given index. Stereo for example will return with index 0 SpeakerPosition::Left and with index 1 SpeakerPosition::Right.
+     * The Templateparameter is the SpeakerConfiguration to analyze
+     * @param index Index of the SpeakerPosition to get.
+     * @return single Bitmask with only 1 bit set. This can be represented as SpeakerPosition.
+     */
+    template<SpeakerConfiguration c>
+    constexpr SpeakerPosition getSpeakerPositionAt(size_t index) {
+        size_t indexCounter = 0;
+        for (int i = 0; i < sizeof(c); i++) {
+            if (static_cast<uint64_t>(c) & ((uint64_t)1 << i)) {//check if bit is set in pos
+                if (indexCounter == index)
+                    return static_cast<SpeakerPosition>(1 << i);
+                indexCounter++;
+            }
+        }
+        return SpeakerPosition::Undefined;
+    }
+
+    template<SpeakerConfiguration c>
+    constexpr const char* getSpeakerSuffix(size_t index) {
+        switch (getSpeakerPositionAt<c>(index)) {
+        case SpeakerPosition::FrontCenter:
+            return "FC";
+        case SpeakerPosition::FrontLeft:
+            return "FL";
+        case SpeakerPosition::FrontRight:
+            return "FR";
+        case SpeakerPosition::FrontLeftHeight:
+            return "FLH";
+        case SpeakerPosition::FrontRightHeight:
+            return "FRH";
+        case SpeakerPosition::FrontLeftOfCenter:
+            return "FLC";
+        case SpeakerPosition::FrontRightOfCenter:
+            return "FRC";
+        default:
+            return "";
+        }
+    }
+    template<>
+    constexpr const char* getSpeakerSuffix<SpeakerConfiguration::Mono>(size_t index) {
+        return "";
+    }
+    template<>
+    constexpr const char* getSpeakerSuffix<SpeakerConfiguration::MonoLegacy>(size_t index) {
+        return "";
+    }
 }
 #endif //! SPEAKER_HPP

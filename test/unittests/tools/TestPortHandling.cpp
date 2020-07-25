@@ -285,7 +285,7 @@ TEST_CASE("Testing Audiochannel functions") {
 	}
 	size_t counter = 0;
 
-	iterateAudioChannels(plug, [&counter](IAudioChannel* t, size_t ind) {
+	iterateAudioChannels(plug, [&counter](IAudioPort*p,IAudioChannel* t, size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;

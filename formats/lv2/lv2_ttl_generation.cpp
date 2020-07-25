@@ -36,8 +36,9 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
 
     /******DETECT AND WRITE PORTS*****/
     //TODO maybe add  "lv2:optionalFeature lv2:hardRTCapable ;" here
-    auto portsSize = getNumberOfPorts<IAudioPort>(plug, PortDirection::Input) + getNumberOfPorts<IAudioPort>(plug, PortDirection::Output);
-    iteratePorts<IPort>(plug, [&plugTTL, portsSize, plug](IPort* p, size_t index) {
+    auto portsSize = getAudioChannelCount(plug, PortDirection::All) + getNumberOfPorts<IMidiPort>(plug, PortDirection::All);
+    size_t pCount = 0;
+    iteratePorts<IPort>(plug, [&plugTTL,&pCount, portsSize, plug](IPort* p, size_t ) {
         if (dynamic_cast<IAudioPort*>(p) != nullptr) {
             auto aPort = dynamic_cast<IAudioPort*>(p);
             for (int i = 0; i < aPort->size(); i++) {
@@ -48,8 +49,12 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
                 plugTTL << "    lv2:port [" << std::endl 
                     << "        a lv2:AudioPort ," << std::endl
                     << "            " << (p->getDirection() == PortDirection::Input ? "lv2:InputPort ;" : "lv2:OutputPort ;") << std::endl
-                    << "        " << "lv2:symbol " << symbol << ";" << std::endl
-                    << "        " << "lv2:name " << name << ";" << std::endl;
+                    << "        " << "lv2:symbol \"" << symbol << "\" ;" << std::endl
+                    << "        " << "lv2:name \"" << name << "\" ;" << std::endl
+                    << "        " << "lv2:index " << std::to_string(pCount) << ";" << std::endl
+                    << "    ]" << (pCount == portsSize - 1 ? "." : ";") << std::endl
+                    ;
+                pCount++;
             }
         }
         else if (dynamic_cast<IMidiPort*>(p) != nullptr) {
@@ -64,13 +69,14 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
                     << "            " << (p->getDirection() == PortDirection::Input ? "lv2:InputPort ;" : "lv2:OutputPort ;") << std::endl
                     << "        atom:bufferType atom:Sequence ;" << std::endl
                     << "        atom:supports midi:MidiEvent ;" << std::endl
-                    << "        " << "lv2:symbol " << symbol << ";" << std::endl
-                    << "        " << "lv2:name " << name << ";" << std::endl;
+                    << "        " << "lv2:symbol \"" << symbol << "\" ;" << std::endl
+                    << "        " << "lv2:name \"" << name << "\ ;" << std::endl
+                    << "        " << "lv2:index " << std::to_string(pCount) << ";" << std::endl
+                    << "    ]" << (pCount == portsSize - 1 ? "." : ";") << std::endl
+                    ;
             }
+            pCount++;
         }
-        plugTTL << "        " << "lv2:index " << std::to_string(index) << ";" << std::endl
-            << "    ]" << (index == portsSize - 1 ? "." : ";") << std::endl
-            ;
         return false;
         });
     //std::strcpy(ttlFile,plugTTL.str().c_str());
