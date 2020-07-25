@@ -26,7 +26,9 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
         << "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." << std::endl
         << "@prefix units: <http://lv2plug.in/ns/extensions/units#> ." << std::endl
         << "@prefix pg: <http://lv2plug.in/ns/ext/port-groups#>." << std::endl
-        << ((plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) || plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput)) ? "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n" : "")
+        << ((plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) ||
+             plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput)) ?
+                "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n@prefix midi: <http://lv2plug.in/ns/ext/midi#> .\n" : "")
         << "<" << plug->getInfoComponent()->getPluginURI() << ">" << std::endl
         << "    a lv2:Plugin ; " << std::endl
         //TODO: implement speacial style of Plugin here. (like lv2 : AmplifierPlugin;)
@@ -70,7 +72,7 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
                     << "        atom:bufferType atom:Sequence ;" << std::endl
                     << "        atom:supports midi:MidiEvent ;" << std::endl
                     << "        " << "lv2:symbol \"" << symbol << "\" ;" << std::endl
-                    << "        " << "lv2:name \"" << name << "\ ;" << std::endl
+                    << "        " << "lv2:name \"" << name << "\" ;" << std::endl
                     << "        " << "lv2:index " << std::to_string(pCount) << ";" << std::endl
                     << "    ]" << (pCount == portsSize - 1 ? "." : ";") << std::endl
                     ;

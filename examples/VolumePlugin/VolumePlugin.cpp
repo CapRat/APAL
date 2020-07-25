@@ -12,6 +12,8 @@ public:
         this->portComponent->addPort(in0);
         this->portComponent->addPort(out0);
         this->infoComponent->pluginName = "VolumePlugin";
+        this->infoComponent->creatorName="Benjamin Heisch";
+        this->infoComponent->pluginUri = "http://xplug_plug.in/examples/VolumePlugin";
     }
 
     // Geerbt über IPlugin

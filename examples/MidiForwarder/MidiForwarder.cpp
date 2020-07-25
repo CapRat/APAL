@@ -10,6 +10,8 @@ public:
 		this->portComponent->addPort(std::make_shared<QueueMidiPort>("MidiOut2", PortDirection::Output));
 		this->featureComponent->detectFeatures(this->getPortComponent());
 		this->infoComponent->pluginName = "MidiForwarder";
+        this->infoComponent->creatorName="Benjamin Heisch";
+        this->infoComponent->pluginUri = "http://xplug_plug.in/examples/MidiForwarder";
 	}
 	// Geerbt über IPlugin
 	virtual void processAudio() override {
