@@ -17,7 +17,7 @@ using namespace XPlug;
 #ifdef _WIN32
 #define SYMBOL_EXPORT_TEST_LIB "simple_symbol_export"
 #else
-#define SYMBOL_EXPORT_TEST_LIB "libsimple_symbol_export.so"
+#define SYMBOL_EXPORT_TEST_LIB "./libsimple_symbol_export.so"
 #endif //! _WIN32
 
 #include <iostream>

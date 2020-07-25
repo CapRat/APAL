@@ -46,7 +46,7 @@ add_library(XPlug STATIC ${XPLUG_INCLUDE_FILES} ${XPLUG_SOURCE_FILES}   )
 
 target_link_libraries(XPlug PUBLIC ${CMAKE_DL_LIBS})
 set_target_properties(XPlug PROPERTIES POSITION_INDEPENDENT_CODE  True VERSION  ${XPlug_VERSION_MAJOR})
-target_compile_features(XPlug PUBLIC cxx_std_11)
+target_compile_features(XPlug PUBLIC cxx_std_14)
 
 EXPORT_SYMBOLS(XPlug FUNCTION_NAMES "XPlugGetVersion")
 GENERATE_EXPORT_HEADER(XPlug)

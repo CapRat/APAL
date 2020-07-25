@@ -1,4 +1,5 @@
 #include <base/PluginBases.hpp>
+#include<memory>
 using namespace XPlug;
 /*void XPlug::LazyPlugin::processAudio(const std::vector<IPort>& inputs, const std::vector<IPort>& outputs)
 {

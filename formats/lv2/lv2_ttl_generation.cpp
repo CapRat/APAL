@@ -20,12 +20,12 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
     auto plug = static_cast<IPlugin*>(pluginPtr);
     std::stringstream plugTTL;
 
-    plugTTL << "@prefix doap : <http://usefulinc.com/ns/doap#> ." << std::endl
-        << "@prefix lv2 : <http://lv2plug.in/ns/lv2core#> ." << std::endl
-        << "@prefix rdf : <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." << std::endl
-        << "@prefix rdfs : <http://www.w3.org/2000/01/rdf-schema#> ." << std::endl
-        << "@prefix units : <http://lv2plug.in/ns/extensions/units#> ." << std::endl
-        << "@prefix pg : <http://lv2plug.in/ns/ext/port-groups#>." << std::endl
+    plugTTL << "@prefix doap: <http://usefulinc.com/ns/doap#> ." << std::endl
+        << "@prefix lv2: <http://lv2plug.in/ns/lv2core#> ." << std::endl
+        << "@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> ." << std::endl
+        << "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." << std::endl
+        << "@prefix units: <http://lv2plug.in/ns/extensions/units#> ." << std::endl
+        << "@prefix pg: <http://lv2plug.in/ns/ext/port-groups#>." << std::endl
         << ((plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) || plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput)) ? "@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .\n" : "")
         << "<" << plug->getInfoComponent()->getPluginURI() << ">" << std::endl
         << "    a lv2:Plugin ; " << std::endl
@@ -69,7 +69,7 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
             }
         }
         plugTTL << "        " << "lv2:index " << std::to_string(index) << ";" << std::endl
-            << "    ]" << (index == portsSize - 1 ? "." : ",") << std::endl
+            << "    ]" << (index == portsSize - 1 ? "." : ";") << std::endl
             ;
         return false;
         });
@@ -80,8 +80,8 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
 std::string getManifestFromMultpleInfos(std::vector<TTLPluginInfo> plugInfos)
 {
     std::stringstream mainTTLs;
-    mainTTLs << "@prefix lv2 : < http ://lv2plug.in/ns/lv2core#> ." << std::endl
-        << "@prefix rdfs : < http ://www.w3.org/2000/01/rdf-schema#> ." << std::endl;
+    mainTTLs << "@prefix lv2: <http://lv2plug.in/ns/lv2core#> ." << std::endl
+        << "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> ." << std::endl;
 
     for (auto plug:plugInfos){
         mainTTLs << "<" << plug.plugPtr->getInfoComponent()->getPluginURI() << ">" << std::endl
