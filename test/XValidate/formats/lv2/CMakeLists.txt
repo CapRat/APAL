@@ -1,5 +1,8 @@
 if(XPLUG_LV2_SUPPORT)
    find_package(LV2 REQUIRED)
    target_include_directories(XValidate PUBLIC ${LV2_INCLUDE_DIRS})
-   target_sources(XValidate PUBLIC  ${CMAKE_CURRENT_LIST_DIR}/LV2TestSuite.cpp)
+   target_sources(XValidate PUBLIC  
+   ${CMAKE_CURRENT_LIST_DIR}/LV2TestSuite.cpp 
+   ${CMAKE_CURRENT_LIST_DIR}/lilv.c
+   )
 endif(XPLUG_LV2_SUPPORT)

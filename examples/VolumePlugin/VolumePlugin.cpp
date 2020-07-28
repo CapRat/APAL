@@ -23,10 +23,8 @@ public:
        // auto out0 = getPortAt<IAudioPort>(this, 0, PortDirection::Output);
         for (int i = 0; i < in0->size(); i++) {
             for (int s = 0; s < in0->getSampleSize(); s++) {
+                if(in0->at(i)->getData() != nullptr && out0->at(i)->getData()!=nullptr )
                 out0->at(i)->getData()[s] = in0->at(i)->getData()[s] * 0.5f;
-                /* if (outputs[0].channels[i].data64 != nullptr) {
-                     outputs[0].channels[i].data64[s] = inputs[0].channels[i].data64[s] * 0.5;
-                 }*/
             }
         }
     }

@@ -18,7 +18,7 @@ if(XPLUG_LV2_SUPPORT)
 endif(XPLUG_LV2_SUPPORT)
 
 if(XPLUG_BUILD_TESTS)
-    include(integration_tests)
+    include(xplug)
     DLOAD_PLUGINVAL()
     if(XPLUG_VST2_SUPPORT)
         RUN_VST2_TEST(MidiForwarder)

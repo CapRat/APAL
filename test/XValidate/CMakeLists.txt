@@ -7,7 +7,7 @@ add_executable(XValidate
 "tools/Logger.hpp"
 "tools/clipp.hpp" 
 "IFormatTestSuite.hpp" 
- )
+   "formats/lv2/lilv.h" "formats/lv2/lilv.c" )
 add_subdirectory(formats)
 
 target_link_libraries(XValidate PUBLIC XPlug)

@@ -47,9 +47,8 @@ int main(int argc, char* argv[])
     bool silentLogging = false;
     bool testDefaultSelection = true;
     auto cli = (
-        value("path to pluginbinary", pluginPath),
         option("-p", "--performance").set(enablePerformanceMeasureing).doc("Enables performancemeasurement of functions."),
-        option("-v", "--verbose").set(verboseLogging).doc("Prints all available messages."),
+        option("-w", "--verbose").set(verboseLogging).doc("Prints all available messages."),
         option("-q", "--quiet").set(silentLogging).doc("Prints nothing, except errors."),
         option("-nt","--notest").set(disableTesting).doc("Dont run regular tests."),
         option("-l", "--strictnessLevel").doc("Sets the Level, how strict the tests should be executed.") & value("strictness level", strictnessLevel) 
@@ -57,17 +56,19 @@ int main(int argc, char* argv[])
     for (auto testSuite : GlobalData().testSuites) {
         auto formatName = testSuite->getFormatName();
         std::transform(formatName.begin(), formatName.end(), formatName.begin(), ::tolower);
-        cli.push_back(option("-" + formatName, "--enable" + formatName).call([testSuite,&testDefaultSelection](const char*) {testSuite->enable(); testDefaultSelection = false; }).doc("Enable " + testSuite->getFormatName() + " Tests."));
+        cli.push_back(option("-" + formatName, "--enable" + testSuite->getFormatName()).call([testSuite, &testDefaultSelection](const char*) {
+            testSuite->enable(); testDefaultSelection = false;
+            }) .doc("Enable " + testSuite->getFormatName() + " Tests."));
     }
+    cli.push_back(value("path to pluginbinary", pluginPath));
     if (!parse(argc, argv, cli))  std::cout << make_man_page(cli, argv[0]);
     // If testDefaultSelection is true, enable all testsuites.
     TestSuiteData tData{ pluginPath , (verboseLogging?VerbosityLevel::Verbose:silentLogging?VerbosityLevel::Quiet:VerbosityLevel::Normal ),strictnessLevel };
    
     // Initialize all testsuites and enable or disable them, if default selection is needed.
     for (auto testSuite : GlobalData().testSuites) {
-        testSuite->initialize(tData);
         if (testDefaultSelection) {
-            if (testSuite->isSupported(pluginPath))
+            if (testSuite->isSupported(pluginPath)) 
                 testSuite->enable();
             else
                 testSuite->disable();
@@ -76,6 +77,7 @@ int main(int argc, char* argv[])
 
     for (auto testSuite : GlobalData().testSuites) {
         if (testSuite->isEnabled()) {
+            testSuite->initialize(tData);
             if (!disableTesting) {
                 GlobalLog().logN("Execute " + testSuite->getFormatName() + " Tests with strictness " + std::to_string(strictnessLevel),LoggerValue::INFO);
                 testSuite->run();

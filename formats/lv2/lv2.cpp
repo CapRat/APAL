@@ -27,10 +27,12 @@ struct MidiHandle {
  * @param in 
 */
 inline void handleInput(MidiHandle* in) {
-    LV2_ATOM_SEQUENCE_FOREACH(in->midiDataLocation, ev) {
-        if (ev->body.type == in->midi_MidiEventID) {
-            const uint8_t* const msg = (const uint8_t*)(ev + 1);
-            in->connectedMidiPort->feed({ msg[0],msg[1],msg[2] });
+    if (in->midiDataLocation != nullptr) {
+        LV2_ATOM_SEQUENCE_FOREACH(in->midiDataLocation, ev) {
+            if (ev->body.type == in->midi_MidiEventID) {
+                const uint8_t* const msg = (const uint8_t*)(ev + 1);
+                in->connectedMidiPort->feed({ msg[0],msg[1],msg[2] });
+            }
         }
     }
 }
@@ -45,19 +47,21 @@ typedef struct {
  * @param in
 */
 inline void handleOutput(MidiHandle* out) {
-    const uint32_t out_capacity = out->midiDataLocation->atom.size;
-    // Write an empty Sequence header to the output
-    lv2_atom_sequence_clear(out->midiDataLocation);
-    out->midiDataLocation->atom.type = out->midi_MidiEventID;
-    while (!out->connectedMidiPort->empty()) {
-        MIDINoteEvent ev;
-        // Could simply do fifth.event = *ev here instead...
-        ev.event.time.frames =0;  // Same time
-        ev.event.body.type = out->midi_MidiEventID;    // Same type
-        ev.event.body.size = sizeof(MIDINoteEvent);    // Same size
-        ev.msg = out->connectedMidiPort->get();
-        lv2_atom_sequence_append_event(
-            out->midiDataLocation, out_capacity, &ev.event);
+    if (out->midiDataLocation != nullptr) {
+        const uint32_t out_capacity = out->midiDataLocation->atom.size;
+        // Write an empty Sequence header to the output
+        lv2_atom_sequence_clear(out->midiDataLocation);
+        out->midiDataLocation->atom.type = out->midi_MidiEventID;
+        while (!out->connectedMidiPort->empty()) {
+            MIDINoteEvent ev;
+            // Could simply do fifth.event = *ev here instead...
+            ev.event.time.frames = 0;  // Same time
+            ev.event.body.type = out->midi_MidiEventID;    // Same type
+            ev.event.body.size = sizeof(MIDINoteEvent);    // Same size
+            ev.msg = out->connectedMidiPort->get();
+            lv2_atom_sequence_append_event(
+                out->midiDataLocation, out_capacity, &ev.event);
+        }
     }
 }
 
@@ -69,7 +73,10 @@ struct LV2HandleDataType {
     std::vector<MidiHandle> midiHandles;
 };
 
-
+inline bool supportsMidi(IPlugin* plug,IPort* port) {
+    return((plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) && port->getDirection() == PortDirection::Input) ||
+        (plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput) && port->getDirection() == PortDirection::Output));
+}
 
 /**
    The `lv2_descriptor()` function is the entry point to the plugin library.  The
@@ -106,23 +113,24 @@ extern "C" {
         };
         desc->connect_port = [](LV2_Handle instance, uint32_t IPort, void* DataLocation) {
             auto data = static_cast<LV2HandleDataType*>(instance);
-            iteratePortsFlat(data->plug, [IPort,DataLocation,&data](XPlug::IPort* p, size_t ind) {
+            size_t midiPortIndex = 0;
+            iteratePortsFlat(data->plug, [IPort,DataLocation,&data,&midiPortIndex](XPlug::IPort* p, size_t ind) {
                 if (IPort == ind) {
                     auto midiPort = dynamic_cast<IMidiPort*>(p);
-                    if (midiPort != nullptr && (
-                        (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiInput) && midiPort->getDirection() == PortDirection::Input) ||
-                        (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput) && midiPort->getDirection() == PortDirection::Output)
-                        )) {
-                        data->midiHandles.push_back(MidiHandle{ (LV2_Atom_Sequence*)DataLocation,midiPort,
-                                                               data->map->map(data->map->handle, LV2_MIDI__MidiEvent)
-                            });
+                    if (midiPort != nullptr)
+                        if( supportsMidi(data->plug,midiPort)) {
+                            if (data->midiHandles.capacity() < getNumberOfPorts<IMidiPort>(data->plug,PortDirection::All)) // Resize if vector is not big enough
+                                data->midiHandles.resize(getNumberOfPorts<IMidiPort>(data->plug, PortDirection::All));
+                        data->midiHandles[midiPortIndex] = MidiHandle{ (LV2_Atom_Sequence*)DataLocation,midiPort, data->map->map(data->map->handle, LV2_MIDI__MidiEvent) };
                     }
                     else {
                         auto aPort = dynamic_cast<IAudioPort*>(p);
                         aPort->at(ind - IPort)->feed((float*)DataLocation);
                     }
-                    return true;
+   
                 }
+                if (dynamic_cast<IMidiPort*>(p) != nullptr)
+                    midiPortIndex++;
                 return false;
                 });
 
@@ -155,7 +163,7 @@ extern "C" {
             }
             if (!lv2Handle->map) {
                 return NULL;
-            }
+            } 
             return lv2Handle;
         };
 
@@ -185,28 +193,7 @@ extern "C" {
         };
 
         desc->extension_data = [](const char* uri)-> const void* {
-            if (strcmp(uri, "urn:custom_test_data") == 0) {
-                static custom_test_data data{ [](size_t plugIndex) {
-                    int counter = 0;
-                    iteratePortsFlat(GlobalData().getPlugin(plugIndex).get(), [&counter](IPort* p, size_t ind) {
-                        counter++;
-                        return false;
-                        });
-                    return counter;
-                } ,
-                    [](size_t plugIndex,size_t portIndex) {
-                        int ret;
-                        iteratePortsFlat(GlobalData().getPlugin(plugIndex).get(),[&ret, portIndex](IPort* p,size_t ind) {
-                            ret = p->getDirection() == PortDirection::Input ? 0 : 1;
-                            if (dynamic_cast<IAudioPort*>(p) == nullptr) 
-                                ret += 2;
-                            return portIndex == ind;
-                        });
-                        return ret;
-                } };
-                return &data;
-            }
-            return NULL;
+            return nullptr;
         };
 
         return desc;

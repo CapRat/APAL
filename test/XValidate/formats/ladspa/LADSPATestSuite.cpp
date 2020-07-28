@@ -33,7 +33,7 @@ public:
             auto handle = desc->instantiate(desc, sampleRate);
             desc->activate(handle);
             auto portData = std::vector<LADSPA_Data*>(desc->PortCount);
-            for (int i = 0; i < desc->PortCount; i++) {
+            for (size_t i = 0; i < desc->PortCount; i++) {
                 portData[i] = new LADSPA_Data[sampleRate];
                 desc->connect_port(handle, i, portData[i]);
             }

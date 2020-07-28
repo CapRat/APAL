@@ -11,6 +11,7 @@ void RegisterTestSuite(std::shared_ptr<IFormatTestSuite>);
 IFormatTestSuite* GetTestSuite(std::string formatName);
 
 
+
 Logger& GlobalLog();
 
 #endif //! XVALIDATE_HPP

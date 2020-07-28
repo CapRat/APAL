@@ -13,6 +13,9 @@ using namespace XPlug;
 using namespace Steinberg;
 using namespace Vst;
 
+/**
+ * @brief Implementation of the IEventList interfacem but without query ,addref and release functions, because it should not be needed.
+*/
 class EventList : public IEventList {
 private:
     std::vector<Event> events;

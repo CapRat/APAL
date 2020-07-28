@@ -27,7 +27,7 @@ public:
     virtual std::string getFormatName() = 0;
 
     /**
-     * @brief Initializes the Testsuite with needed data. Dont do something fancy in here. Every testsuite is initialized, because it should be tested through isSupported.
+     * @brief Initializes the Testsuite with needed data. Do heave initialisation in here.
      * @param data Data for initializing.
      */
     virtual void initialize(TestSuiteData data) = 0;
