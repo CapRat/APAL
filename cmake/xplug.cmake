@@ -63,13 +63,15 @@ get_architecture()
 add_custom_command(TARGET ${TARGET} POST_BUILD COMMAND ${CMAKE_COMMAND} -E make_directory ${VST3_PACKAGE_ROOT} 
     COMMAND ${CMAKE_COMMAND} -E make_directory ${VST3_PACKAGE_ROOT}/Contents/Resources 
     COMMAND ${CMAKE_COMMAND} -E make_directory ${VST3_PACKAGE_ROOT}/Contents/${ARCHITECTURE_NAME} 
-    COMMAND ${CMAKE_COMMAND} -E copy  $<TARGET_FILE:${TARGET}> ${VST3_PACKAGE_ROOT}/Contents/${ARCHITECTURE_NAME}/${TARGET}.vst3
+    COMMAND ${CMAKE_COMMAND} -E copy  $<TARGET_FILE:${TARGET}> ${VST3_PACKAGE_ROOT}/Contents/${ARCHITECTURE_NAME}/$<TARGET_FILE_NAME:${TARGET}> 
     COMMAND ${CMAKE_COMMAND} -E copy  ${__DIR_OF_XPLUG_CMAKE}/speaker.ico ${VST3_PACKAGE_ROOT}/Plugin.ico)
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" OR ${CMAKE_SYSTEM_NAME} STREQUAL "MSYS")
     file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated_desktop.ini CONTENT "[.ShellClassInfo]\nIconResource=Plugin.ico,0")
+    set(WINDOWS_EXTRA_DIR "/${ARCHITECTURE_NAME}/")
     add_custom_command(TARGET ${TARGET} POST_BUILD  COMMAND ${CMAKE_COMMAND} -E copy  ${CMAKE_CURRENT_BINARY_DIR}/generated_desktop.ini ${VST3_PACKAGE_ROOT}/desktop.ini
         COMMAND attrib +s +r +h ${VST3_PACKAGE_ROOT}/desktop.ini
-        COMMAND attrib +r +h ${VST3_PACKAGE_ROOT}/Plugin.ico)
+        COMMAND attrib +r +h ${VST3_PACKAGE_ROOT}/Plugin.ico
+        COMMAND ${CMAKE_COMMAND} -E rename  ${VST3_PACKAGE_ROOT}/Contents/${ARCHITECTURE_NAME}/$<TARGET_FILE_NAME:${TARGET}> ${VST3_PACKAGE_ROOT}/Contents/${ARCHITECTURE_NAME}/${TARGET}.vst3 )
 endif(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" OR ${CMAKE_SYSTEM_NAME} STREQUAL "MSYS")
 endfunction(create_vst3_package)
 
