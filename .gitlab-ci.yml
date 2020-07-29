@@ -23,9 +23,9 @@ docker-build-linux-x64:
   script:
     #- git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
     - mkdir -p build/Release
-    - mkdir -p build/Debug     
-    - mkdir deps
-    - cmake -DINSTALL_PREFIX=deps/ -DBUILD_PATH=build/ -P scripts/install.cmake 
+    - mkdir -p build/Debug
+    - mkdir -p build/deps
+    - cmake -DINSTALL_PREFIX=build/deps/ -DBUILD_PATH=build/deps -P scripts/install.cmake 
     - cd build/Release
     - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=build/ ../..
     - cmake --build .  
