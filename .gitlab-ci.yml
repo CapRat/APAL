@@ -22,11 +22,16 @@ docker-build-linux-x64:
    # - DEBIAN_FRONTEND=noninteractive apt --yes --force-yes install libx11-dev libfreetype6-dev 	pkg-config libxcb-util0-dev libstdc++6 libx11-xcb-dev libxcb-util0-dev libxcb-cursor-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev libcairo2-dev libgtkmm-3.0-dev libsqlite3-dev libxcb-keysyms1-dev
   script:
     #- git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
-    - mkdir build
-    - cmake -DINSTALL_PREFIX=build/ -P scripts/install.cmake 
-    - cd build
-    - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=build/ ..
+    - mkdir build/Release
+    - mkdir build/Debug     
+    - mkdir deps
+    - cmake -DINSTALL_PREFIX=deps/ -DBUILD_PATH=build/ -P scripts/install.cmake 
+    - cd build/Release
+    - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=build/ ../..
     - cmake --build .  
+    - cd ../Debug
+    - cmake -E env CXXFLAGS="-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage" C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage -lgcov" cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=build/ ../..
+    - cmake --build .
   artifacts:    
     paths:
       - build/
@@ -37,17 +42,14 @@ docker_ubuntu_test:
   stage: test
   before_script:
     - apt update
-    -  DEBIAN_FRONTEND=noninteractive apt --yes install cmake git ninja-build build-essential libstdc++6 pkg-config libxcb-util0-dev libx11-xcb-dev libxcb-util0-dev libxcb-cursor-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev libcairo2-dev libgtkmm-3.0-dev libsqlite3-dev libxcb-keysyms1-dev
+    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake git ninja-build build-essential libstdc++6 pkg-config libxcb-util0-dev libx11-xcb-dev libxcb-util0-dev libxcb-cursor-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev libcairo2-dev libgtkmm-3.0-dev libsqlite3-dev libxcb-keysyms1-dev
    # - DEBIAN_FRONTEND=noninteractive apt --yes --force-yes install libx11-dev libfreetype6-dev 	pkg-config libxcb-util0-dev libstdc++6 libx11-xcb-dev libxcb-util0-dev libxcb-cursor-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev libcairo2-dev libgtkmm-3.0-dev libsqlite3-dev libxcb-keysyms1-dev
   script:
     #- git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
-    - mkdir build
-    - cmake -DINSTALL_PREFIX=build/ -P scripts/install.cmake 
-    - cd build
-    - cmake -E env CXXFLAGS="-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage" C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage -lgcov" cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=build/ ..
-    - cmake --build .  
-    - ctest .   
-    - gcovr --fail-under-line 80 -s  --exclude-directories "test|examples"  -r ../  .
+    - cd build/Debug
+    - ctest .
+    - gcovr --fail-under-line 80 -s  --exclude-directories "test|examples"  -r ../..  .
+    - cd ../Debug
 #docker-test-linux-x64 :
 #  image: dockcross/linux-x64    
 #  stage: test
@@ -68,7 +70,7 @@ docker-deploy-linux-x64 :
   image: debian:buster-slim
   stage: deploy
   script:
-    - cd build
+    - cd build/Release
     - echo Y | apt install rpm
     - cpack -G DEB .
     - cpack -G RPM .
