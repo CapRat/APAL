@@ -1,6 +1,5 @@
 find_path(VST2_INCLUDE_DIR
     NAMES aeffect.h 
-    pluginterfaces/vst/ivstaudioprocessor.h 
     PATHS ${CMAKE_CURRENT_LIST_DIR}/../deps
     PATH_SUFFIXES vstsdk2.4 vstsdk2.4/pluginterfaces/vst2.x include/pluginterfaces/vst2.x
 )

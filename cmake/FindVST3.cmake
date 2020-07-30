@@ -1,8 +1,8 @@
 find_path(VST3_INCLUDE_DIR
     NAMES pluginterfaces/vst/ivstaudioprocessor.h 
-    pluginterfaces/vst/ivstaudioprocessor.h 
+        vst/ivstaudioprocessor.h 
     PATHS ${CMAKE_CURRENT_LIST_DIR}/../deps
-    PATH_SUFFIXES vst3sdk plugininterfaces include vst3sdk/include
+    PATH_SUFFIXES vst3sdk pluginterfaces include vst3sdk/include
 )
 
 find_library(VST3_BASE_LIBRARY	            NAMES base PATH_SUFFIXES lib ../lib PATHS ${VST3_INCLUDE_DIR})
