@@ -24,7 +24,7 @@ public:
         for (int i = 0; i < in0->size(); i++) {
             for (int s = 0; s < in0->getSampleSize(); s++) {
                 if(in0->at(i)->getData() != nullptr && out0->at(i)->getData()!=nullptr )
-                //out0->at(i)->getData()[s] = in0->at(i)->getData()[s] * 0.5f;
+                    out0->at(i)->getData()[s] = in0->at(i)->getData()[s] * 0.5f;
             }
         }
     }
