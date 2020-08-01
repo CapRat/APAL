@@ -52,11 +52,13 @@ debian_test:
 docker-deploy-linux-x64 :
   image: debian:buster-slim
   stage: deploy
+  before_script:
+    - apt update
+    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake rpm
   script:
     - cd build/Release
-    - echo Y | apt install rpm
     - cpack -G DEB .
-    - cpack -G RPM .
+    #- cpack -G RPM .
     - cpack -G ZIP .
   dependencies:
     - debian_buster_x64_build
