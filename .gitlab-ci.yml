@@ -1,15 +1,3 @@
-#docker-build-win64:
-#  image: docker:latest
-#  stage: build
-#  services:
-#    - docker:dind
-#  before_script:    
-#    - docker run --rm dockcross/windows-static-x86 > ./dockcross
-#    - chmod +x ./dockcross
-#    - cat ./dockcross
-#  script:
-#    - ./dockcross cmake -Bbuild -H. -GNinja
-#    - ./dockcross ninja -Cbuild
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   
@@ -18,17 +6,16 @@ debian_buster_x64_build:
   stage: build
   before_script:
     - apt update
-    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake git ninja-build build-essential pkg-config
+    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake git ninja-build build-essential
    # - DEBIAN_FRONTEND=noninteractive apt --yes --force-yes install libx11-dev libfreetype6-dev 	pkg-config libxcb-util0-dev libstdc++6 libx11-xcb-dev libxcb-util0-dev libxcb-cursor-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev libcairo2-dev libgtkmm-3.0-dev libsqlite3-dev libxcb-keysyms1-dev
   script:
-    #- git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
     - mkdir -p build/Release
     - mkdir -p build/Debug
     - mkdir -p build/deps
     - cmake -DINSTALL_PREFIX=$(pwd)/build/deps -DBUILD_DIR=build/deps -P scripts/install.cmake 
     - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B build/Release
     - cmake --build build/Release/ 
-    - cmake -E env CXXFLAGS="-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage" C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage -lgcov" cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B build/Debug
+    - cmake -E env CXXFLAGS="-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage" C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage -lgcov" cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B build/Debug
     - cmake --build build/Debug
   artifacts:    
     paths:
@@ -41,13 +28,11 @@ debian_test:
   before_script:
     - apt update
     - DEBIAN_FRONTEND=noninteractive apt --yes install cmake gcovr
-   # - DEBIAN_FRONTEND=noninteractive apt --yes --force-yes install libx11-dev libfreetype6-dev 	pkg-config libxcb-util0-dev libstdc++6 libx11-xcb-dev libxcb-util0-dev libxcb-cursor-dev libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev libfontconfig1-dev libcairo2-dev libgtkmm-3.0-dev libsqlite3-dev libxcb-keysyms1-dev
   script:
-    #- git clone https://github.com/CapRat/plugin-torture.git && mkdir plugin-torture/build && cd plugin-torture/build && cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install && cd ../..
     - cd build/Debug
     - ctest -E pluginval
-    - gcovr --fail-under-line 80 -s  --exclude-directories "test|examples"  -r ../..  .
-    
+    - gcovr --fail-under-line 80 -s -j4  -r $(pwd)/../../  $gcovr --fail-under-line 80 -s -e '.*/deps/.*$' -e '.*(CMake|(T|t)tl|string_view).*$'  --exclude-directories "test/|examples/|deps/"   -r $(pwd)/../../  $(pwd)
+   
 #docker-test-linux-x64 :
 #  image: dockcross/linux-x64    
 #  stage: test
