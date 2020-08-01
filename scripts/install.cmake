@@ -87,7 +87,9 @@ endif(NOT SKIP_LV2)
 
 ######################## INSTALLING VST3 #########################
 if(NOT SKIP_VST3)
-    execute_process(COMMAND git clone --recursive https://github.com/steinbergmedia/vst3sdk.git ${BUILD_DIR}/Vst3SdkSrc) #Clone VST3
+    execute_process(COMMAND git clone https://github.com/steinbergmedia/vst3sdk.git ${BUILD_DIR}/Vst3SdkSrc) #Clone VST3
+    execute_process(COMMAND git submodule update --init --remote pluginterfaces base cmake public.sdk WORKING_DIRECTORY ${BUILD_DIR}/Vst3SdkSrc) 
+    file(REMOVE_RECURSE ${BUILD_DIR}/Vst3SdkSrc/public.sdk/samples/vst-hosting/audiohost/ ${BUILD_DIR}/Vst3SdkSrc/public.sdk/samples/vst-hosting/editorhost/)
     file(MAKE_DIRECTORY ${BUILD_DIR}/Vst3SdkBuild)
     execute_process(COMMAND cmake -DCMAKE_BUILD_TYPE=${BUILD_CONFIG} -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF -DSMTG_RUN_VST_VALIDATOR=OFF -DSMTG_ADD_VSTGUI=OFF -S ${BUILD_DIR}/Vst3SdkSrc -B ${BUILD_DIR}/Vst3SdkBuild)  #Configure VST3
     execute_process(COMMAND cmake --build ${BUILD_DIR}/Vst3SdkBuild --config ${BUILD_CONFIG}  ) #BuildVST3

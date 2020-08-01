@@ -4,7 +4,7 @@ include(GenerateExportHeader)
 add_library(static_example STATIC "tools/TestLibLoading.cpp")
 EXPORT_SYMBOLS(static_example FUNCTION_NAMES static_test_function static_test_function2 )
 target_compile_definitions(static_example PRIVATE BUILD_TEST_LIB BUILD_STATIC_EXAMPLE)
-
+set_target_properties(static_example PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 add_library(simple_symbol_export MODULE "tools/TestLibLoading.cpp" )
 target_compile_definitions(simple_symbol_export PRIVATE BUILD_TEST_LIB BUILD_SIMPLE_SYMBOL_EXPORT)
 GENERATE_EXPORT_HEADER(simple_symbol_export)

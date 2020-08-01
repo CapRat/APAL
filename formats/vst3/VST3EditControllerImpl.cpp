@@ -57,7 +57,7 @@ tresult PLUGIN_API VST3EditControllerImpl::getState(IBStream* state)
 
 int32 PLUGIN_API VST3EditControllerImpl::getParameterCount()
 {
-    return kNotImplemented;
+    return 0;
 }
 
 tresult PLUGIN_API VST3EditControllerImpl::getParameterInfo(int32 paramIndex, ParameterInfo& info)

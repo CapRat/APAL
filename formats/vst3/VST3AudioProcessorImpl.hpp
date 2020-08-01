@@ -5,7 +5,7 @@
 using namespace Steinberg;
 using namespace Vst;
 
-class VST3AudioProccessorImpl : public Component, public IAudioProcessor
+class VST3AudioProccessorImpl : public Component, public IAudioProcessor, public IProcessContextRequirements
 {
 public:
 	static const FUID cid;
@@ -76,6 +76,21 @@ public:
 		 - kInfiniteTail when infinite tail. */
 	virtual uint32 PLUGIN_API getTailSamples() override;
 
+
+	/**
+	To get accurate process context information (Vst::ProcessContext), it is now required to implement this interface and
+	return the desired bit mask of flags which your audio effect needs. If you do not implement this
+	interface, you may not get any information at all of the process function.
+
+	The host asks for this information once between initialize and setActive. It cannot be changed afterwards.
+
+	This gives the host the opportunity to better optimize the audio process graph when it knows which
+	plug-ins need which information.
+
+	Plug-Ins built with an earlier SDK version (< 3.7) will still get the old information, but the information
+	may not be as accurate as when using this interface.
+	*/
+	virtual uint32 PLUGIN_API getProcessContextRequirements()override;
 protected:
 	ProcessSetup processSetup;
 	

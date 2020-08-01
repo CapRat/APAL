@@ -46,6 +46,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
         }
         delete data->desc->PortNames;
         delete data->desc->PortDescriptors;
+        delete data->desc;
         delete data;
     };
 

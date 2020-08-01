@@ -1,6 +1,7 @@
 #include "VST3AudioProcessorImpl.hpp"
 #include "VST3EditControllerImpl.hpp"
 #include <vst/vstspeaker.h>
+
 #include "interfaces/IPlugin.hpp"
 #include "GlobalData.hpp"
 #include <interfaces/IPlugin.hpp>
@@ -28,8 +29,9 @@ VST3AudioProccessorImpl::~VST3AudioProccessorImpl()
  tresult PLUGIN_API VST3AudioProccessorImpl::queryInterface(const TUID _iid, void** obj)
 {
     //QUERY_INTERFACE(_iid, obj, VST3AudioProccessorImpl::iid, VST3AudioProccessorImpl)
-    QUERY_INTERFACE(_iid, obj, IAudioProcessor::iid, IAudioProcessor)
-        return Component::queryInterface(_iid, obj);
+     QUERY_INTERFACE(_iid, obj, IAudioProcessor::iid, IAudioProcessor);
+     QUERY_INTERFACE(_iid, obj, IProcessContextRequirements::iid, IProcessContextRequirements);
+     return Component::queryInterface(_iid, obj);
 }
 
  uint32 PLUGIN_API VST3AudioProccessorImpl::addRef()
@@ -193,18 +195,20 @@ called) */
  tresult PLUGIN_API VST3AudioProccessorImpl::process(ProcessData& data)
 {
      auto plug = GlobalData().getPlugin(plugIndex).get();
-     if (data.numInputs != getNumberOfPorts<IAudioPort>(plug, PortDirection::Input) ||
+     /*if (data.numInputs != getNumberOfPorts<IAudioPort>(plug, PortDirection::Input) ||
          data.numOutputs != getNumberOfPorts<IAudioPort>(plug, PortDirection::Output))
-         return kResultFalse;
+         return kResultFalse;*/
      size_t inputIndex = 0;
      size_t outputIndex = 0;
      iteratePorts<IAudioPort>(plug, [&inputIndex, &outputIndex, &data](IAudioPort* p, size_t ind) {
          p->setSampleSize(data.numSamples);
-         AudioBusBuffers& b = p->getDirection() == PortDirection::Input ? data.inputs[inputIndex++] : data.outputs[outputIndex++];
-         if (b.numChannels != p->size()) return false;
-         for (int channelIndex = 0; channelIndex < b.numChannels; channelIndex++) {
-             // TODO: hier double processing einfügen, wenn implementiert.
-             p->at(channelIndex)->feed(b.channelBuffers32[channelIndex]);
+         if (p->getDirection() == PortDirection::Input ? inputIndex<data.numInputs : outputIndex < data.numOutputs) {
+             AudioBusBuffers& b = p->getDirection() == PortDirection::Input ? data.inputs[inputIndex++] : data.outputs[outputIndex++];
+             if (b.numChannels != p->size()) return false;
+             for (int channelIndex = 0; channelIndex < b.numChannels; channelIndex++) {
+                 // TODO: hier double processing einfügen, wenn implementiert.
+                 p->at(channelIndex)->feed(b.channelBuffers32[channelIndex]);
+             }
          }
          return false;
          });
@@ -306,5 +310,10 @@ It should return:
 {
     return kNoTail;
 }
+
+ uint32 PLUGIN_API VST3AudioProccessorImpl::getProcessContextRequirements()
+ {
+     return 0;
+ }
 
 const ::Steinberg::FUID VST3AudioProccessorImpl::cid(INLINE_UID(0x00000100, 0x00011011, 0x00011000, 0x00000110));

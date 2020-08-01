@@ -1,0 +1,1 @@
+XPlug can be build without dependencies. But dependencies add a lot of more stuff, so the make XPlug a lot more usefull. 
