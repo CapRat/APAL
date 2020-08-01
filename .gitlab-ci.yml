@@ -13,7 +13,7 @@
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
   
-debian-buster-x64:
+debian_buster_x64_build:
   image: debian:buster-slim 
   stage: build
   before_script:
@@ -74,7 +74,7 @@ docker-deploy-linux-x64 :
     - cpack -G RPM .
     - cpack -G ZIP .
   dependencies:
-    - docker-build-linux-x64
+    - debian_buster_x64_build
   artifacts:
     paths:
       - build
