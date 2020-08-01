@@ -31,7 +31,7 @@ debian_test:
   script:
     - cd build/Debug
     - ctest -E pluginval
-    - gcovr --fail-under-line 80 -s -j4  -r $(pwd)/../../  $gcovr --fail-under-line 80 -s -e '.*/deps/.*$' -e '.*(CMake|(T|t)tl|string_view).*$'  --exclude-directories "test/|examples/|deps/"   -r $(pwd)/../../  $(pwd)
+    #- gcovr --fail-under-line 80 -s -j4  -r $(pwd)/../../  $gcovr --fail-under-line 80 -s -e '.*/deps/.*$' -e '.*(CMake|(T|t)tl|string_view).*$'  --exclude-directories "test/|examples/|deps/"   -r $(pwd)/../../  $(pwd)
    
 #docker-test-linux-x64 :
 #  image: dockcross/linux-x64    
