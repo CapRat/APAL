@@ -7,6 +7,7 @@ endif(NOT BUILD_DIR)
 SET(SKIP_VST3 OFF)
 SET(SKIP_TORTURE OFF)
 SET(SKIP_LV2 OFF)
+SET(SKIP_PLUGINVAL OFF)
 if(WIN32)
     if(NOT INSTALL_PREFIX)
         SET(INSTALL_PREFIX "c:/Program Files" )
@@ -14,6 +15,7 @@ if(WIN32)
     SET(TORTURE_INSTALL_PREFIX ${INSTALL_PREFIX}/plugin-torture)
     SET(LV2_INSTALL_PREFIX ${INSTALL_PREFIX}/lv2)
     SET(VST3_INSTALL_PREFIX ${INSTALL_PREFIX}/vst3sdk)
+    SET(PLUGINVAL_INSTALL_PREFIX ${INSTALL_PREFIX}/pluginval)
 elseif(UNIX)
     if(NOT INSTALL_PREFIX)
         SET(INSTALL_PREFIX "/usr/local")
@@ -21,6 +23,7 @@ elseif(UNIX)
     SET(TORTURE_INSTALL_PREFIX ${INSTALL_PREFIX})
     SET(LV2_INSTALL_PREFIX ${INSTALL_PREFIX})
     SET(VST3_INSTALL_PREFIX ${INSTALL_PREFIX})
+    SET(PLUGINVAL_INSTALL_PREFIX ${INSTALL_PREFIX})
 endif(WIN32)
 
 
@@ -65,6 +68,7 @@ function(xinstall)
         file(COPY ${XINSTALL_SRC_FILEPATH} DESTINATION ${XINSTALL_FILEDIR})
     endforeach(XINSTALL_FILEPATH ${XINSTALL_FILEPATHS})
 endfunction(xinstall)
+
 
 
 
@@ -114,3 +118,28 @@ if(NOT SKIP_VST3)
     file(REMOVE_RECURSE ${BUILD_DIR}/Vst3SdkSrc)
     file(REMOVE_RECURSE ${BUILD_DIR}/Vst3SdkBuild)
 endif(NOT SKIP_VST3)
+
+
+#################INSTALLING PLUGINVAL######################
+if(NOT SKIP_PLUGINVAL)
+    if(WIN32)
+        set(PLUGINVAL_DOWNLOAD_URL https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Windows.zip)
+        set(EXE_NAME pluginval.exe)
+    elseif(APPLE)
+        set(PLUGINVAL_DOWNLOAD_URL https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_macOS.zip)
+        set(EXE_NAME pluginval.app/Contents/MacOS/pluginval)
+    elseif(UNIX AND NOT APPLE)
+        set(PLUGINVAL_DOWNLOAD_URL https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Linux.zip)
+        set(EXE_NAME pluginval)
+    endif(WIN32)
+
+    set(PLUGINVAL_EXE_PATH ${BUILD_DIR}/${EXE_NAME}) # Path to extracted executable
+    set(PLUGINVAL_TEMP_ZIP_PATH ${BUILD_DIR}/pluginval_dload.zip) #Path to downloaded zipfile
+    if(NOT EXISTS ${PLUGINVAL_EXE_PATH})
+        if(NOT EXISTS ${PLUGINVAL_TEMP_ZIP_PATH})
+            file(DOWNLOAD ${PLUGINVAL_DOWNLOAD_URL} ${PLUGINVAL_TEMP_ZIP_PATH})
+        endif(NOT EXISTS ${PLUGINVAL_TEMP_ZIP_PATH})
+        execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xf ${PLUGINVAL_TEMP_ZIP_PATH} WORKING_DIRECTORY ${BUILD_DIR})
+    endif(NOT EXISTS  ${PLUGINVAL_EXE_PATH})
+    xinstall(INSTALL_PREFIX ${PLUGINVAL_INSTALL_PREFIX} DESTINATION bin/  FILE_PATTERNS ${PLUGINVAL_EXE_PATH})
+endif(NOT SKIP_PLUGINVAL)

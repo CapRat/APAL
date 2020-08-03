@@ -1,6 +1,6 @@
 #TortureTester_EXECUTABLE
 find_program(TortureTester_EXECUTABLE NAMES plugin-torture torture TortureTester DOC "Path to torture-plugin tester Executable"
-PATHS bin)
+PATH_SUFFIXES bin/ plugin-torture/bin/)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(TortureTester

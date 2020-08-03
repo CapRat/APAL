@@ -1,6 +1,6 @@
   find_path(LV2_INCLUDE_DIR
       NAMES core/lv2.h
-      PATH_SUFFIXES include lv2 include/lv2
+      PATH_SUFFIXES include lv2 include/lv2  lv2/include/lv2
   )
 
 find_package(PackageHandleStandardArgs)

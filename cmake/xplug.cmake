@@ -127,34 +127,3 @@ function(run_lv2_tests TARGET)
 
     add_test(NAME ${TARGET}_xvalidate_lv2_test COMMAND XValidate -lv2 -l 10 -p  ${LV2_TEMP_PACKAGE}/$<TARGET_FILE_NAME:${TARGET}> )
 endfunction(run_lv2_tests TARGET)
-
-
-macro(DLOAD_PLUGINVAL)
-    if(NOT TARGET pluginval)
-    if(WIN32)
-        set(PLUGINVAL_DOWNLOAD_URL https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Windows.zip)
-        set(EXE_NAME pluginval.exe)
-    elseif(APPLE)
-         set(PLUGINVAL_DOWNLOAD_URL https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_macOS.zip)
-         set(EXE_NAME pluginval.app/Contents/MacOS/pluginval)
-    elseif(UNIX AND NOT APPLE)
-         set(PLUGINVAL_DOWNLOAD_URL https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Linux.zip)
-         set(EXE_NAME pluginval)
-    endif(WIN32)
-
-    set(PLUGINVAL_EXE_PATH ${CMAKE_BINARY_DIR}/${EXE_NAME}) # Path to extracted executable
-    set(PLUGINVAL_TEMP_ZIP_PATH ${CMAKE_BINARY_DIR}/pluginval_dload.zip) #Path to downloaded zipfile
-     if(NOT EXISTS ${PLUGINVAL_EXE_PATH})
-       if(NOT EXISTS ${PLUGINVAL_TEMP_ZIP_PATH})
-        file(DOWNLOAD ${PLUGINVAL_DOWNLOAD_URL} ${PLUGINVAL_TEMP_ZIP_PATH})
-       endif(NOT EXISTS ${PLUGINVAL_TEMP_ZIP_PATH})
-       execute_process(COMMAND ${CMAKE_COMMAND} -E tar -xf ${PLUGINVAL_TEMP_ZIP_PATH} WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
-     endif(NOT EXISTS  ${PLUGINVAL_EXE_PATH})
-     add_executable(pluginval IMPORTED GLOBAL)
-     set_target_properties(pluginval PROPERTIES IMPORTED_LOCATION "${PLUGINVAL_EXE_PATH}")
-
-     if(XPLUG_INSTALL)
-        install(PROGRAMS  "${PLUGINVAL_EXE_PATH}" DESTINATION bin)
-     endif(XPLUG_INSTALL)
- endif(NOT TARGET pluginval)
- endmacro(DLOAD_PLUGINVAL)

@@ -1,5 +1,6 @@
 
-find_program(pluginval_EXECUTABLE NAMES pluginval DOC "Path to pluginval tester Executable")
+find_program(pluginval_EXECUTABLE NAMES pluginval DOC "Path to pluginval tester Executable"
+PATH_SUFFIXES bin/ pluginval/bin/)
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(pluginval
