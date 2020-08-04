@@ -152,7 +152,7 @@ public:
             plug.instantiate(sampleRate);
             plug.allocateAndConnectPorts(512);
             plug.activate();
-            for (auto p : plug.ports) {
+            for (auto& p : plug.ports) {
                 if (p.type == PortType::Midi && p.dir == Direction::Input) {
                     // uint8_t* x= { 0x1,0x2,0x3 };
                     p.addMidiMsg(0x1, 0x2, 0x3);

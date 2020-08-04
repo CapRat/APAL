@@ -75,6 +75,7 @@ struct MidiEventBuffer {
 struct Port {
 private:
     const LV2Features* features;
+    size_t size_of_data = 0;
 public:
     const LilvPort* lilvPort = nullptr;
     void* data = nullptr;
@@ -84,16 +85,23 @@ public:
         this->lilvPort = lilvPort;
         this->type = type;
         this->features = features;
-     
-
     }
-
+    Port(const Port& other) {
+        features = other.features;
+        this->dir = other.dir;
+        this->type = other.type;
+        this->size_of_data = other.size_of_data;
+        this->lilvPort = other.lilvPort;
+        this->data = malloc(size_of_data);
+        memcpy(this->data,other.data, this->size_of_data);
+    }
 
     inline void allocate(size_t sample_count) {
         if (this->data != nullptr)
             this->free();
         switch (this->type) {
         case Midi:
+            this->size_of_data = sizeof(MidiEventBuffer);
             this->data = new MidiEventBuffer;
             memset(data, 0, sizeof(MidiEventBuffer));
             ((MidiEventBuffer*)this->data)->seq.atom.type = features->uridmap.map(features->uridmap.handle, LV2_ATOM__Sequence);
@@ -101,6 +109,7 @@ public:
            // lv2_atom_sequence_clear(&((MidiEventBuffer*)this->data)->seq);
             return;
         case Audio:
+            this->size_of_data =sizeof(float)*sample_count;
             data = new float[sample_count];
             return;
         }
