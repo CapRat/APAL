@@ -31,7 +31,7 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
     case effClose: ///< no arguments  @see AudioEffect::open
         data->plug->deinit();
         break;
-    case effSetProgram: ///< [value]: new program number  @see AudioEffect::setProgram
+  /*  case effSetProgram: ///< [value]: new program number  @see AudioEffect::setProgram
         break;
     case effGetProgram: ///< [return value]: current program number  @see AudioEffect::getProgram
         break;
@@ -48,7 +48,7 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
     case effSetSampleRate: ///< [opt]: new sample rate for audio processing  @see AudioEffect::setSampleRate
         break;
     case effSetBlockSize: ///< [value]: new maximum block size for audio processing  @see AudioEffect::setBlockSize
-        break;
+        break;*/
     case effMainsChanged: ///< [value]: 0 means "turn off", 1 means "turn on"  @see AudioEffect::suspend @see AudioEffect::resume
         if (value == 0)
             data->plug->activate();
@@ -85,7 +85,7 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
             }
         }   
         break;
-    case effCanBeAutomated: ///< [index]: parameter index [return value]: 1=true, 0=false  @see AudioEffectX::canParameterBeAutomated
+ /*   case effCanBeAutomated: ///< [index]: parameter index [return value]: 1=true, 0=false  @see AudioEffectX::canParameterBeAutomated
         break;
     case effString2Parameter: ///< [index]: parameter index [ptr]: parameter string [return value]: true for success  @see AudioEffectX::string2parameter
         break;
@@ -105,7 +105,7 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
         break;
 
     case effProcessVarIo: ///< [ptr]: #VstVariableIo*  @see AudioEffectX::processVariableIo
-        break;
+        break;*/
     case effSetSpeakerArrangement: ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::setSpeakerArrangement
         if (getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Input) == 0 || getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Output) == 0)
             return 0;
@@ -148,7 +148,7 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
     }
     case effGetTailSize: ///< [return value]: tail size (for example the reverb time of a reverb plug-in); 0 is default (return 1 for 'no tail')
         return 1;
-    case effGetParameterProperties: ///< [index]: parameter index [ptr]: #VstParameterProperties* [return value]: 1 if supported  @see AudioEffectX::getParameterProperties
+/*    case effGetParameterProperties: ///< [index]: parameter index [ptr]: #VstParameterProperties* [return value]: 1 if supported  @see AudioEffectX::getParameterProperties
         break;
     case effGetVstVersion: ///< [return value]: VST version  @see AudioEffectX::getVstVersion
         return kVstVersion;
@@ -207,7 +207,7 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
     case effGetNumMidiInputChannels: ///< [return value]: number of used MIDI input channels (1-15)  @see AudioEffectX::getNumMidiInputChannels
         break;
     case effGetNumMidiOutputChannels: ///< [return value]: number of used MIDI output channels (1-15)  @see AudioEffectX::getNumMidiOutputChannels
-        break;
+        break;*/
         //#endif // VST_2_4_EXTENSIONS
     }
     return 0;
@@ -343,8 +343,8 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
         writeMidiOutput(effect);
     };
 
-    effect->processDoubleReplacing = [](AEffect* effect, double** inputs, double** outputs, int32_t sampleFrames) {
-    /*    auto data = static_cast<VST2ImplementationData*>(effect->user);
+    /*effect->processDoubleReplacing = [](AEffect* effect, double** inputs, double** outputs, int32_t sampleFrames) {
+        auto data = static_cast<VST2ImplementationData*>(effect->user);
         int inputIndex = 0;
         int outputIndex = 0;
         iteratePorts<IAudioPort>(data->plug, [sampleFrames, inputs, &inputIndex, outputs, &outputIndex](IAudioPort* p, size_t) {
@@ -363,8 +363,8 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
             });
 
         data->plug->processAudio();
-        writeMidiOutput(effect);*/
-    };
+        writeMidiOutput(effect);
+    };*/
     effect->flags |= effFlagsCanReplacing | effFlagsCanDoubleReplacing;
     if (data->plug->getFeatureComponent()->supportsFeature(Feature::GUISupport))
         effect->flags |= effFlagsHasEditor;
