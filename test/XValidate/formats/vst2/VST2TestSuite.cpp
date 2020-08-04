@@ -50,13 +50,13 @@ public:
         delete[] inData;
         delete[] outData;
         //MIDI TEST
-        if (effect->dispatcher(effect, effCanDo, 0, 0, "receiveVstMidiEvent", 0) == 1){
+        if (effect->dispatcher(effect, effCanDo, 0, 0, (void*)"receiveVstMidiEvent", 0) == 1){
             VstMidiEvent mEvent{ kVstMidiType,sizeof(VstMidiEvent),0,0,0,0,{ 0x1,0x2,0x3,0x0 },0,0,0,0 };
             VstEvent* mEventP = (VstEvent*)&mEvent;
             VstEvents ev{ 1,nullptr,{ mEventP,NULL } };
             effect->dispatcher(effect, effProcessEvents, 0, 0, &ev, 0);
         }
-        effect->dispatcher(effect, effCanDo, 0, 0, "sendVstMidiEvent", 0);
+        effect->dispatcher(effect, effCanDo, 0, 0, (void*)"sendVstMidiEvent", 0);
         effect->dispatcher(effect, effMainsChanged, 0, 0, nullptr, 0);
         effect->dispatcher(effect, effClose, 0, 0, nullptr, 0);// Close Effect
       
