@@ -51,11 +51,11 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
         break;*/
     case effMainsChanged: ///< [value]: 0 means "turn off", 1 means "turn on"  @see AudioEffect::suspend @see AudioEffect::resume
         if (value == 0)
-            data->plug->activate();
-        else
             data->plug->deactivate();
+        else
+            data->plug->activate();
         break;
-    case effEditGetRect: ///< [ptr]: #ERect** receiving pointer to editor size  @see ERect @see AEffEditor::getRect
+  /*  case effEditGetRect: ///< [ptr]: #ERect** receiving pointer to editor size  @see ERect @see AEffEditor::getRect
         break;
     case effEditOpen: ///< [ptr]: system dependent Window pointer, e.g. HWND on Windows  @see AEffEditor::open
         break;
@@ -66,10 +66,10 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
     case effGetChunk: ///< [ptr]: void** for chunk data address [index]: 0 for bank, 1 for program  @see AudioEffect::getChunk
         break;
     case effSetChunk: ///< [ptr]: chunk data [value]: byte size [index]: 0 for bank, 1 for program  @see AudioEffect::setChunk
-        break;
+        break;*/
 
         /**************************EXTENDING OPCODES*******************************/
-    case effProcessEvents: ///< [ptr]: #VstEvents*  @see AudioEffectX::processEvents = effSetChunk + 1        ///< [ptr]: #VstEvents*  @see AudioEffectX::processEventsdes:
+    case effProcessEvents: ///< [ptr]: #VstEventsVstEvents*  @see AudioEffectX::processEvents = effSetChunk + 1        ///< [ptr]: #VstEvents*  @see AudioEffectX::processEventsdes:
         if (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiInput)) {
             auto events = (VstEvents*)ptr;
             if (events->numEvents == 0)
