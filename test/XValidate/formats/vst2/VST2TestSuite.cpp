@@ -51,7 +51,6 @@ public:
         delete[] outData;
         //MIDI TEST
         if (effect->dispatcher(effect, effCanDo, 0, 0, "receiveVstMidiEvent", 0) == 1){
-           
             VstMidiEvent mEvent{ kVstMidiType,sizeof(VstMidiEvent),0,0,0,0,{ 0x1,0x2,0x3,0x0 },0,0,0,0 };
             VstEvent* mEventP = (VstEvent*)&mEvent;
             VstEvents ev{ 1,nullptr,{ mEventP,NULL } };
