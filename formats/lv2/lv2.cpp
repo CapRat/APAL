@@ -114,20 +114,20 @@ extern "C" {
         desc->connect_port = [](LV2_Handle instance, uint32_t IPort, void* DataLocation) {
             auto data = static_cast<LV2HandleDataType*>(instance);
             size_t midiPortIndex = 0;
-            iteratePortsFlat(data->plug, [IPort,DataLocation,&data,&midiPortIndex](XPlug::IPort* p, size_t ind) {
+            iteratePortsFlat(data->plug, [IPort, DataLocation, &data, &midiPortIndex](XPlug::IPort* p, size_t ind) {
                 if (IPort == ind) {
                     auto midiPort = dynamic_cast<IMidiPort*>(p);
-                    if (midiPort != nullptr)
-                        if( supportsMidi(data->plug,midiPort)) {
-                            if (data->midiHandles.capacity() < getNumberOfPorts<IMidiPort>(data->plug,PortDirection::All)) // Resize if vector is not big enough
+                    if (midiPort != nullptr) {
+                        if (supportsMidi(data->plug, midiPort)) {
+                            if (data->midiHandles.capacity() < getNumberOfPorts<IMidiPort>(data->plug, PortDirection::All)) // Resize if vector is not big enough
                                 data->midiHandles.resize(getNumberOfPorts<IMidiPort>(data->plug, PortDirection::All));
-                        data->midiHandles[midiPortIndex] = MidiHandle{ (LV2_Atom_Sequence*)DataLocation,midiPort, data->map->map(data->map->handle, LV2_MIDI__MidiEvent) };
+                            data->midiHandles[midiPortIndex] = MidiHandle{ (LV2_Atom_Sequence*)DataLocation,midiPort, data->map->map(data->map->handle, LV2_MIDI__MidiEvent) };
+                        }
                     }
                     else {
                         auto aPort = dynamic_cast<IAudioPort*>(p);
                         aPort->at(ind - IPort)->feed((float*)DataLocation);
                     }
-   
                 }
                 if (dynamic_cast<IMidiPort*>(p) != nullptr)
                     midiPortIndex++;
