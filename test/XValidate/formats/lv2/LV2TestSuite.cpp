@@ -11,11 +11,7 @@
 #include <map>
 using namespace XPlug;
 
-struct custom_test_data {
-    int (*get_port_count)(size_t plugIndex);
-    int (*get_port_job)(size_t plugIndex, size_t portIndex);
-};
-
+/*
 template <typename T, size_t size>
 struct Atom_Sequence{
     LV2_Atom_Sequence seq;
@@ -35,10 +31,8 @@ struct LV2Features {
     std::vector<LV2_Feature*> features;
     std::vector<std::string> uridmapHandle;
     LV2_URID_Map uridmap;
-    /**
-     * @brief Constructor, which should construct features.
-     * @return 
-    */
+
+
     LV2Features() {
         uridmap = { &uridmapHandle,
            [](LV2_URID_Map_Handle handle, const char* uri)->LV2_URID {
@@ -73,9 +67,7 @@ struct MidiEventBuffer {
     MIDINoteEvent midiEvents[40];
 };
 
-/**
- * @brief Port Class, which saves the given Data, and also deltes it, if not used anymore.
-*/
+
 struct Port {
     const LilvPort* lilvPort=nullptr;
     void* data = nullptr;
@@ -126,56 +118,23 @@ struct Plugin {
     const LilvPlugin* lilvPlugin;
     std::vector<Port> ports;
 
-};
+};*/
 
+#include "LV2Module.hpp"
 class LV2TestSuite :public FormatTestSuiteBase {
 
 public:
-    LV2Features features;
-    LilvWorld* world=nullptr;
-    std::vector<Plugin> plugins;
+    LV2Module* module = nullptr;
 
     LV2TestSuite() {
     }
     ~LV2TestSuite() {
-        lilv_world_free(this->world);
+        if (this->module != nullptr)
+            delete this->module;
     }
     inline  virtual void initialize(TestSuiteData data) override {
         this->data = data;
-        this->world = lilv_world_new();
-
-        // Use the path of the lv2 binary. Has to have manifest.ttl in that folder, to work.
-        auto bundlePath = replaceInString(this->data.pluginPath, "\\", "/");
-        if(bundlePath.substr(bundlePath.find_last_of('/')+1, bundlePath.size()).find('.')!=std::string::npos)
-            bundlePath = bundlePath.substr(0, bundlePath.find_last_of('/') + 1);
-
-        LilvNode* bundle = lilv_new_file_uri(this->world, NULL, bundlePath.c_str());
-        lilv_world_load_bundle(this->world, bundle);
-        lilv_world_load_specifications(this->world);
-        lilv_world_load_plugin_classes(this->world);
-        auto lilvPlugins = lilv_world_get_all_plugins(this->world);
-
-        auto auPort = lilv_new_uri(this->world, LILV_URI_AUDIO_PORT);
-        auto midiEvent = lilv_new_uri(this->world, LILV_URI_MIDI_EVENT);
-  
-        LILV_FOREACH(plugins, plugIter, lilvPlugins) {
-            Plugin p;
-            p.lilvPlugin = lilv_plugins_get(lilvPlugins, plugIter);
-            for (auto i = 0; i < lilv_plugin_get_num_ports(p.lilvPlugin); i++) {
-                Port port;
-                port.lilvPort= lilv_plugin_get_port_by_index(p.lilvPlugin, i);
-                port.feat = &features;
-                if (lilv_port_is_a(p.lilvPlugin, port.lilvPort, auPort))
-                    port.type = Audio;
-                else if (lilv_port_supports_event(p.lilvPlugin, port.lilvPort, midiEvent))
-                    port.type = Midi;
-                p.ports.push_back(port);
-            }
-            this->plugins.push_back(p);
-        }
-
-        lilv_node_free(auPort);
-        lilv_node_free(midiEvent);
+        this->module = new LV2Module(this->data.pluginPath);
     }
 
     virtual std::string getFormatName() override
@@ -188,23 +147,21 @@ public:
     {
         double sampleRate=512;
         size_t sampleCount = 512;
-        const LV2_Descriptor* desc = nullptr;
-     
-        for (auto plug : this->plugins) {
-            lilv_plugin_verify(plug.lilvPlugin);
-            auto lInstance = lilv_plugin_instantiate(plug.lilvPlugin, sampleRate, features.features.data());
-            lilv_instance_activate(lInstance);
-           
-            for (int i = 0; i < plug.ports.size();i++) {
-                plug.ports[i].allocate(sampleCount);
-                lilv_instance_connect_port(lInstance, i, plug.ports[i].data);
+        for (auto plug : this->module->plugins) {
+            plug.verify();
+            plug.instantiate(sampleRate);
+            plug.allocateAndConnectPorts(512);
+            plug.activate();
+            for (auto p : plug.ports) {
+                if (p.type == PortType::Midi && p.dir == Direction::Input) {
+                    // uint8_t* x= { 0x1,0x2,0x3 };
+                    p.addMidiMsg(0x1, 0x2, 0x3);
+                    p.addMidiMsg(0xFF, 0xFF, 0xFF);
+                }
             }
-            lilv_instance_run(lInstance, sampleCount);
-
-            lilv_instance_deactivate(lInstance);
-            lilv_instance_free(lInstance);
+            plug.run(sampleRate);
+            plug.deactivate();
         }
-
         return TEST_SUCCEEDED;
     }
     virtual SucceedState runPerformance() override
