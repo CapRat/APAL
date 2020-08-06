@@ -5,7 +5,7 @@
 #include <tools/LibLoading.hpp>
 #include <tools/StringTools.hpp>
 #include "lv2_ttl_generation.hpp"
-#include "turtle.hpp"
+
 using namespace XPlug;
 
 std::string(*getTTLFromPluginPtr)(IPlugin*) = nullptr;

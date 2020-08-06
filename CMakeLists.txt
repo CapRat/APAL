@@ -36,6 +36,16 @@ set_version(1 0 0)
 
 
 #####################BUILD######################
+if(XPLUG_BUILD_TESTS)
+enable_testing()
+add_subdirectory(test)
+endif(XPLUG_BUILD_TESTS)
+
+
+if(XPLUG_BUILD_EXAMPLES)
+add_subdirectory(examples)
+endif(XPLUG_BUILD_EXAMPLES)
+
 add_subdirectory(formats)
 add_subdirectory(include)
 add_subdirectory(src)
@@ -82,12 +92,3 @@ set(CPACK_PACKAGE_CONTACT "Benjamin Heisch")
 include(CPack)
 
 endif(XPLUG_INSTALL)
-if(XPLUG_BUILD_TESTS)
-enable_testing()
-add_subdirectory(test)
-endif(XPLUG_BUILD_TESTS)
-
-
-if(XPLUG_BUILD_EXAMPLES)
-add_subdirectory(examples)
-endif(XPLUG_BUILD_EXAMPLES)

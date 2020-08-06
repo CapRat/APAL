@@ -186,7 +186,7 @@ called) */
 
  tresult PLUGIN_API VST3AudioProccessorImpl::setProcessing(TBool state)
 {
-    return kNotImplemented;
+    return kResultOk;
 }
 
  static int x = 0;

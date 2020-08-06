@@ -25,4 +25,5 @@ if(XPLUG_VST3_SUPPORT)
 	endif(WIN32)
 
 	install(TARGETS vst3 EXPORT XPlugExport DESTINATION lib)
+	add_subdirectory(tests)
 endif(XPLUG_VST3_SUPPORT)

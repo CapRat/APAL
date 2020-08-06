@@ -40,7 +40,8 @@ inline void handleInput(MidiHandle* in) {
 // Struct for a 3 byte MIDI event, used for writing notes
 typedef struct {
     LV2_Atom_Event event;
-    MidiMessage msg;
+    //MidiMessage msg;
+    uint8_t        msg[3];
 } MIDINoteEvent;
 /**
  * @brief Treats the MidiHandle, at it would be an output. (fetches things from the Pipe to the output)
@@ -51,14 +52,14 @@ inline void handleOutput(MidiHandle* out) {
         const uint32_t out_capacity = out->midiDataLocation->atom.size;
         // Write an empty Sequence header to the output
         lv2_atom_sequence_clear(out->midiDataLocation);
-        out->midiDataLocation->atom.type = out->midi_MidiEventID;
+        //out->midiDataLocation->atom.type = out->midi_MidiEventID;
         while (!out->connectedMidiPort->empty()) {
-            MIDINoteEvent ev;
-            // Could simply do fifth.event = *ev here instead...
-            ev.event.time.frames = 0;  // Same time
-            ev.event.body.type = out->midi_MidiEventID;    // Same type
-            ev.event.body.size = sizeof(MIDINoteEvent);    // Same size
-            ev.msg = out->connectedMidiPort->get();
+            auto msg = out->connectedMidiPort->get();
+            MIDINoteEvent ev{
+               {0 , {sizeof(MIDINoteEvent) - sizeof(LV2_Atom),out->midi_MidiEventID } },//LV2_Atom_Event
+               {msg[0],msg[1],msg[2]} // new MidiMsg
+            };
+           
             lv2_atom_sequence_append_event(
                 out->midiDataLocation, out_capacity, &ev.event);
         }

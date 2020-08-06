@@ -21,7 +21,6 @@ public:
 		while (!in0->empty()) {
 			auto midiMsg = in0->get();
 			auto midiMsg2= midiMsg;
-			midiMsg[1]=midiMsg[1]*2;
 			out0->feed(std::move(midiMsg));
 			out1->feed(std::move(midiMsg2));
 		}
