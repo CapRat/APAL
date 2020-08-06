@@ -12,10 +12,10 @@ namespace XPlug {
     class AudioChannel :public IAudioChannel {
     public:
 
-        AudioChannel(std::string channelname, SpeakerPosition pos);
+        AudioChannel(std::string _channelname, SpeakerPosition _pos);
         // Geerbt über IAudioChannel
         virtual std::string_view getName() override;
-        virtual void setRole(SpeakerPosition pos) override;
+        virtual void setRole(SpeakerPosition _pos) override;
         virtual SpeakerPosition getRole() override;
         virtual void feed(float* data) override;
         virtual float* getData() override;
@@ -36,10 +36,10 @@ namespace XPlug {
         PortDirection dir;
         size_t sampleSize;
     public:
-        StaticAudioPort(std::string name, PortDirection dir) 
+        StaticAudioPort(std::string _name, PortDirection _dir) 
         {
-            this->name = std::move(name);
-            this->dir = dir;
+            this->name = std::move(_name);
+            this->dir = _dir;
             for (int i = 0; i < number_of_channels; i++) 
                 this->channels[i] =std::make_unique<AudioChannel>(this->name + getSpeakerSuffix<configuration>(i), getSpeakerPositionAt<configuration>(i));
         }
@@ -52,7 +52,7 @@ namespace XPlug {
         inline virtual PortType getType() override   { return PortType::Audio; }
         inline virtual PortDirection getDirection() override  { return this->dir; }
         inline virtual size_t getSampleSize() override { return this->sampleSize; }
-        inline virtual void setSampleSize(size_t sampleSize) override  { this->sampleSize = sampleSize; }
+        inline virtual void setSampleSize(size_t _sampleSize) override  { this->sampleSize = _sampleSize; }
     };
 
     typedef StaticAudioPort <1, SpeakerConfiguration::Mono> MonoPort;

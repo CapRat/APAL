@@ -90,7 +90,7 @@ extern "C" {
                 "1.0.0.0", //version
                 kVstVersionString //sdkversion
             );
-            gPluginFactory->registerClass(&componentClass, [](void* data)->FUnknown* {return   (IAudioProcessor*)new VST3AudioProccessorImpl(); });
+            gPluginFactory->registerClass(&componentClass, [](void* )->FUnknown* {return   (IAudioProcessor*)new VST3AudioProccessorImpl(); });
             static std::string controllerName = std::string(plug->getInfoComponent()->getPluginName()) + "Controller";
             static PClassInfo2 componentContollerClass(
                 VST3EditControllerImpl::cid, //cid
@@ -103,7 +103,7 @@ extern "C" {
                 "1.0.0.0", //version
                 kVstVersionString //sdkversion
             );
-            gPluginFactory->registerClass(&componentContollerClass, [](void* data)->FUnknown* {return   (IEditController*)new VST3EditControllerImpl(); });
+            gPluginFactory->registerClass(&componentContollerClass, [](void*)->FUnknown* {return   (IEditController*)new VST3EditControllerImpl(); });
         }
         else
             gPluginFactory->addRef();

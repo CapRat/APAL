@@ -7,6 +7,7 @@ class VST3EditControllerImpl : public Steinberg::Vst::IEditController{
 public:
 	static const FUID cid;
 	VST3EditControllerImpl();
+	virtual ~VST3EditControllerImpl() = default;
 	// Geerbt über IEditController
 	virtual tresult PLUGIN_API queryInterface(const TUID _iid, void** obj) override;
 	virtual uint32 PLUGIN_API addRef() override;

@@ -50,7 +50,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 	REQUIRE_MESSAGE(emptyPlug != nullptr, "Error, cant initialize EmptyPortPlugin");
 	size_t counter = 0;
 
-	iteratePorts<IPort>(plug, [&counter ](IPort* t, size_t ind) {
+	iteratePorts<IPort>(plug, [&counter ](IPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -58,7 +58,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 	REQUIRE_MESSAGE(counter == 9, "Couldnt iterate all Audioports");
 	// Testing iteration over Audioports, not filtered by direction
 	counter = 0;
-	iteratePorts<IAudioPort>(plug, [&counter ](IAudioPort* t, size_t ind) {
+	iteratePorts<IAudioPort>(plug, [&counter ](IAudioPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -67,7 +67,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over AUuioports, filtered by inputports
 	counter = 0;
-	iteratePorts<IAudioPort>(plug,PortDirection::Input, [&counter ](IAudioPort* t, size_t ind) {
+	iteratePorts<IAudioPort>(plug,PortDirection::Input, [&counter ](IAudioPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -76,7 +76,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over AUuioports,  filtered by outputports. Outputportsnames are in the array at index 3, so add this to the counter on data access.
 	counter = 0;
-	iteratePorts<IAudioPort>(plug, PortDirection::Output, [&counter ](IAudioPort* t, size_t ind) {
+	iteratePorts<IAudioPort>(plug, PortDirection::Output, [&counter ](IAudioPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -86,7 +86,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over MidiPorts, not filtered by direction. Midiportnames are in the array at index 6, so add this to the counter on data access.
 	counter = 0;
-	iteratePorts<IMidiPort>(plug, [&counter ](IMidiPort* t, size_t ind) {
+	iteratePorts<IMidiPort>(plug, [&counter ](IMidiPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -95,7 +95,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over MidiPorts, filtered by inputports. Midiportnames are in the array at index 6, so add this to the counter on data access.
 	counter = 0;
-	iteratePorts<IMidiPort>(plug, PortDirection::Input, [&counter ](IMidiPort* t, size_t ind) {
+	iteratePorts<IMidiPort>(plug, PortDirection::Input, [&counter ](IMidiPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -104,7 +104,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over MidiPorts, filtered by outputports. MidiOutput portnames are in the array at index 8, so add this to the counter on data access.
 	counter = 0;
-	iteratePorts<IMidiPort>(plug, PortDirection::Output, [&counter ](IMidiPort* t, size_t ind) {
+	iteratePorts<IMidiPort>(plug, PortDirection::Output, [&counter ](IMidiPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -112,7 +112,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 	REQUIRE_MESSAGE(counter == 1, "Couldnt iterate all MidiPorts");
 
 	counter = 0;
-	iteratePorts<IPort>(plug, [&counter](IPort* t, size_t ind) {
+	iteratePorts<IPort>(plug, [&counter](IPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -120,7 +120,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 	REQUIRE_MESSAGE(counter == 9, "Couldnt iterate all Audioports");
 	// Testing iteration over Audioports, not filtered by direction
 	counter = 0;
-	iteratePorts<IAudioPort>(plug, [&counter](IAudioPort* t, size_t ind) {
+	iteratePorts<IAudioPort>(plug, [&counter](IAudioPort*, size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -129,7 +129,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over AUuioports, filtered by inputports
 	counter = 0;
-	iteratePorts<IAudioPort>(plug, PortDirection::Input, [&counter](IAudioPort* t, size_t ind) {
+	iteratePorts<IAudioPort>(plug, PortDirection::Input, [&counter](IAudioPort*, size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -138,7 +138,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over AUuioports,  filtered by outputports. Outputportsnames are in the array at index 3, so add this to the counter on data access.
 	counter = 0;
-	iteratePorts<IAudioPort>(plug, PortDirection::Output, [&counter](IAudioPort* t, size_t ind) {
+	iteratePorts<IAudioPort>(plug, PortDirection::Output, [&counter](IAudioPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -148,7 +148,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over MidiPorts, not filtered by direction. Midiportnames are in the array at index 6, so add this to the counter on data access.
 	counter = 0;
-	iteratePorts<IMidiPort>(plug, [&counter](IMidiPort* t, size_t ind) {
+	iteratePorts<IMidiPort>(plug, [&counter](IMidiPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -157,7 +157,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over MidiPorts, filtered by inputports. Midiportnames are in the array at index 6, so add this to the counter on data access.
 	counter = 0;
-	iteratePorts<IMidiPort>(plug, PortDirection::Input, [&counter](IMidiPort* t, size_t ind) {
+	iteratePorts<IMidiPort>(plug, PortDirection::Input, [&counter](IMidiPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -166,7 +166,7 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 
 	// Testing iteration over MidiPorts, filtered by inputports. Midiportnames are in the array at index 6, so add this to the counter on data access.
 	counter = 0;
-	iteratePortsFlat(plug, [&counter](IPort* t, size_t ind) {
+	iteratePortsFlat(plug, [&counter](IPort* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;
@@ -174,13 +174,13 @@ TEST_CASE("Testing Porthandling Iterationfunctions") {
 	REQUIRE_MESSAGE(counter == 21, "Couldnt iterate all Ports");
 
 
-	iteratePorts<IPort>(emptyPlug,[](IPort* t, size_t ind) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
-	iteratePorts<IAudioPort>(emptyPlug, [](IAudioPort* t, size_t ind) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
-	iteratePorts<IAudioPort>(emptyPlug, PortDirection::Input, [](IAudioPort* t, size_t ind) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
-	iteratePorts<IAudioPort>(emptyPlug, PortDirection::Output, [](IAudioPort* t, size_t ind) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
-	iteratePorts<IMidiPort>(emptyPlug, [](IMidiPort* t, size_t ind) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
-	iteratePorts<IMidiPort>(emptyPlug, PortDirection::Input, [](IMidiPort* t, size_t ind) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
-	iteratePorts<IMidiPort>(emptyPlug, PortDirection::Output, [](IMidiPort* t, size_t ind) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false;});
+	iteratePorts<IPort>(emptyPlug,[](IPort* , size_t ) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
+	iteratePorts<IAudioPort>(emptyPlug, [](IAudioPort* , size_t ) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
+	iteratePorts<IAudioPort>(emptyPlug, PortDirection::Input, [](IAudioPort* , size_t ) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
+	iteratePorts<IAudioPort>(emptyPlug, PortDirection::Output, [](IAudioPort* , size_t ) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
+	iteratePorts<IMidiPort>(emptyPlug, [](IMidiPort* , size_t ) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
+	iteratePorts<IMidiPort>(emptyPlug, PortDirection::Input, [](IMidiPort*, size_t ) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false; });
+	iteratePorts<IMidiPort>(emptyPlug, PortDirection::Output, [](IMidiPort* , size_t ) { ASSERT_MESSAGE("Error, empty Port is iterated");  return false;});
 	delete plug;
 	delete emptyPlug;
 }
@@ -285,7 +285,7 @@ TEST_CASE("Testing Audiochannel functions") {
 	}
 	size_t counter = 0;
 
-	iterateAudioChannels(plug, [&counter](IAudioPort*p,IAudioChannel* t, size_t ind) {
+	iterateAudioChannels(plug, [&counter](IAudioPort*,IAudioChannel* , size_t ind) {
 		REQUIRE_MESSAGE(counter == ind, "Error, index is not correct");
 		counter++;
 		return false;

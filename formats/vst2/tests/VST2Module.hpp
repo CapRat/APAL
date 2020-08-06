@@ -18,7 +18,7 @@ public:
 
     inline VST2Module(std::string pluginPath, audioMasterCallback cb =nullptr) {
         if (cb == nullptr) {
-            cb = [](AEffect* effect, int32_t opCode, int32_t, intptr_t, void*, float)->intptr_t {
+            cb = [](AEffect* , int32_t opCode, int32_t, intptr_t, void*, float)->intptr_t {
                 switch (opCode) {
                 case audioMasterProcessEvents:
                     break;
@@ -47,10 +47,10 @@ public:
         effect->dispatcher(effect, effClose, 0, 0, nullptr, 0);// Close Effect
         return true;
     }
-    inline bool allocate(size_t sampleSize) {
+    inline bool allocate(size_t _samplesize) {
         if (inData != nullptr || outData != nullptr)
             this->free();
-        this->samplesize = samplesize;
+        this->samplesize = _samplesize;
         inData = new float* [effect->numInputs];
         outData = new float* [effect->numOutputs];
         for (int i = 0; i < effect->numInputs; i++)
@@ -71,7 +71,7 @@ public:
     inline void run() {
         effect->processReplacing(effect, inData, outData, this->samplesize);
     }
-    inline void sendMidi(uint8_t msg[3]) {
+    inline void sendMidi(char msg[3]) {
         if (effect->dispatcher(effect, effCanDo, 0, 0, (void*)"receiveVstMidiEvent", 0) == 1) {
             VstMidiEvent mEvent{ kVstMidiType,sizeof(VstMidiEvent),0,0,0,0,{ msg[0],msg[1],msg[2],0x0 },0,0,0,0 };
             VstEvent* mEventP = (VstEvent*)&mEvent;

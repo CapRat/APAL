@@ -12,6 +12,8 @@ std::string mapSpeakerConfToLV2Type(SpeakerConfiguration conf) {
     switch (conf) {
     case SpeakerConfiguration::Mono:
         return "MonoGroup";
+    default:
+        return "Loll!";
     }
     return "";
 }
@@ -43,7 +45,7 @@ std::string getTTLFromPlugin(IPlugin* pluginPtr)
     iteratePorts<IPort>(plug, [&plugTTL,&pCount, portsSize, plug](IPort* p, size_t ) {
         if (dynamic_cast<IAudioPort*>(p) != nullptr) {
             auto aPort = dynamic_cast<IAudioPort*>(p);
-            for (int i = 0; i < aPort->size(); i++) {
+            for (size_t i = 0; i < aPort->size(); i++) {
                 std::string symbol = to_string(aPort->at(i)->getName());
                 std::transform(symbol.begin(), symbol.end(), symbol.begin(), ::tolower);
                 std::string name = symbol;

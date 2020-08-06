@@ -18,7 +18,7 @@ public:
     inline virtual Steinberg::int32 getEventCount()override { return (Steinberg::int32)events.size(); }
     inline virtual ~EventList() {};
     inline virtual Steinberg::tresult getEvent(Steinberg::int32 index, Steinberg::Vst::Event& e) override {
-        if (index < events.size()) {
+        if (index < (Steinberg::int32)events.size()) {
             e = events[index];
             return Steinberg::kResultOk;
         }
@@ -30,7 +30,7 @@ public:
     }
     inline virtual void clear() { this->events.clear(); }
     //dont implement that stupid COM Interface, cause it should not be used here...
-    inline virtual  Steinberg::tresult queryInterface(const  Steinberg::TUID _iid, void** obj) override { return Steinberg::kNoInterface; }
+    inline virtual  Steinberg::tresult queryInterface(const  Steinberg::TUID , void** ) override { return Steinberg::kNoInterface; }
     inline  virtual  Steinberg::uint32  addRef() override { return 0; }
     inline virtual  Steinberg::uint32  release() override { return 0; }
 };
@@ -64,15 +64,15 @@ public:
      * @param sampleSize size of on Sample. Values can be 32 or 64. Values from SymbolicSampleSizes
      * @param numSamples Numbers of Samples in one buffer per bus.
     */
-    inline ProcessDataClass(std::vector<Steinberg::Vst::SpeakerArrangement> inputChannels, std::vector<Steinberg::Vst::SpeakerArrangement> outputChannels, Steinberg::Vst::SymbolicSampleSizes sampleSize, size_t numSamples) {
+    inline ProcessDataClass(std::vector<Steinberg::Vst::SpeakerArrangement> _inputChannels, std::vector<Steinberg::Vst::SpeakerArrangement> _outputChannels, Steinberg::Vst::SymbolicSampleSizes _sampleSize, size_t _numSamples) {
         using namespace Steinberg;
         using namespace Vst;
         this->processMode = ProcessModes::kRealtime;
-        this->symbolicSampleSize = sampleSize;
+        this->symbolicSampleSize = _sampleSize;
         this->processContext = nullptr;
-        this->numSamples = (Steinberg::int32)numSamples;
-        this->numInputs = inputChannels.size();
-        this->numOutputs = outputChannels.size();
+        this->numSamples = (Steinberg::int32)_numSamples;
+        this->numInputs = _inputChannels.size();
+        this->numOutputs = _outputChannels.size();
         inputAudioBusBuffers = std::vector<AudioBusBuffers>(this->numInputs);
         outputAudioBusBuffers = std::vector<AudioBusBuffers>(this->numOutputs);
         this->inputs = inputAudioBusBuffers.data();
@@ -82,9 +82,9 @@ public:
         this->inputParameterChanges = nullptr;
         this->outputParameterChanges = nullptr;
         auto allocator = [this](std::vector<AudioBusBuffers>& buffers, std::vector<SpeakerArrangement>& channelConfig) {
-            for (int i = 0; i < buffers.size(); i++) {
+            for (size_t i = 0; i < buffers.size(); i++) {
                 buffers[i].numChannels = getNumberOfChannel(channelConfig[i]);
-                buffers[i].silenceFlags = NULL;
+                buffers[i].silenceFlags = 0;
                 if (this->symbolicSampleSize == SymbolicSampleSizes::kSample32) {
                     buffers[i].channelBuffers32 = new Sample32 * [this->inputs[i].numChannels];
                     for (int j = 0; j < buffers[i].numChannels; j++) {
@@ -101,8 +101,8 @@ public:
                 }
             }
         };
-        allocator(inputAudioBusBuffers, inputChannels);
-        allocator(outputAudioBusBuffers, outputChannels);
+        allocator(inputAudioBusBuffers, _inputChannels);
+        allocator(outputAudioBusBuffers, _outputChannels);
     }
     /**
      * @brief Deletes any allocated Memory.
@@ -205,7 +205,7 @@ public:
         ERROR_IF((this->factory->getFactoryInfo(&info) != kResultOk), "Cant get FactoryInfo from factory");
         this->factory->queryInterface(IPluginFactory3::iid, (void**)&factory3);
         this->factory->queryInterface(IPluginFactory2::iid, (void**)&factory2);
-        for (int i = 0; i < this->factory->countClasses(); i++) {
+        for (Steinberg::int32 i = 0; i < this->factory->countClasses(); i++) {
             // Get Class Info
             PClassInfoW ci3;
             if (factory3 != nullptr) {
@@ -229,9 +229,9 @@ public:
                 ERROR_IF(((this->factory->createInstance(ci3.cid, Vst::IComponent::iid, (void**)&processorComponent)
                     != kResultOk)), "Error, could not create IComponentobject successfully");
                 std::string x;
-                int i = 0;
-                while (ci3.name[i] != NULL) {
-                    x.push_back(static_cast<char>(ci3.name[i++]));
+                int j = 0;
+                while (ci3.name[j] != 0) {
+                    x.push_back(static_cast<char>(ci3.name[j++]));
                 }
                 ERROR_IF((processorComponent->initialize(nullptr) != kResultOk), std::string("Error while initialising Component ") + x);
                 TUID controllerCID;
@@ -256,6 +256,7 @@ public:
             ERROR_IF(editController->terminate() != Steinberg::kResultOk, "Error while terminating IEditController implementation.");
         if (processorComponent != nullptr)
             ERROR_IF(processorComponent->terminate() != Steinberg::kResultOk, "Error while terminating IEditController implementation.");
+        return true;
     }
 
     inline bool allocateData(size_t audioPortBufferSize) {
@@ -270,13 +271,15 @@ public:
         i = 0;
         for (auto& sArr : outputs)
             ERROR_IF(this->audioProcessor->getBusArrangement(BusDirections::kOutput, i++, sArr) != kResultOk, "Error, Couldnt get Busarrangement");
-        pData=std::make_unique<ProcessDataClass>(inputs, outputs, SymbolicSampleSizes::kSample32, audioPortBufferSize);
+        pData=std::make_unique<ProcessDataClass>(inputs, outputs,size, audioPortBufferSize);
+        return true;
     }
 
     inline bool run() {
         ERROR_IF(this->audioProcessor->setProcessing(true)!=Steinberg::kResultOk,"Error, while set Processing to true");
         ERROR_IF(this->audioProcessor->process(*(this->pData.get())) != Steinberg::kResultOk, "Error, because processing not returned valid State");
         ERROR_IF(this->audioProcessor->setProcessing(false) != Steinberg::kResultOk, "Error, while set Processing to false");
+        return true;
     }
     inline std::string getLastError() { return lastError; }
     inline std::string getLastWarning() { return lastWarning; }

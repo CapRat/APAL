@@ -10,6 +10,7 @@
 #include <array>
 #include <algorithm>
 #include <map>
+#include <exception>
 
 
 inline std::string replaceInString(std::string strToChange, const std::string itemToReplace, const std::string substitute)
@@ -79,11 +80,11 @@ public:
     void* data = nullptr;
     PortType type;
     Direction dir;
-    Port(const LilvPort* lilvPort, PortType type,Direction dir, const LV2Features* features) {
-        this->lilvPort = lilvPort;
-        this->type = type;
-        this->features = features;
-        this->dir = dir;
+    Port(const LilvPort* _lilvPort, PortType _type,Direction _dir, const LV2Features* _features) {
+        this->lilvPort = _lilvPort;
+        this->type = _type;
+        this->features = _features;
+        this->dir = _dir;
     }
     Port(const Port& other) {
         features = other.features;
@@ -112,6 +113,8 @@ public:
             this->size_of_data =sizeof(float)*sample_count;
             data = new float[sample_count];
             return;
+        default:
+            return;
         }
     }
 
@@ -134,7 +137,8 @@ public:
                 delete[](float*)this->data;
                 return;
             default:
-                delete this->data;
+               // delete this->data;
+                return;
         }
         this->data = nullptr;
     }
@@ -157,15 +161,15 @@ public:
      * @param w 
      * @return 
     */
-    Plugin(const LilvPlugin* lilvPlugin, const LV2Features* features, LilvWorld* w) {
-        this->lilvPlugin = lilvPlugin;
-        this->features = features;
+    Plugin(const LilvPlugin* _lilvPlugin, const LV2Features* _features, LilvWorld* w) {
+        this->lilvPlugin = _lilvPlugin;
+        this->features = _features;
     
         auto auPort = lilv_new_uri(w, LILV_URI_AUDIO_PORT);
         auto midiEvent = lilv_new_uri(w, LILV_URI_MIDI_EVENT);
         auto inPort = lilv_new_uri(w, LILV_URI_INPUT_PORT);
         auto outPort = lilv_new_uri(w, LILV_URI_OUTPUT_PORT);
-        for (int i = 0; i < lilv_plugin_get_num_ports(this->lilvPlugin);i++) {
+        for (uint32_t i = 0; i < lilv_plugin_get_num_ports(this->lilvPlugin);i++) {
             auto lilvPort = lilv_plugin_get_port_by_index(this->lilvPlugin, i);
             auto pType = PortType::Undefined;
             if (lilv_port_is_a(this->lilvPlugin, lilvPort, auPort))
@@ -187,8 +191,8 @@ public:
      * @param sampleRate 
      * @return 
     */
-    inline  void  instantiate(size_t sampleRate) {
-        this->sampleRate = sampleRate;
+    inline  void  instantiate(size_t _sampleRate) {
+        this->sampleRate = _sampleRate;
         lilvInstance = lilv_plugin_instantiate(this->lilvPlugin, this->sampleRate, features->features.data());
     }
 
@@ -197,7 +201,7 @@ public:
      * @param audioPortBufferSize Memorysize of each audiobuffer in every Port.
     */
     inline void allocateAndConnectPorts(size_t audioPortBufferSize) {
-        for (int i = 0; i < this->ports.size(); i++) {
+        for (size_t i = 0; i < this->ports.size(); i++) {
             this->ports[i].allocate(audioPortBufferSize);
             lilv_instance_connect_port(lilvInstance, i, this->ports[i].data);
         }

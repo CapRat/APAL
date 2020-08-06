@@ -132,8 +132,8 @@ public:
         if (this->module != nullptr)
             delete this->module;
     }
-    inline  virtual void initialize(TestSuiteData data) override {
-        this->data = data;
+    inline  virtual void initialize(TestSuiteData _data) override {
+        this->data = _data;
         this->module = new LV2Module(this->data.pluginPath);
     }
 
@@ -146,7 +146,7 @@ public:
     virtual SucceedState run() override
     {
         double sampleRate=512;
-        size_t sampleCount = 512;
+       // size_t sampleCount = 512;
         for (auto plug : this->module->plugins) {
             plug.verify();
             plug.instantiate(sampleRate);

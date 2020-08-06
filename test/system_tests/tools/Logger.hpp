@@ -22,10 +22,10 @@ protected:
     }
 public:
 
-    inline void log(std::string msg, LoggerValue val) {
+    inline void log(std::string msg, LoggerValue ) {
         std::cout << msg;
     }
-    inline void logN(std::string msg, LoggerValue val) {
+    inline void logN(std::string msg, LoggerValue ) {
         std::cout << msg << std::endl;
     }
     inline void logIf(bool cond, std::string msg, LoggerValue val) {

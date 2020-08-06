@@ -9,6 +9,7 @@ class Component : public IComponent
 {
 public:
 	Component();
+	virtual ~Component() = default;
 	// Geerbt über IComponent
 	virtual tresult PLUGIN_API queryInterface(const TUID _iid, void** obj) override;
 	virtual uint32 PLUGIN_API addRef() override;

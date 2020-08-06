@@ -9,14 +9,14 @@ XPlug::StaticInfoComponent::StaticInfoComponent()
     this->creatorName = "";
     this->creatorURL = "";
 }
-XPlug::StaticInfoComponent::StaticInfoComponent(std::string pluginName, std::string pluginUri, std::string pluginDescription, std::string pluginCopyright, std::string creatorName, std::string creatorURL)
+XPlug::StaticInfoComponent::StaticInfoComponent(std::string _pluginName, std::string _pluginUri, std::string _pluginDescription, std::string _pluginCopyright, std::string _creatorName, std::string _creatorURL)
 {
-    this->pluginName = pluginName;
-    this->pluginUri = pluginUri;
-    this->pluginDescription = pluginDescription;
-    this->pluginCopyright = pluginCopyright;
-    this->creatorName = creatorName;
-    this->creatorURL = creatorURL;
+    this->pluginName = _pluginName;
+    this->pluginUri = _pluginUri;
+    this->pluginDescription = _pluginDescription;
+    this->pluginCopyright = _pluginCopyright;
+    this->creatorName = _creatorName;
+    this->creatorURL = _creatorURL;
 }
 std::string_view XPlug::StaticInfoComponent::getPluginName()
 {

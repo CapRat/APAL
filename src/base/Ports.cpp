@@ -2,9 +2,9 @@
 #include <queue>
 using namespace XPlug;
 
-AudioChannel::AudioChannel(std::string channelname, SpeakerPosition pos) {
-    this->channelname = channelname;
-    this->pos = pos;
+AudioChannel::AudioChannel(std::string _channelname, SpeakerPosition _pos) {
+    this->channelname = _channelname;
+    this->pos = _pos;
     this->data= nullptr;
 }
 // Geerbt über IAudioChannel
@@ -12,17 +12,17 @@ std::string_view AudioChannel::getName()
 {
     return this->channelname;
 }
-void AudioChannel::setRole(SpeakerPosition pos)
+void AudioChannel::setRole(SpeakerPosition _pos)
 {
-    this->pos = pos;
+    this->pos = _pos;
 }
  SpeakerPosition AudioChannel::getRole()
 {
      return this->pos;
 }
-void AudioChannel::feed(float* data)
+void AudioChannel::feed(float* _data)
 {
-    this->data = data;
+    this->data = _data;
 }
 
  float* XPlug::AudioChannel::getData()
@@ -59,10 +59,10 @@ SpeakerConfiguration XPlug::DynamicAudioPort::getConfig()
 }*/
 
 
-XPlug::QueueMidiPort::QueueMidiPort(std::string name, PortDirection dir)
+XPlug::QueueMidiPort::QueueMidiPort(std::string _name, PortDirection _dir)
 {
-    this->name = name;
-    this->dir = dir;
+    this->name = _name;
+    this->dir = _dir;
 }
 
 std::string_view XPlug::QueueMidiPort::getPortName()

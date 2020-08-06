@@ -13,7 +13,7 @@ void testIFeatureComponent(XPlug::IFeatureComponent* featComp) {
         try {
             featComp->formatNotSupportedFeature(static_cast<Feature>(i), "test");
         }
-        catch (std::exception e) {
+        catch (std::exception& e) {
         }
     }
     REQUIRE_MESSAGE(featComp->supportsFeature(static_cast<Feature>(static_cast<size_t>(LAST_FEATURE) + 1)) == false, "Non defined Feature should be not supported. Otherwhise you would be rly ... good?");
@@ -45,14 +45,14 @@ void testIAudioPort(XPlug::IAudioPort* aPort) {
 }
 void testIMidiPort(XPlug::IMidiPort* mPort) {
     REQUIRE_MESSAGE(mPort != nullptr, "Null Midiport is definitly wrong");
-    MidiMessage x = { 0x1,0x2,0x3 };
+    //MidiMessage x = { 0x1,0x2,0x3 };
 }
 
 
 void testIPortComponent(XPlug::IPortComponent* portComp) {
   //  INFO("Error, there should nothing above an index size.");
   //  REQUIRE_THROWS(portComp->at(portComp->size()) == nullptr);
-    for (int i = 0; i < portComp->size(); i++) {
+    for (size_t i = 0; i < portComp->size(); i++) {
         testIPort(portComp->at(i));
     }
 }

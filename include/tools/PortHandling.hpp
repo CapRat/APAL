@@ -64,7 +64,7 @@ namespace XPlug {
     template<typename T>
     size_t getNumberOfPorts(IPlugin* plug, XPlug::PortDirection dir) {
         size_t size=0;
-        iteratePorts<T>(plug, dir, [&size](T* port, size_t index) { size++; return false; });
+        iteratePorts<T>(plug, dir, [&size](T* , size_t ) { size++; return false; });
         return size;
     }
 

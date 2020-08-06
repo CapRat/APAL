@@ -5,7 +5,7 @@ using namespace XPlug;
 
 //function to compare array elements
 char compareMidiMessage(MidiMessage a, MidiMessage b) {
-    int i;
+    size_t i;
     for (i = 0; i < sizeof(MidiMessage); i++) {
         if (a[i] != b[i])
             return false;

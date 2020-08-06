@@ -5,7 +5,7 @@ XPlug::DynamicFeatureComponent::DynamicFeatureComponent(std::vector<Feature> fea
 bool XPlug::DynamicFeatureComponent::supportsFeature(Feature feature) {
     return std::find(supportedFeatures.begin(), supportedFeatures.end(), feature) != supportedFeatures.end();
 }
-void XPlug::DynamicFeatureComponent::formatNotSupportedFeature(Feature feature,std::string format) {
+void XPlug::DynamicFeatureComponent::formatNotSupportedFeature(Feature feature,std::string ) {
     throw UseOfNonSupportedFeature(feature);
 }
 void XPlug::DynamicFeatureComponent::addSupportedFeature(Feature feat) {
@@ -23,13 +23,13 @@ XPlug::AutomaticFeatureComponent::AutomaticFeatureComponent(IPortComponent* pCom
 
 void XPlug::AutomaticFeatureComponent::detectFeatures(IPortComponent* pComp)
 {
-    bool suppAudioPort = false;
+   // bool suppAudioPort = false;
     bool suppMidiIn = false;
     bool suppMidiOut = false;
-    for (int i = 0; i < pComp->size();i++) {
+    for (size_t i = 0; i < pComp->size();i++) {
         auto port = pComp->at(i);
         if (dynamic_cast<IAudioPort*>(port)) {
-            suppAudioPort = true;
+         //   suppAudioPort = true;
         }
         else if (dynamic_cast<IMidiPort*>(port)) {
             if (port->getDirection() == PortDirection::Input)

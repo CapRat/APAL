@@ -24,7 +24,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
 
     desc->ImplementationData = new LADSPAHandleDataType { GlobalData().getPlugin(index).get(), desc };
     /******************* INSTANTIATION**********************/
-    desc->instantiate = [](const LADSPA_Descriptor* descriptor, unsigned long SampleRate) -> LADSPA_Handle {
+    desc->instantiate = [](const LADSPA_Descriptor* descriptor, unsigned long ) -> LADSPA_Handle {
         auto data = static_cast<LADSPAHandleDataType*>(descriptor->ImplementationData);
         data->plug->init();
         return data;
@@ -67,7 +67,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
     char** portNamesCArray = new char*[desc->PortCount * sizeof(const char*)];
     auto portDescripors = new LADSPA_PortDescriptor[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
     auto rangeHints = new LADSPA_PortRangeHint[desc->PortCount * sizeof(LADSPA_PortDescriptor)];
-    iteratePorts<IAudioPort>(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](IAudioPort* p, size_t portIndex) {
+    iteratePorts<IAudioPort>(plug.get(), [&portNamesCArray, &portDescripors, &rangeHints, &curIndex](IAudioPort* p, size_t ) {
         for (size_t i = 0; i < p->size(); i++) {
             std::string name = p->getPortName().to_string() + (p->at(i)->getName()!= "" ? static_cast<std::string>(p->at(i)->getName()): std::to_string(i));
             portNamesCArray[curIndex] = new char[name.length() + 1];
@@ -105,7 +105,7 @@ const LADSPA_Descriptor* ladspa_descriptor(unsigned long index)
                 IPlugin* plug = (IPlugin*)desc->ImplementationData;
                 plug->processAudio(plug->getPortComponent()->getInputPorts(), plug->getPortComponent()->getOutputPorts());
             };*/
-    desc->set_run_adding_gain;
+    //desc->set_run_adding_gain;
     return desc;
 }
 }

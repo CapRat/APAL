@@ -13,7 +13,7 @@ XPlug::LazyPlugin::LazyPlugin() : ModularPlugin(
 
 XPlug::LazyPlugin::LazyPlugin(std::vector<std::unique_ptr<IPort>> ports):LazyPlugin()
 {
-    for (int i = 0; i < ports.size(); i++) {
+    for (size_t i = 0; i < ports.size(); i++) {
         this->portComponent->addPort(std::move(ports[i]));
     }
     this->featureComponent->detectFeatures(this->getPortComponent());

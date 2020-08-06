@@ -10,7 +10,7 @@
 using namespace XPlug;
 /**
  * @brief Struct for  use in the vst2 implementation. This struct is stored in the AEffect->user pointer. So it can be casted to this struct.
- * If the VST2 implementation needs to hold data, pack it in here.
+ * If the VST2 implementation needs to hold implementationData, pack it in here.
  */
 struct VST2ImplementationData {
     audioMasterCallback audioMaster;
@@ -18,8 +18,8 @@ struct VST2ImplementationData {
 };
 
 
-
-static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, intptr_t value, void* ptr, float opt)
+//                                 effect             opcode      index       value        ptr        opt
+static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t , intptr_t value, void* ptr, float )
 {
     auto data = static_cast<VST2ImplementationData*>(effect->user);
     switch (opcode) {
@@ -63,9 +63,9 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
         break;
     case effEditIdle: ///< no arguments @see AEffEditor::idle
         break;
-    case effGetChunk: ///< [ptr]: void** for chunk data address [index]: 0 for bank, 1 for program  @see AudioEffect::getChunk
+    case effGetChunk: ///< [ptr]: void** for chunk implementationData address [index]: 0 for bank, 1 for program  @see AudioEffect::getChunk
         break;
-    case effSetChunk: ///< [ptr]: chunk data [value]: byte size [index]: 0 for bank, 1 for program  @see AudioEffect::setChunk
+    case effSetChunk: ///< [ptr]: chunk implementationData [value]: byte size [index]: 0 for bank, 1 for program  @see AudioEffect::setChunk
         break;*/
 
         /**************************EXTENDING OPCODES*******************************/
@@ -109,8 +109,8 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t index, i
     case effSetSpeakerArrangement: ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::setSpeakerArrangement
         if (getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Input) == 0 || getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Output) == 0)
             return 0;
-        return ((VstSpeakerArrangement*)value)->numChannels == getPortAt<IAudioPort>(data->plug, 0, PortDirection::Input )->size() &&
-               ((VstSpeakerArrangement*)ptr  )->numChannels == getPortAt<IAudioPort>(data->plug, 0, PortDirection::Output)->size();
+        return ((VstSpeakerArrangement*)value)->numChannels == (int32_t)getPortAt<IAudioPort>(data->plug, 0, PortDirection::Input )->size() &&
+               ((VstSpeakerArrangement*)ptr  )->numChannels == (int32_t)getPortAt<IAudioPort>(data->plug, 0, PortDirection::Output)->size();
         break;
     case effSetBypass: ///< [value]: 1 = bypass, 0 = no bypass  @see AudioEffectX::setBypass
         break;
@@ -243,10 +243,10 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
     // first internal init
     //  vst_dispatcherCallback(nullptr, -1729, 0xdead, 0xf00d, &plugin, 0.0f);
     AEffect* const effect(new AEffect);
-    VST2ImplementationData* const data(new  VST2ImplementationData);
-    data->audioMaster = audioMaster;
-    data->plug = GlobalData().getPlugin(0).get();
-    effect->user = data;
+    VST2ImplementationData* const implementationData(new VST2ImplementationData);
+    implementationData->audioMaster = audioMaster;
+    implementationData->plug = GlobalData().getPlugin(0).get();
+    effect->user = implementationData;
     // std::memset(effect, 0, sizeof(AEffect));
     effect->magic = kEffectMagic;
     effect->dispatcher = vst_dispatcher;
@@ -254,8 +254,8 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
     /******************INFORMATION*****************/
     effect->uniqueID = 0;
     effect->version = 0;
-    effect->numInputs = static_cast<int>( getNumberOfPorts<IAudioPort>(data->plug,PortDirection::Input));
-    effect->numOutputs = static_cast<int>(getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Output));
+    effect->numInputs = static_cast<int>( getNumberOfPorts<IAudioPort>(implementationData->plug,PortDirection::Input));
+    effect->numOutputs = static_cast<int>(getNumberOfPorts<IAudioPort>(implementationData->plug, PortDirection::Output));
     effect->numParams = 0;
     effect->numPrograms = 0;
   
@@ -320,8 +320,8 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
          audioMaster(nullptr, audioMasterGetInputSpeakerArrangement, 0, 0, nullptr, 0);*/
     }
    
-    effect->processReplacing = [](AEffect* effect, float** inputs, float** outputs, int32_t sampleFrames) {
-        auto data = static_cast<VST2ImplementationData*>(effect->user);
+    effect->processReplacing = [](AEffect* _effect, float** inputs, float** outputs, int32_t sampleFrames) {
+        auto data = static_cast<VST2ImplementationData*>(_effect->user);
         int inputIndex = 0;
         int outputIndex = 0;
         iteratePorts<IAudioPort>(data->plug, [sampleFrames,&inputs,&inputIndex,&outputs,&outputIndex](IAudioPort* p, size_t) {
@@ -340,14 +340,14 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
             });
         
         data->plug->processAudio();
-        writeMidiOutput(effect);
+        writeMidiOutput(_effect);
     };
 
     /*effect->processDoubleReplacing = [](AEffect* effect, double** inputs, double** outputs, int32_t sampleFrames) {
-        auto data = static_cast<VST2ImplementationData*>(effect->user);
+        auto implementationData = static_cast<VST2ImplementationData*>(effect->user);
         int inputIndex = 0;
         int outputIndex = 0;
-        iteratePorts<IAudioPort>(data->plug, [sampleFrames, inputs, &inputIndex, outputs, &outputIndex](IAudioPort* p, size_t) {
+        iteratePorts<IAudioPort>(implementationData->plug, [sampleFrames, inputs, &inputIndex, outputs, &outputIndex](IAudioPort* p, size_t) {
             p->setSampleSize(static_cast<size_t>(sampleFrames));
             for (size_t i = 0; i < p->size(); i++) {
                 if (p->getDirection() == PortDirection::Input) {
@@ -362,19 +362,20 @@ const AEffect* VSTPluginMain(audioMasterCallback audioMaster)
             return false;
             });
 
-        data->plug->processAudio();
+        implementationData->plug->processAudio();
         writeMidiOutput(effect);
     };*/
     effect->flags |= effFlagsCanReplacing | effFlagsCanDoubleReplacing;
-    if (data->plug->getFeatureComponent()->supportsFeature(Feature::GUISupport))
+    if (implementationData->plug->getFeatureComponent()->supportsFeature(Feature::GUISupport))
         effect->flags |= effFlagsHasEditor;
 
-
-    effect->getParameter = [](AEffect* effect, int32_t index) -> float {
-        auto data = static_cast<VST2ImplementationData*>(effect->user);
+    //effect, index
+    effect->getParameter = [](AEffect* , int32_t ) -> float {
+        //auto implementationData = static_cast<VST2ImplementationData*>(_effect->user);
         return 0; };
-    effect->setParameter = [](AEffect* effect, int32_t index, float value) {
-        auto data = static_cast<VST2ImplementationData*>(effect->user);
+    //effect, index, parameter
+    effect->setParameter = [](AEffect* , int32_t , float ) {
+        //auto implementationData = static_cast<VST2ImplementationData*>(_effect->user);
     };
 
     // pointers

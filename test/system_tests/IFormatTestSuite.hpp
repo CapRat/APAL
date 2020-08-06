@@ -86,7 +86,7 @@ protected:
 public:
     virtual ~FormatTestSuiteBase() = default;
 
-    inline  virtual void initialize(TestSuiteData data) override { this->data = data; }
+    inline  virtual void initialize(TestSuiteData _data) override { this->data = _data; }
     inline virtual void enable() override { this->enabled = true; }
     inline virtual void disable() override { this->enabled = false; }
     inline virtual bool isEnabled() override { return   enabled; }

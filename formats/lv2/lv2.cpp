@@ -82,7 +82,7 @@ inline bool supportsMidi(IPlugin* plug,IPort* port) {
 /**
    The `lv2_descriptor()` function is the entry point to the plugin library.  The
    host will load symbols the library and call this function repeatedly with increasing
-   indices to find all the plugins defined in the library.  The index is not an
+   indices to find all the plugins defined in the library.  The descriptorIndex is not an
    indentifier, the URI of the returned descriptor is used to determine the
    identify of the plugin.
 
@@ -91,10 +91,9 @@ inline bool supportsMidi(IPlugin* plug,IPort* port) {
 */
 static std::unordered_map<std::string, uint32_t>  URI_INDEX_MAP;
 extern "C" {
-    static int currentLV2Index = 0;
     const LV2_Descriptor* lv2_descriptor(uint32_t index)
     {
-        if (index < 0 || index >= GlobalData().getNumberOfRegisteredPlugins())
+        if (index >= GlobalData().getNumberOfRegisteredPlugins())
             return NULL;
         PluginPtr plug = GlobalData().getPlugin(index);
 
@@ -152,10 +151,10 @@ extern "C" {
         //  midiData->body.
         };
     
-        desc->instantiate = [](const LV2_Descriptor* descriptor, double SampleRate, const char* bundlePath, const LV2_Feature* const* features)->LV2_Handle {
-            auto index = URI_INDEX_MAP[std::string(descriptor->URI)];
-            GlobalData().getPlugin(index)->init();
-            auto lv2Handle = new LV2HandleDataType{ GlobalData().getPlugin(index).get(),descriptor };
+        desc->instantiate = [](const LV2_Descriptor* descriptor, double , const char* , const LV2_Feature* const* features)->LV2_Handle {
+            auto descriptorIndex = URI_INDEX_MAP[std::string(descriptor->URI)];
+            GlobalData().getPlugin(descriptorIndex)->init();
+            auto lv2Handle = new LV2HandleDataType{ GlobalData().getPlugin(descriptorIndex).get(),descriptor,nullptr,{} };
             for (int i = 0; features[i]; ++i) {
                 if (!strcmp(features[i]->URI, LV2_URID__map)) {
                     lv2Handle->map = (LV2_URID_Map*)features[i]->data;
@@ -180,7 +179,7 @@ extern "C" {
             auto data = static_cast<LV2HandleDataType*>(instance); 
             //TODO not nice. Maybe write a function, which does this, but is RT Capable (non mem allocation and blocking ist allowed.
             
-            iteratePorts<IAudioPort>(data->plug, [SampleCount](IAudioPort* p, size_t index) {
+            iteratePorts<IAudioPort>(data->plug, [SampleCount](IAudioPort* p, size_t ) {
                 p->setSampleSize(SampleCount);
                 return false;
                 });
@@ -193,18 +192,18 @@ extern "C" {
                 handleOutput(&mHandle);
         };
 
-        desc->extension_data = [](const char* uri)-> const void* {
+        desc->extension_data = [](const char* )-> const void* {
             return nullptr;
         };
 
         return desc;
     }
 
-    const LV2_Lib_Descriptor* lv2_lib_descriptor(const char* bundle_path, const LV2_Feature* const* features)
+    const LV2_Lib_Descriptor* lv2_lib_descriptor(const char* , const LV2_Feature* const* )
     {
         auto lDesc= new LV2_Lib_Descriptor;
-        lDesc->cleanup = [](LV2_Lib_Handle h) {};
-        lDesc->get_plugin = [](LV2_Lib_Handle h, uint32_t index) {
+        lDesc->cleanup = [](LV2_Lib_Handle ) {};
+        lDesc->get_plugin = [](LV2_Lib_Handle , uint32_t index) {
             return lv2_descriptor(index);
         };
         lDesc->size = sizeof(LV2_Lib_Descriptor);

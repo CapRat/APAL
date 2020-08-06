@@ -84,7 +84,7 @@ namespace XPlug {
     template<SpeakerConfiguration c>
     constexpr SpeakerPosition getSpeakerPositionAt(size_t index) {
         size_t indexCounter = 0;
-        for (int i = 0; i < sizeof(c); i++) {
+        for (size_t i = 0; i < sizeof(c); i++) {
             if (static_cast<uint64_t>(c) & ((uint64_t)1 << i)) {//check if bit is set in pos
                 if (indexCounter == index)
                     return static_cast<SpeakerPosition>(1 << i);
@@ -116,11 +116,11 @@ namespace XPlug {
         }
     }
     template<>
-    constexpr const char* getSpeakerSuffix<SpeakerConfiguration::Mono>(size_t index) {
+    constexpr const char* getSpeakerSuffix<SpeakerConfiguration::Mono>(size_t) {
         return "";
     }
     template<>
-    constexpr const char* getSpeakerSuffix<SpeakerConfiguration::MonoLegacy>(size_t index) {
+    constexpr const char* getSpeakerSuffix<SpeakerConfiguration::MonoLegacy>(size_t) {
         return "";
     }
 }

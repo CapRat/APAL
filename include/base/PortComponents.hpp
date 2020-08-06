@@ -11,7 +11,7 @@ namespace XPlug {
     class DynamicPortComponent :public IPortComponent {
     public:
         DynamicPortComponent() = default;
-        inline DynamicPortComponent(std::initializer_list<std::shared_ptr<IPort>> ports) { this->ports.insert(this->ports.end(), ports.begin(), ports.end()); }
+        inline DynamicPortComponent(std::initializer_list<std::shared_ptr<IPort>> usedPorts) { this->ports.insert(this->ports.end(), usedPorts.begin(), usedPorts.end()); }
         // Geerbt über IPortComponent
         inline virtual size_t size() override { return ports.size(); };
         inline virtual IPort* at(size_t index) override { return ports[index].get();}
@@ -24,7 +24,7 @@ namespace XPlug {
     template<size_t numberOfPorts>
     class StaticPortComponent :public IPortComponent {
     public:
-        StaticPortComponent(std::initializer_list<std::shared_ptr<IPort>> ports) { std::copy( ports.begin(), ports.end(),this->ports.begin()); }
+        StaticPortComponent(std::initializer_list<std::shared_ptr<IPort>> usedPorts) { std::copy(usedPorts.begin(), usedPorts.end(),this->ports.begin()); }
         // Geerbt über IPortComponent
         inline virtual size_t size() override { return numberOfPorts; }
         inline virtual IPort* at(size_t index) override { return ports[index].get(); }

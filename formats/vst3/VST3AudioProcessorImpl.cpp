@@ -79,12 +79,12 @@ it should modify its buses arrangements and return kResultFalse. */
     if (numIns < 0 || numOuts < 0)
         return kInvalidArgument;
     auto plug = GlobalData().getPlugin(plugIndex).get();
-    if (numIns == getNumberOfPorts<IAudioPort>(plug,PortDirection::Input) && numOuts == getNumberOfPorts<IAudioPort>(plug, PortDirection::Output)) {
-        for (size_t in = 0; in < numIns; in++) {
+    if (numIns == (int32)getNumberOfPorts<IAudioPort>(plug,PortDirection::Input) && numOuts == (int32)getNumberOfPorts<IAudioPort>(plug, PortDirection::Output)) {
+        for (int32 in = 0; in < numIns; in++) {
             if (SpeakerArrangementToSpeakerConfig(inputs[in])!= getPortAt<IAudioPort>(plug,in,PortDirection::Input)->getConfig())
                 return kResultFalse;
         }
-        for (int out = 0; out < numOuts; out++) {
+        for (int32 out = 0; out < numOuts; out++) {
             if (SpeakerArrangementToSpeakerConfig(outputs[out]) != getPortAt<IAudioPort>(plug, out,PortDirection::Output)->getConfig())
                 return kResultFalse;
         }
@@ -184,12 +184,11 @@ setup reconfiguration), this could be used to reset some buffers (like Delay lin
 The host has to be sure that it is called only when the Plug-in is enable (setActive was
 called) */
 
- tresult PLUGIN_API VST3AudioProccessorImpl::setProcessing(TBool state)
+ tresult PLUGIN_API VST3AudioProccessorImpl::setProcessing(TBool )
 {
     return kResultOk;
 }
 
- static int x = 0;
 /** The Process call, where all information (parameter changes, event, audio buffer) are passed. */
 #include <vst/ivstevents.h>
  tresult PLUGIN_API VST3AudioProccessorImpl::process(ProcessData& data)
@@ -198,13 +197,13 @@ called) */
      /*if (data.numInputs != getNumberOfPorts<IAudioPort>(plug, PortDirection::Input) ||
          data.numOutputs != getNumberOfPorts<IAudioPort>(plug, PortDirection::Output))
          return kResultFalse;*/
-     size_t inputIndex = 0;
-     size_t outputIndex = 0;
-     iteratePorts<IAudioPort>(plug, [&inputIndex, &outputIndex, &data](IAudioPort* p, size_t ind) {
+     int32 inputIndex = 0;
+     int32 outputIndex = 0;
+     iteratePorts<IAudioPort>(plug, [&inputIndex, &outputIndex, &data](IAudioPort* p, size_t) {
          p->setSampleSize(data.numSamples);
          if (p->getDirection() == PortDirection::Input ? inputIndex<data.numInputs : outputIndex < data.numOutputs) {
              AudioBusBuffers& b = p->getDirection() == PortDirection::Input ? data.inputs[inputIndex++] : data.outputs[outputIndex++];
-             if (b.numChannels != p->size()) return false;
+             if (b.numChannels != (int32)p->size()) return false;
              for (int channelIndex = 0; channelIndex < b.numChannels; channelIndex++) {
                  // TODO: hier double processing einfügen, wenn implementiert.
                  p->at(channelIndex)->feed(b.channelBuffers32[channelIndex]);
@@ -279,6 +278,8 @@ called) */
                      //  e.midiCCOut.value = msg[1];
                      //  e.midiCCOut.value2 = msg[2];//no dont use this...
                      break;
+                 default:
+                     return false;
                  }
                  data.outputEvents->addEvent(e);
                  

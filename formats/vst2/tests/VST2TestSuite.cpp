@@ -16,12 +16,12 @@ public:
 
     virtual SucceedState run() override
     {
-        size_t sampleSize = 512;
+       // size_t sampleSize = 512;
         VST2Module module(data.pluginPath);
         module.intialise();
         module.allocate(512);
         module.run();
-        uint8_t msg[3] = { 0x1,0x2,0x3 };
+        char msg[3] = { 0x1,0x2,0x3 };
         module.sendMidi(msg);
         module.deinitialize();
         module.free();

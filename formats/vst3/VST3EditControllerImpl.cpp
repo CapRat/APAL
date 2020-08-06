@@ -30,7 +30,7 @@ uint32 PLUGIN_API VST3EditControllerImpl::release()
     return __funknownRefCount;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::initialize(FUnknown* context)
+tresult PLUGIN_API VST3EditControllerImpl::initialize(FUnknown* )
 {
     return kResultOk;
 }
@@ -40,17 +40,17 @@ tresult PLUGIN_API VST3EditControllerImpl::terminate()
     return kResultOk;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::setComponentState(IBStream* state)
+tresult PLUGIN_API VST3EditControllerImpl::setComponentState(IBStream* )
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::setState(IBStream* state)
+tresult PLUGIN_API VST3EditControllerImpl::setState(IBStream* )
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::getState(IBStream* state)
+tresult PLUGIN_API VST3EditControllerImpl::getState(IBStream* )
 {
     return kNotImplemented;
 }
@@ -60,46 +60,46 @@ int32 PLUGIN_API VST3EditControllerImpl::getParameterCount()
     return 0;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::getParameterInfo(int32 paramIndex, ParameterInfo& info)
+tresult PLUGIN_API VST3EditControllerImpl::getParameterInfo(int32 , ParameterInfo& )
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::getParamStringByValue(ParamID id, ParamValue valueNormalized, String128 string)
+tresult PLUGIN_API VST3EditControllerImpl::getParamStringByValue(ParamID , ParamValue , String128 )
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::getParamValueByString(ParamID id, TChar* string, ParamValue& valueNormalized)
+tresult PLUGIN_API VST3EditControllerImpl::getParamValueByString(ParamID , TChar* , ParamValue& )
 {
     return kNotImplemented;
 }
-ParamValue PLUGIN_API VST3EditControllerImpl::normalizedParamToPlain(ParamID id, ParamValue valueNormalized)
+ParamValue PLUGIN_API VST3EditControllerImpl::normalizedParamToPlain(ParamID , ParamValue )
 {
     return 0;
 }
 
-ParamValue PLUGIN_API VST3EditControllerImpl::plainParamToNormalized(ParamID id, ParamValue plainValue)
+ParamValue PLUGIN_API VST3EditControllerImpl::plainParamToNormalized(ParamID , ParamValue )
 {
     return kNotImplemented;
 }
 
-ParamValue PLUGIN_API VST3EditControllerImpl::getParamNormalized(ParamID id)
+ParamValue PLUGIN_API VST3EditControllerImpl::getParamNormalized(ParamID )
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::setParamNormalized(ParamID id, ParamValue value)
+tresult PLUGIN_API VST3EditControllerImpl::setParamNormalized(ParamID , ParamValue )
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API VST3EditControllerImpl::setComponentHandler(IComponentHandler* handler)
+tresult PLUGIN_API VST3EditControllerImpl::setComponentHandler(IComponentHandler* )
 {
     return kNotImplemented;
 }
 
-IPlugView* PLUGIN_API VST3EditControllerImpl::createView(FIDString name)
+IPlugView* PLUGIN_API VST3EditControllerImpl::createView(FIDString )
 {
     return nullptr;
 }

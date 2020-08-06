@@ -41,7 +41,7 @@ uint32 PLUGIN_API Component::release()
     return __funknownRefCount;
 }
 
-tresult PLUGIN_API Component::initialize(FUnknown* context)
+tresult PLUGIN_API Component::initialize(FUnknown* )
 {
     XPlug::GlobalData().getPlugin(plugIndex)->init();
     return kResultOk;
@@ -67,7 +67,7 @@ tresult PLUGIN_API Component::getControllerClassId(TUID classId)
     return kResultFalse;
 }
 
-tresult PLUGIN_API Component::setIoMode(IoMode mode)
+tresult PLUGIN_API Component::setIoMode(IoMode )
 {
     return kNotImplemented;
 }
@@ -119,7 +119,7 @@ tresult PLUGIN_API Component::getBusInfo(MediaType type, BusDirection dir, int32
     bus.mediaType = type;
     bus.direction = dir;
 
-    for (int i = 0; i < sizeof(bus.name)&& i< p->getPortName().size(); i++) {
+    for (size_t i = 0; i < sizeof(bus.name)&& i< p->getPortName().size(); i++) {
         bus.name[i] = p->getPortName()[i];
     }
     //kAux not supported yet.
@@ -127,13 +127,14 @@ tresult PLUGIN_API Component::getBusInfo(MediaType type, BusDirection dir, int32
     bus.flags =BusInfo::kDefaultActive;
     return kResultOk;
 }
-
-tresult PLUGIN_API Component::getRoutingInfo(RoutingInfo& inInfo, RoutingInfo& outInfo)
+//RoutingInfo& inInfo, RoutingInfo& outInfo)
+tresult PLUGIN_API Component::getRoutingInfo(RoutingInfo&, RoutingInfo&)
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API Component::activateBus(MediaType type, BusDirection dir, int32 index, TBool state)
+//tresult PLUGIN_API Component::activateBus(MediaType type, BusDirection dir, int32 index, TBool state)
+tresult PLUGIN_API Component::activateBus(MediaType , BusDirection , int32 , TBool )
 {
     /*
     if (index < 0)
@@ -152,17 +153,17 @@ tresult PLUGIN_API Component::activateBus(MediaType type, BusDirection dir, int3
     return kResultTrue;
 }
 
-tresult PLUGIN_API Component::setActive(TBool state)
+tresult PLUGIN_API Component::setActive(TBool )
 {
     return kResultTrue;
 }
 
-tresult PLUGIN_API Component::setState(IBStream* state)
+tresult PLUGIN_API Component::setState(IBStream* )
 {
     return kNotImplemented;
 }
 
-tresult PLUGIN_API Component::getState(IBStream* state)
+tresult PLUGIN_API Component::getState(IBStream* )
 {
     return kNotImplemented;
 }

@@ -21,10 +21,10 @@ namespace XPlug  {
         std::unique_ptr <TIFeatureComponent> featureComponent = nullptr;
     public:
         ModularPlugin() = default;
-        ModularPlugin(std::unique_ptr<TIInfoComponent> infoComponent, std::unique_ptr <TIPortComponent> portComponent, std::unique_ptr <TIFeatureComponent> featureComponent) {
-            this->infoComponent = std::move(infoComponent);
-            this->portComponent = std::move(portComponent);
-            this->featureComponent = std::move(featureComponent);
+        ModularPlugin(std::unique_ptr<TIInfoComponent> _infoComponent, std::unique_ptr <TIPortComponent> _portComponent, std::unique_ptr <TIFeatureComponent> _featureComponent) {
+            this->infoComponent = std::move(_infoComponent);
+            this->portComponent = std::move(_portComponent);
+            this->featureComponent = std::move(_featureComponent);
         }
         virtual IInfoComponent* getInfoComponent() override { return infoComponent.get(); }
         virtual IPortComponent* getPortComponent() override { return portComponent.get(); }
@@ -37,7 +37,7 @@ namespace XPlug  {
     class LazyPlugin :public ModularPlugin< StaticInfoComponent, DynamicPortComponent, AutomaticFeatureComponent>{
     public:
         LazyPlugin();
-        LazyPlugin(std::vector<std::unique_ptr<IPort>> ports);
+        LazyPlugin(std::vector<std::unique_ptr<IPort>> _ports);
 
         // Geerbt über IPlugin
         virtual void init() override;

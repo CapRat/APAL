@@ -26,7 +26,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
+#include <ctype.h>
 #ifdef _WIN32
 #    include <windows.h>
 #    include <direct.h>
@@ -953,6 +953,224 @@ read_node(Sratom* sratom,
     SordModel* model,
     const SordNode* node,
     ReadMode        mode);
+/**
+   @defgroup sratom Sratom
+
+   A library for serialising LV2 Atoms.
+
+   @{
+*/
+
+/**
+   Atom serialiser.
+*/
+typedef struct SratomImpl Sratom;
+
+/**
+   Mode for reading resources to LV2 Objects.
+
+   This affects how resources (which are either blank nodes or have URIs) are
+   read by sratom_read(), since they may be read as simple references (a URI or
+   blank node ID) or a complete description (an atom "Object").
+
+   Currently, blank nodes are always read as Objects, but support for reading
+   blank node IDs may be added in the future.
+*/
+
+/**
+   Create a new Atom serialiser.
+*/
+
+Sratom*
+sratom_new(LV2_URID_Map* map);
+
+/**
+   Free an Atom serialisation.
+*/
+
+void
+sratom_free(Sratom* sratom);
+
+/**
+   Set the environment for reading or writing Turtle.
+
+   This can be used to set namespace prefixes and a base URI for
+   sratom_to_turtle() and sratom_from_turtle().
+*/
+
+void
+sratom_set_env(Sratom* sratom,
+    SerdEnv* env);
+
+/**
+   Set the sink(s) where sratom will write its output.
+
+   This must be called before calling sratom_write().
+*/
+
+void
+sratom_set_sink(Sratom* sratom,
+    const char* base_uri,
+    SerdStatementSink sink,
+    SerdEndSink       end_sink,
+    void* handle);
+
+/**
+   Write pretty numeric literals.
+
+   If `pretty_numbers` is true, numbers will be written as pretty Turtle
+   literals, rather than string literals with precise types.  The cost of this
+   is that the types might get fudged on a round-trip to RDF and back.
+*/
+
+void
+sratom_set_pretty_numbers(Sratom* sratom,
+    bool    pretty_numbers);
+
+/**
+   Configure how resources will be read to form LV2 Objects.
+*/
+
+void
+sratom_set_object_mode(Sratom* sratom,
+    SratomObjectMode object_mode);
+
+/**
+   Write an Atom to RDF.
+   The serialised atom is written to the sink set by sratom_set_sink().
+   @return 0 on success, or a non-zero error code otherwise.
+*/
+
+int
+sratom_write(Sratom* sratom,
+    LV2_URID_Unmap* unmap,
+    uint32_t        flags,
+    const SerdNode* subject,
+    const SerdNode* predicate,
+    uint32_t        type_urid,
+    uint32_t        size,
+    const void* body);
+
+/**
+   Read an Atom from RDF.
+   The resulting atom will be written to `forge`.
+*/
+
+void
+sratom_read(Sratom* sratom,
+    LV2_Atom_Forge* forge,
+    SordWorld* world,
+    SordModel* model,
+    const SordNode* node);
+
+/**
+   Serialise an Atom to a Turtle string.
+   The returned string must be free()'d by the caller.
+*/
+
+char*
+sratom_to_turtle(Sratom* sratom,
+    LV2_URID_Unmap* unmap,
+    const char* base_uri,
+    const SerdNode* subject,
+    const SerdNode* predicate,
+    uint32_t        type,
+    uint32_t        size,
+    const void* body);
+
+/**
+   Read an Atom from a Turtle string.
+   The returned atom must be free()'d by the caller.
+*/
+
+LV2_Atom*
+sratom_from_turtle(Sratom* sratom,
+    const char* base_uri,
+    const SerdNode* subject,
+    const SerdNode* predicate,
+    const char* str);
+
+/**
+   A convenient resizing sink for LV2_Atom_Forge.
+   The handle must point to an initialized SerdChunk.
+*/
+
+LV2_Atom_Forge_Ref
+sratom_forge_sink(LV2_Atom_Forge_Sink_Handle handle,
+    const void* buf,
+    uint32_t                   size);
+
+/**
+   The corresponding deref function for sratom_forge_sink.
+*/
+
+LV2_Atom*
+sratom_forge_deref(LV2_Atom_Forge_Sink_Handle handle,
+    LV2_Atom_Forge_Ref         ref);
+
+
+/* Character utilities */
+
+/** Return true if `c` lies within [`min`...`max`] (inclusive) */
+static inline bool
+in_range(const int c, const int min, const int max)
+{
+    return (c >= min && c <= max);
+}
+
+/** RFC2234: ALPHA ::= %x41-5A / %x61-7A  ; A-Z / a-z */
+static inline bool
+is_alpha(const int c)
+{
+    return in_range(c, 'A', 'Z') || in_range(c, 'a', 'z');
+}
+
+/** RFC2234: DIGIT ::= %x30-39  ; 0-9 */
+static inline bool
+is_digit(const int c)
+{
+    return in_range(c, '0', '9');
+}
+
+/* RFC2234: HEXDIG ::= DIGIT / "A" / "B" / "C" / "D" / "E" / "F" */
+static inline bool
+is_hexdig(const int c)
+{
+    return is_digit(c) || in_range(c, 'A', 'F');
+}
+
+/* Turtle / JSON / C: XDIGIT ::= DIGIT / A-F / a-f */
+static inline bool
+is_xdigit(const int c)
+{
+    return is_hexdig(c) || in_range(c, 'a', 'f');
+}
+
+static inline bool
+is_space(const char c)
+{
+    switch (c) {
+    case ' ': case '\f': case '\n': case '\r': case '\t': case '\v':
+        return true;
+    default:
+        return false;
+    }
+}
+
+static inline bool
+is_base64(const uint8_t c)
+{
+    return is_alpha(c) || is_digit(c) || c == '+' || c == '/' || c == '=';
+}
+
+
+/* String utilities */
+
+size_t
+serd_substrlen(const uint8_t* str,
+    size_t         len,
+    size_t* n_bytes,
+    SerdNodeFlags* flags);
 
 Sratom*
 sratom_new(LV2_URID_Map* map)
@@ -1092,7 +1310,7 @@ static bool
 path_is_absolute(const char* path)
 {
     return (path[0] == '/'
-        || (isalpha(path[0]) && path[1] == ':'
+        || (is_alpha(path[0]) && path[1] == ':'
             && (path[2] == '/' || path[2] == '\\')));
 }
 
@@ -4207,160 +4425,6 @@ sord_write_iter(SordIter* iter,
 
 /***********************SRATOM*****************************/
 
-    /**
-       @defgroup sratom Sratom
-
-       A library for serialising LV2 Atoms.
-
-       @{
-    */
-
-    /**
-       Atom serialiser.
-    */
-typedef struct SratomImpl Sratom;
-
-/**
-   Mode for reading resources to LV2 Objects.
-
-   This affects how resources (which are either blank nodes or have URIs) are
-   read by sratom_read(), since they may be read as simple references (a URI or
-   blank node ID) or a complete description (an atom "Object").
-
-   Currently, blank nodes are always read as Objects, but support for reading
-   blank node IDs may be added in the future.
-*/
-
-/**
-   Create a new Atom serialiser.
-*/
-
-Sratom*
-sratom_new(LV2_URID_Map* map);
-
-/**
-   Free an Atom serialisation.
-*/
-
-void
-sratom_free(Sratom* sratom);
-
-/**
-   Set the environment for reading or writing Turtle.
-
-   This can be used to set namespace prefixes and a base URI for
-   sratom_to_turtle() and sratom_from_turtle().
-*/
-
-void
-sratom_set_env(Sratom* sratom,
-    SerdEnv* env);
-
-/**
-   Set the sink(s) where sratom will write its output.
-
-   This must be called before calling sratom_write().
-*/
-
-void
-sratom_set_sink(Sratom* sratom,
-    const char* base_uri,
-    SerdStatementSink sink,
-    SerdEndSink       end_sink,
-    void* handle);
-
-/**
-   Write pretty numeric literals.
-
-   If `pretty_numbers` is true, numbers will be written as pretty Turtle
-   literals, rather than string literals with precise types.  The cost of this
-   is that the types might get fudged on a round-trip to RDF and back.
-*/
-
-void
-sratom_set_pretty_numbers(Sratom* sratom,
-    bool    pretty_numbers);
-
-/**
-   Configure how resources will be read to form LV2 Objects.
-*/
-
-void
-sratom_set_object_mode(Sratom* sratom,
-    SratomObjectMode object_mode);
-
-/**
-   Write an Atom to RDF.
-   The serialised atom is written to the sink set by sratom_set_sink().
-   @return 0 on success, or a non-zero error code otherwise.
-*/
-
-int
-sratom_write(Sratom* sratom,
-    LV2_URID_Unmap* unmap,
-    uint32_t        flags,
-    const SerdNode* subject,
-    const SerdNode* predicate,
-    uint32_t        type_urid,
-    uint32_t        size,
-    const void* body);
-
-/**
-   Read an Atom from RDF.
-   The resulting atom will be written to `forge`.
-*/
-
-void
-sratom_read(Sratom* sratom,
-    LV2_Atom_Forge* forge,
-    SordWorld* world,
-    SordModel* model,
-    const SordNode* node);
-
-/**
-   Serialise an Atom to a Turtle string.
-   The returned string must be free()'d by the caller.
-*/
-
-char*
-sratom_to_turtle(Sratom* sratom,
-    LV2_URID_Unmap* unmap,
-    const char* base_uri,
-    const SerdNode* subject,
-    const SerdNode* predicate,
-    uint32_t        type,
-    uint32_t        size,
-    const void* body);
-
-/**
-   Read an Atom from a Turtle string.
-   The returned atom must be free()'d by the caller.
-*/
-
-LV2_Atom*
-sratom_from_turtle(Sratom* sratom,
-    const char* base_uri,
-    const SerdNode* subject,
-    const SerdNode* predicate,
-    const char* str);
-
-/**
-   A convenient resizing sink for LV2_Atom_Forge.
-   The handle must point to an initialized SerdChunk.
-*/
-
-LV2_Atom_Forge_Ref
-sratom_forge_sink(LV2_Atom_Forge_Sink_Handle handle,
-    const void* buf,
-    uint32_t                   size);
-
-/**
-   The corresponding deref function for sratom_forge_sink.
-*/
-
-LV2_Atom*
-sratom_forge_deref(LV2_Atom_Forge_Sink_Handle handle,
-    LV2_Atom_Forge_Ref         ref);
 
 /**
    @}
@@ -6555,7 +6619,6 @@ new_lv2_env(const SerdNode* base)
 {
     SerdEnv* env = serd_env_new(base);
 
-#define USTR(s) ((const uint8_t*)(s))
     serd_env_set_prefix_from_strings(env, USTR("doap"), USTR(LILV_NS_DOAP));
     serd_env_set_prefix_from_strings(env, USTR("foaf"), USTR(LILV_NS_FOAF));
     serd_env_set_prefix_from_strings(env, USTR("lv2"), USTR(LILV_NS_LV2));
@@ -7132,7 +7195,6 @@ lilv_scale_point_get_label(const LilvScalePoint* point)
 }
 
 
-#define USTR(s) ((const uint8_t*)(s))
 
 typedef struct {
     void* value;  ///< Value/Object
@@ -10971,7 +11033,7 @@ lilv_copy_file(const char* src, const char* dst)
 static inline bool
 is_windows_path(const char* path)
 {
-    return (isalpha(path[0]) && (path[1] == ':' || path[1] == '|') &&
+    return (is_alpha(path[0]) && (path[1] == ':' || path[1] == '|') &&
         (path[2] == '/' || path[2] == '\\'));
 }
 
@@ -11326,7 +11388,8 @@ lilv_file_equals(const char* a_path, const char* b_path)
 #if defined(HAVE_POSIX_FADVISE) && defined(HAVE_FILENO)
 #   include <fcntl.h>
 #endif
-
+#undef NS_XSD
+#undef NS_RDF
 #define NS_XSD "http://www.w3.org/2001/XMLSchema#"
 #define NS_RDF "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 
@@ -11629,68 +11692,7 @@ serd_byte_sink_write(const void* buf, size_t len, SerdByteSink* bsink)
     return orig_len;
 }
 
-/* Character utilities */
 
-/** Return true if `c` lies within [`min`...`max`] (inclusive) */
-static inline bool
-in_range(const int c, const int min, const int max)
-{
-    return (c >= min && c <= max);
-}
-
-/** RFC2234: ALPHA ::= %x41-5A / %x61-7A  ; A-Z / a-z */
-static inline bool
-is_alpha(const int c)
-{
-    return in_range(c, 'A', 'Z') || in_range(c, 'a', 'z');
-}
-
-/** RFC2234: DIGIT ::= %x30-39  ; 0-9 */
-static inline bool
-is_digit(const int c)
-{
-    return in_range(c, '0', '9');
-}
-
-/* RFC2234: HEXDIG ::= DIGIT / "A" / "B" / "C" / "D" / "E" / "F" */
-static inline bool
-is_hexdig(const int c)
-{
-    return is_digit(c) || in_range(c, 'A', 'F');
-}
-
-/* Turtle / JSON / C: XDIGIT ::= DIGIT / A-F / a-f */
-static inline bool
-is_xdigit(const int c)
-{
-    return is_hexdig(c) || in_range(c, 'a', 'f');
-}
-
-static inline bool
-is_space(const char c)
-{
-    switch (c) {
-    case ' ': case '\f': case '\n': case '\r': case '\t': case '\v':
-        return true;
-    default:
-        return false;
-    }
-}
-
-static inline bool
-is_base64(const uint8_t c)
-{
-    return is_alpha(c) || is_digit(c) || c == '+' || c == '/' || c == '=';
-}
-
-
-/* String utilities */
-
-size_t
-serd_substrlen(const uint8_t* str,
-    size_t         len,
-    size_t* n_bytes,
-    SerdNodeFlags* flags);
 
 static inline int
 serd_strncasecmp(const char* s1, const char* s2, size_t n)
@@ -15017,7 +15019,7 @@ static bool
 read_IRIREF_scheme(SerdReader* reader, Ref dest)
 {
     int c = peek_byte(reader);
-    if (!isalpha(c)) {
+    if (!is_alpha(c)) {
         return r_err(reader, SERD_ERR_BAD_SYNTAX,
             "bad IRI scheme start `%c'\n", c);
     }

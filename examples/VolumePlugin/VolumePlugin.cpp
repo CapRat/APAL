@@ -21,8 +21,8 @@ public:
     {
       //  auto in0 = getPortAt<IAudioPort>(this, 0,PortDirection::Input);
        // auto out0 = getPortAt<IAudioPort>(this, 0, PortDirection::Output);
-        for (int i = 0; i < in0->size(); i++) {
-            for (int s = 0; s < in0->getSampleSize(); s++) {
+        for (size_t i = 0; i < in0->size(); i++) {
+            for (size_t s = 0; s < in0->getSampleSize(); s++) {
                 if(in0->at(i)->getData() != nullptr && out0->at(i)->getData()!=nullptr )
                     out0->at(i)->getData()[s] = in0->at(i)->getData()[s];
             }

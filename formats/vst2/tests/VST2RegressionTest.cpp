@@ -2,7 +2,7 @@
 #include "VST2Module.hpp"
 #include "regression_data.hpp"
 TEST_CASE("VST2 Midi Forwarding regression") {
-    VST2Module module(MIDI_FORWARDER, [](AEffect* effect, int32_t opCode, int32_t index, intptr_t value , void* ptr, float)->intptr_t {
+    VST2Module module(MIDI_FORWARDER, [](AEffect* , int32_t opCode, int32_t , intptr_t  , void* ptr, float)->intptr_t {
         switch (opCode) {
         case audioMasterProcessEvents: {
             auto events = (VstEvents*)ptr;
@@ -25,7 +25,7 @@ TEST_CASE("VST2 Midi Forwarding regression") {
     module.intialise();
     module.allocate(512);
     module.run();
-    uint8_t msg[3] = { 0x1,0x2,0x3 };
+    char msg[3] = { 0x1,0x2,0x3 };
     module.sendMidi(msg);
     module.run();
     module.deinitialize();
