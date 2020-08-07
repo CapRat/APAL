@@ -3,6 +3,7 @@
 #include "tools/LibLoading.hpp"
 #include "vst_def.hpp"
 typedef AEffect* (*VSTPluginMain)(audioMasterCallback);
+
 class VST2Module {
 private:
     size_t samplesize = 0;
@@ -12,9 +13,7 @@ private:
     audioMasterCallback aMasterCallback = nullptr;
 public:
     XPlug::library_t pluginLib = nullptr;
-    AEffect* effect;
-
-
+    AEffect* effect=nullptr;
 
     inline VST2Module(std::string pluginPath, audioMasterCallback cb =nullptr) {
         if (cb == nullptr) {
@@ -34,6 +33,7 @@ public:
         VSTPluginMain_fnc = XPlug::LoadFunc<VSTPluginMain>(pluginLib, "VSTPluginMain");
     }
     inline ~VST2Module() {
+        
         XPlug::UnloadLib(this->pluginLib);
     }
     inline bool intialise() {

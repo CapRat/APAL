@@ -10,10 +10,6 @@
 #include <vector>
 #include <unordered_map>
 using namespace XPlug;
-struct custom_test_data {
-    int (*get_port_count)(size_t plugIndex);
-    int (*get_port_job)(size_t plugIndex,size_t portIndex);
-};
 
 
 struct MidiHandle {

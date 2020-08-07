@@ -1,8 +1,6 @@
 #include "VST3EditControllerImpl.hpp"
 
-VST3EditControllerImpl::VST3EditControllerImpl()
-{
-    __funknownRefCount = 1;
+VST3EditControllerImpl::VST3EditControllerImpl() : __funknownRefCount(1){
 }
 
 tresult PLUGIN_API VST3EditControllerImpl::queryInterface(const TUID _iid, void** obj)

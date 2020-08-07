@@ -14,7 +14,7 @@ std::vector<TTLPluginInfo>(*getPluginInfosPtr)(std::string) = nullptr;
 
 
 
-void writeOutBundle(std::vector<TTLPluginInfo> infoArray,std::string fileOutDir ="./") {
+void writeOutBundle(std::vector<TTLPluginInfo> infoArray, const std::string& fileOutDir ="./") {
     for (auto info : infoArray) {
         auto plugTTL= getTTLFromPluginPtr(info.plugPtr);
         std::ofstream outfile(fileOutDir + info.ttlFileName);

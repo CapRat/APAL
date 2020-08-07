@@ -7,13 +7,12 @@
 #include <tools/PortHandling.hpp>
 // TODO: Maybe quick implementation of the Component stuff.
 //------------------------------------------------------------------------
-Component::Component()
+Component::Component() : __funknownRefCount(1)
 /*    : audioInputs(kAudio, kInput)
     , audioOutputs(kAudio, kOutput)
     , eventInputs(kEvent, kInput)
     , eventOutputs(kEvent, kOutput)*/
 {
-    __funknownRefCount = 1;
 }
 
 

@@ -109,8 +109,8 @@ static intptr_t vst_dispatcher(AEffect* effect, int32_t opcode, int32_t , intptr
     case effSetSpeakerArrangement: ///< [value]: input #VstSpeakerArrangement* [ptr]: output #VstSpeakerArrangement*  @see AudioEffectX::setSpeakerArrangement
         if (getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Input) == 0 || getNumberOfPorts<IAudioPort>(data->plug, PortDirection::Output) == 0)
             return 0;
-        return ((VstSpeakerArrangement*)value)->numChannels == (int32_t)getPortAt<IAudioPort>(data->plug, 0, PortDirection::Input )->size() &&
-               ((VstSpeakerArrangement*)ptr  )->numChannels == (int32_t)getPortAt<IAudioPort>(data->plug, 0, PortDirection::Output)->size();
+        return reinterpret_cast<VstSpeakerArrangement*>(value)->numChannels == (int32_t)getPortAt<IAudioPort>(data->plug, 0, PortDirection::Input )->size() &&
+            reinterpret_cast<VstSpeakerArrangement*>(ptr)->numChannels == (int32_t)getPortAt<IAudioPort>(data->plug, 0, PortDirection::Output)->size();
         break;
     case effSetBypass: ///< [value]: 1 = bypass, 0 = no bypass  @see AudioEffectX::setBypass
         break;
