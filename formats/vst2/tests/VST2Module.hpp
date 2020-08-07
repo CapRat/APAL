@@ -84,8 +84,7 @@ public:
         return true;
     }
     inline bool allocate(size_t _samplesize) {
-        if (inData != nullptr || outData != nullptr)
-            this->free();
+        this->free();
         this->samplesize = _samplesize;
         inData = new float* [effect->numInputs];
         outData = new float* [effect->numOutputs];
@@ -102,12 +101,14 @@ public:
                 if (inData[i] != nullptr)
                     delete[] inData[i];
             delete[] inData;
+            inData = nullptr;
         }
         if (outData != nullptr) {
             for (int i = 0; i < effect->numOutputs; i++)
                 if (outData[i] != nullptr)
                     delete[] outData[i];
             delete[] outData;
+            outData = nullptr;
         }
         return true;
     }
