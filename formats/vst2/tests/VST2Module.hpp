@@ -3,6 +3,42 @@
 #include "tools/LibLoading.hpp"
 #include "vst_def.hpp"
 typedef AEffect* (*VSTPluginMain)(audioMasterCallback);
+/*
+struct VST2AudioData {
+    float** inData = nullptr;
+    float** outData = nullptr;
+    size_t inDataSize = 0;
+    size_t outDataSize = 0;
+    size_t sampleCount = 0;
+
+    inline ~VST2AudioData() { this->free(); }
+    inline bool allocate() {
+        this->free();
+        inData = new float* [inDataSize];
+        outData = new float* [outDataSize];
+        for (int i = 0; i < inDataSize; i++)
+            inData[i] = new float[sampleCount];
+        for (int i = 0; i < outDataSize; i++)
+            outData[i] = new float[sampleCount];
+        return true;
+    }
+
+    inline bool free() {
+        if (inData != nullptr) {
+            for (int i = 0; i < inDataSize; i++)
+                if (inData[i] != nullptr)
+                    delete[] inData[i];
+            delete[] inData;
+        }
+        if (outData != nullptr) {
+            for (int i = 0; i < outDataSize; i++)
+                if (outData[i] != nullptr)
+                    delete[] outData[i];
+            delete[] outData;
+        }
+        return true;
+    }
+};*/
 
 class VST2Module {
 private:
@@ -33,7 +69,7 @@ public:
         VSTPluginMain_fnc = XPlug::LoadFunc<VSTPluginMain>(pluginLib, "VSTPluginMain");
     }
     inline ~VST2Module() {
-        
+        this->free();
         XPlug::UnloadLib(this->pluginLib);
     }
     inline bool intialise() {
@@ -61,10 +97,18 @@ public:
     }
 
     inline bool free() {
-        for (int i = 0; i < effect->numInputs; i++)
-            delete[] inData[i];
-        for (int i = 0; i < effect->numOutputs; i++)
-            delete[] outData[i];
+        if (inData != nullptr) {
+            for (int i = 0; i < effect->numInputs; i++)
+                if (inData[i] != nullptr)
+                    delete[] inData[i];
+            delete[] inData;
+        }
+        if (outData != nullptr) {
+            for (int i = 0; i < effect->numOutputs; i++)
+                if (outData[i] != nullptr)
+                    delete[] outData[i];
+            delete[] outData;
+        }
         return true;
     }
 
