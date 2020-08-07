@@ -49,7 +49,7 @@ TEST_CASE("Symbolload checking", "[symbol]")
 
 extern "C" {
     int static_test_function(int x);
-};
+}
 
 #ifdef BUILD_STATIC_EXAMPLE
 //Static Example Content:

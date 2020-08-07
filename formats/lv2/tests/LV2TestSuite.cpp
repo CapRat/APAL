@@ -1,9 +1,9 @@
 #include "IFormatTestSuite.hpp"
 #include "tools/LibLoading.hpp"
-#include "lv2/core/lv2.h"
-#include "lv2/urid/urid.h"
-#include "lv2/midi/midi.h"
-#include "lv2/atom/forge.h"
+#include <lv2/core/lv2.h>
+#include <lv2/urid/urid.h>
+#include <lv2/midi/midi.h>
+#include <lv2/atom/forge.h>
 #include "lilv.h"
 #include <vector>
 #include <array>
