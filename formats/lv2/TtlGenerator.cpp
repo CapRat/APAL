@@ -10,7 +10,7 @@ using namespace XPlug;
 
 std::string(*getTTLFromPluginPtr)(IPlugin*) = nullptr;
 std::string(*getManifestFromMultpleInfosPtr)(std::vector<TTLPluginInfo>) = nullptr;
-std::vector<TTLPluginInfo>(*getPluginInfosPtr)(std::string) = nullptr;
+std::vector<TTLPluginInfo>(*getPluginInfosPtr)(const std::string&) = nullptr;
 
 
 
@@ -44,11 +44,12 @@ int main(int argc, char* argv[]) {
  
     getTTLFromPluginPtr = LoadFunc<std::string(*)(IPlugin*)>(pluginLibHandle, "getTTLFromPlugin");
     getManifestFromMultpleInfosPtr = LoadFunc< std::string(*)(std::vector<TTLPluginInfo>)>(pluginLibHandle, "getManifestFromMultpleInfos");
-    getPluginInfosPtr = LoadFunc< std::vector<TTLPluginInfo>(*)(std::string)>(pluginLibHandle, "getPluginInfos");
+    getPluginInfosPtr = LoadFunc< std::vector<TTLPluginInfo>(*)(const std::string&)>(pluginLibHandle, "getPluginInfos");
 
 
     /***************GET INFORMATIONS*****************/
-
+    auto y = GetErrorStr();
+    std::cout << y;
     auto infos = getPluginInfosPtr(getFileName(pluginLib, true));
 
     writeOutBundle(infos);

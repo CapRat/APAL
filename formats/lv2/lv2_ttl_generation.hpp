@@ -38,7 +38,7 @@ std::string getManifestFromMultpleInfos(std::vector<TTLPluginInfo> plugInfos);
     * @param plugInfos Array of Plugininfos with the size of \see getSizeOfPluginInfos()
     * @param binaryPath binary Path reltive in the bundle Folder. This is used to get the reference to the needed binary.
 */
-std::vector<TTLPluginInfo> getPluginInfos(std::string binaryPath);
+std::vector<TTLPluginInfo> getPluginInfos(const std::string& binaryPath);
 
 #ifndef _MSC_VER
 }
