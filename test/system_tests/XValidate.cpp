@@ -1,4 +1,4 @@
-#include "tools/clipp.hpp"
+#include "clipp.hpp"
 #include "tools/Logger.hpp"
 #include "XValidate.hpp"
 #include "IFormatTestSuite.hpp"

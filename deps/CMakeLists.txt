@@ -8,3 +8,6 @@
 #${CMAKE_CURRENT_LIST_DIR}/lv2/lv2
 #)
 
+#add_library(lilv lilv.c lilv.h)
+#target_include_directories(lilv PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
