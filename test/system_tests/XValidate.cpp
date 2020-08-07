@@ -19,7 +19,7 @@ void RegisterTestSuite(std::shared_ptr<IFormatTestSuite> testSuite) {
     GlobalData().testSuites.push_back(testSuite);
 }
 
-IFormatTestSuite* GetTestSuite(std::string formatName)
+IFormatTestSuite* GetTestSuite(const std::string& formatName)
 {
     for (auto testSuite : GlobalData().testSuites)
         if (testSuite->getFormatName() == formatName)

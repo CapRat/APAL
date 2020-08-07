@@ -13,7 +13,7 @@
 #include <exception>
 
 
-inline std::string replaceInString(std::string strToChange, const std::string itemToReplace, const std::string substitute)
+inline std::string replaceInString(std::string strToChange, const std::string& itemToReplace, const std::string& substitute)
 {
     while (strToChange.find(itemToReplace) != std::string::npos)
         strToChange.replace(strToChange.find(itemToReplace), 1, substitute);
@@ -104,10 +104,10 @@ public:
             this->size_of_data = sizeof(MidiEventBuffer);
             this->data = new MidiEventBuffer;
             memset(data, 0, sizeof(MidiEventBuffer));
-            ((MidiEventBuffer*)this->data)->seq.atom.type = features->uridmap.map(features->uridmap.handle, LV2_ATOM__Sequence);
-            ((MidiEventBuffer*)this->data)->seq.atom.size = this->size_of_data -sizeof(LV2_Atom);
+            reinterpret_cast<MidiEventBuffer*>(this->data)->seq.atom.type = features->uridmap.map(features->uridmap.handle, LV2_ATOM__Sequence);
+            reinterpret_cast<MidiEventBuffer*>(this->data)->seq.atom.size = this->size_of_data -sizeof(LV2_Atom);
             if(this->dir==Input)
-                lv2_atom_sequence_clear(&((MidiEventBuffer*)this->data)->seq);
+                lv2_atom_sequence_clear(&reinterpret_cast<MidiEventBuffer*>(this->data)->seq);
             return;
         case Audio:
             this->size_of_data =sizeof(float)*sample_count;
@@ -123,7 +123,7 @@ public:
             {0 , {sizeof(MIDINoteEvent)-sizeof(LV2_Atom),features->uridmap.map(features->uridmap.handle, LV2_MIDI__MidiEvent) } },//LV2_Atom_Event
             {b1,b2,b3} // new MidiMsg
         };
-        lv2_atom_sequence_append_event(&((MidiEventBuffer*)this->data)->seq,
+        lv2_atom_sequence_append_event(&reinterpret_cast<MidiEventBuffer*>(this->data)->seq,
            sizeof(MIDINoteEvent[40]), (LV2_Atom_Event*)&ev);
     }
 
@@ -131,10 +131,10 @@ public:
     inline void free() {
         switch (this->type) {
             case Midi:
-                delete  (MidiEventBuffer*)this->data;
+                delete reinterpret_cast<MidiEventBuffer*>(this->data);
                 return;
             case Audio:
-                delete[](float*)this->data;
+                delete[] reinterpret_cast<float*>(this->data);
                 return;
             default:
                // delete this->data;
@@ -232,7 +232,7 @@ private:
     LilvWorld* world = nullptr;
 public:
     std::vector<Plugin> plugins;
-    inline LV2Module(std::string pathToPlugin) {
+    inline explicit LV2Module(const std::string& pathToPlugin) {
         this->world = lilv_world_new();
 
         // Use the path of the lv2 binary. Has to have manifest.ttl in that folder, to work.

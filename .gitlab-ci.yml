@@ -15,7 +15,7 @@ debian_buster_x64_build:
     - cmake -DINSTALL_PREFIX=$(pwd)/build/deps -DBUILD_DIR=build/deps -P scripts/install.cmake 
     - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B build/Release
     - cmake --build build/Release/ 
-    - cmake -E env CXXFLAGS="-g -O0 -Wall -W -Wshadow -Wunused-variable -Wunused-parameter -Wunused-function -Wunused -Wno-system-headers -Wno-deprecated -Woverloaded-virtual -Wwrite-strings -fprofile-arcs -ftest-coverage -pedantic" C_FLAGS="-g -O0 -Wall -W -fprofile-arcs -ftest-coverage" LDFLAGS="-fprofile-arcs -ftest-coverage -lgcov" cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B build/Debug
+    - cmake -E env CXXFLAGS="-g -O0 -Wall -Wextra -Wpedantic -Wshadow  -W --coverage" C_FLAGS="-g -O0 -Wall -W --coverage" LDFLAGS="--coverage -lgcov" cmake -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B build/Debug
     - cmake --build build/Debug
   artifacts:    
     paths:
@@ -27,12 +27,13 @@ debian_test:
   stage: test
   before_script:
     - apt update
-    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake gcovr
+    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake gcovr cppcheck
   script:
     - cd build/Debug
     - ctest -E pluginval
-    #- gcovr --fail-under-line 80 -s -j4  -r $(pwd)/../../  $gcovr --fail-under-line 80 -s -e '.*/deps/.*$' -e '.*(CMake|(T|t)tl|string_view).*$'  --exclude-directories "test/|examples/|deps/"   -r $(pwd)/../../  $(pwd)
-   
+    #- gcovr --fail-under-line 80 -s -e '.*/deps/.*$' -e '.*(CMake|(T|t)tl|string_view).*$'  --exclude-directories "test/|examples/|deps/"   -r $(pwd)/../..  $(pwd)
+    - cppcheck -q --enable=warning,style,performance,portability --error-exitcode=1 --std=c++14 --language=c++ --project=compile_commands.json -ideps/
+    - gcovr --fail-under-line 80 -s -e '.*/deps/.*$' -e '.*(CMake|(T|t)tl|string_view).*$'  --exclude-directories "test/|examples/|deps/"   -r $(pwd)/../..  $(pwd)
 #docker-test-linux-x64 :
 #  image: dockcross/linux-x64    
 #  stage: test

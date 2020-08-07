@@ -107,7 +107,7 @@ size_t getSizeOfPluginInfos()
     return GlobalData().getNumberOfRegisteredPlugins();
 }
 
-std::vector<TTLPluginInfo> getPluginInfos(std::string binaryPath)
+std::vector<TTLPluginInfo> getPluginInfos(const std::string& binaryPath)
 {
     std::vector<TTLPluginInfo> plugins(GlobalData().getNumberOfRegisteredPlugins());
     for (size_t i = 0; i < plugins.size(); i++) {

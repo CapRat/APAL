@@ -70,8 +70,7 @@ public:
     std::shared_ptr<IFormatTestSuite> testSuitePtr = nullptr;
     TestSuiteRegistrator()
     {
-        testSuitePtr = std::shared_ptr<IFormatTestSuite>(new TestType());
-        RegisterTestSuite(testSuitePtr);
+        RegisterTestSuite(std::shared_ptr<IFormatTestSuite>(new TestType()));
     }
 };
 

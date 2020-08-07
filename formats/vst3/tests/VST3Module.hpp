@@ -138,10 +138,10 @@ class VST3Module {
 private:
     std::string lastError="";
     std::string lastWarning="";
-    XPlug::library_t pluginLibrary; // The pluginlibrary
-    GetFactoryProc plugLoadFunction; // FactoryLoad Function
-    void* initfnc; // functionpointer to init function
-    void* exitfnc; // functionpointer to init function
+    XPlug::library_t pluginLibrary=nullptr; // The pluginlibrary
+    GetFactoryProc plugLoadFunction=nullptr; // FactoryLoad Function
+    void* initfnc=nullptr; // functionpointer to init function
+    void* exitfnc=nullptr; // functionpointer to init function
    
 
     Steinberg::Vst::IComponent* processorComponent = nullptr;
@@ -157,7 +157,7 @@ public:
     std::function<bool()>runExitFncLampda; // Function to call exit function crossplattform.Returns Value from  ExitDll/ExitModule/bundleExit
     inline bool hasInitAndExitFunctions() { return initfnc != nullptr && exitfnc != nullptr; }
 
-    inline VST3Module(std::string pluginPath) {
+    inline explicit VST3Module(std::string pluginPath) {
         using namespace XPlug;
         using namespace Steinberg;
         using namespace Vst;
