@@ -10,20 +10,21 @@
 #else
 #include "compatibility/string_view.hpp"
 namespace std {
-    using namespace nonstd;
-    using namespace sv_lite;
+using namespace nonstd;
+using namespace sv_lite;
 }
 
 #endif
 namespace XPlug {
-struct NotImplementedException : public std::exception {
-    const char* what() const noexcept
-    {
-        return "functionality is not implemented yet.";
-    }
+struct NotImplementedException : public std::exception
+{
+  const char* what() const noexcept
+  {
+    return "functionality is not implemented yet.";
+  }
 };
-//std::array<float, 5> x;
-//template <size_t size>
-//typedef std::array<float,size> audio_data;
+// std::array<float, 5> x;
+// template <size_t size>
+// typedef std::array<float,size> audio_data;
 }
 #endif //! TYPES_HPP

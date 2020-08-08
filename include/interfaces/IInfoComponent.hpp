@@ -2,49 +2,50 @@
 #define I_INFO_COMPONENT_HPP
 #include <Types.hpp>
 namespace XPlug {
-    /**
-     * @brief Interface, which is used to retreive Information over the Plugin.
-    */
-    class IInfoComponent {
-    public:
-        /**
-         * @brief Gets the Name of the Plugin.
-         * @return Name of the given Plugin.
-         */
-        virtual std::string_view getPluginName() = 0;
+/**
+ * @brief Interface, which is used to retreive Information over the Plugin.
+ */
+class IInfoComponent
+{
+public:
+  /**
+   * @brief Gets the Name of the Plugin.
+   * @return Name of the given Plugin.
+   */
+  virtual std::string_view getPluginName() = 0;
 
-        /**
-         * @brief Gets the Plugin URI. This can be an Website, but doesnt have to. 
-         * In LV2 this URI is used to identify the Plugin.
-         * @return URI of the Plugin.
-         */
-        virtual std::string_view getPluginURI() = 0;
+  /**
+   * @brief Gets the Plugin URI. This can be an Website, but doesnt have to.
+   * In LV2 this URI is used to identify the Plugin.
+   * @return URI of the Plugin.
+   */
+  virtual std::string_view getPluginURI() = 0;
 
-        /**
-         * @brief Gets the Description of the Plugin. 
-         * @return Description of the Plugin. 
-         */
-        virtual std::string_view getPluginDescription() = 0;
+  /**
+   * @brief Gets the Description of the Plugin.
+   * @return Description of the Plugin.
+   */
+  virtual std::string_view getPluginDescription() = 0;
 
-        /**
-         * @brief Gets the Copyright or Licence of the Plugin. 
-         * @return Copyright or Licence of the Plugin. 
-         */
-        virtual std::string_view getPluginCopyright() = 0;
+  /**
+   * @brief Gets the Copyright or Licence of the Plugin.
+   * @return Copyright or Licence of the Plugin.
+   */
+  virtual std::string_view getPluginCopyright() = 0;
 
-        /********************Creator/Vendor information*********************/
-        /**
-         * @brief Gets the Name of the creator, vendor or developer.
-         * @return Name of the creator, vendor or developer.
-         */
-        virtual std::string_view getCreatorName() = 0;
+  /********************Creator/Vendor information*********************/
+  /**
+   * @brief Gets the Name of the creator, vendor or developer.
+   * @return Name of the creator, vendor or developer.
+   */
+  virtual std::string_view getCreatorName() = 0;
 
-        /**
-         * @brief Gets the URL from the plugincreator or pluginvendor
-         * @return URL from the plugincreator or pluginvendor
-         */
-        virtual std::string_view getCreatorURL() = 0;
-    };
-   
+  /**
+   * @brief Gets the URL from the plugincreator or pluginvendor
+   * @return URL from the plugincreator or pluginvendor
+   */
+  virtual std::string_view getCreatorURL() = 0;
+};
+
 }
 #endif //! I_INFO_COMPONENT_HPP

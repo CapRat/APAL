@@ -1,5 +1,7 @@
 /**
- * File to check, which VST2 Version should be used. It should make sure, that everything is defined. If USE_VST2_SDK variable is set, the official sdk2 headers are used.
+ * File to check, which VST2 Version should be used. It should make sure, that
+ * everything is defined. If USE_VST2_SDK variable is set, the official sdk2
+ * headers are used.
  */
 
 #ifndef VST_DEF_HPP
@@ -10,14 +12,14 @@
 #include "aeffectx.h"
 #ifndef audioMasterWantMidi
 #define audioMasterWantMidi __audioMasterWantMidiDeprecated
-#endif //!audioMasterWantMidi
+#endif //! audioMasterWantMidi
 //# include "vst/aeffectx.h"
 #else
 #define VESTIGE_HEADER
 #include "vestige.h"
 // Use Vestigeheader, with some reverse engeneered values.
 #define effFlagsProgramChunks (1 << 5)
-#define effFlagsCanDoubleReplacing  1 << 12
+#define effFlagsCanDoubleReplacing 1 << 12
 
 #define kVstVersion 2400
 
@@ -38,7 +40,7 @@
 #define effOfflineRun 40
 #define effProcessVarIo 41
 #define effSetSpeakerArrangement 42
-#define effSetBypass 44  
+#define effSetBypass 44
 #define effVendorSpecific 50
 #define effGetTailSize 52
 #define effEditKeyDown 59
@@ -60,25 +62,25 @@
 
 struct VstSpeakerArrangement
 {
-	int32_t type;						
-	int32_t numChannels;
+  int32_t type;
+  int32_t numChannels;
 };
 
 // used for vestige and sdk compatibility
 enum VstStringConstants
 {
-	kVstMaxProgNameLen = VestigeMaxCategLabelLen,
-	kVstMaxParamStrLen = VestigeMaxShortLabelLen,
-	kVstMaxVendorStrLen = VestigeMaxNameLen,	
-	kVstMaxProductStrLen = VestigeMaxLabelLen,
-	kVstMaxEffectNameLen = VestigeMaxCategLabelLen + VestigeMaxShortLabelLen
+  kVstMaxProgNameLen = VestigeMaxCategLabelLen,
+  kVstMaxParamStrLen = VestigeMaxShortLabelLen,
+  kVstMaxVendorStrLen = VestigeMaxNameLen,
+  kVstMaxProductStrLen = VestigeMaxLabelLen,
+  kVstMaxEffectNameLen = VestigeMaxCategLabelLen + VestigeMaxShortLabelLen
 };
 
-struct ERect {
-	int16_t top, left, bottom, right;
+struct ERect
+{
+  int16_t top, left, bottom, right;
 };
 
-#endif 
-
+#endif
 
 #endif //! VST_DEF_HPP

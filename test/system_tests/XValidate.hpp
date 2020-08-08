@@ -6,12 +6,12 @@ class IFormatTestSuite;
 /**
  * @brief Registers an Test.
  * @param
-*/
+ */
 void RegisterTestSuite(std::shared_ptr<IFormatTestSuite>);
-IFormatTestSuite* GetTestSuite(std::string formatName);
+IFormatTestSuite*
+GetTestSuite(std::string formatName);
 
-
-
-Logger& GlobalLog();
+Logger&
+GlobalLog();
 
 #endif //! XVALIDATE_HPP
