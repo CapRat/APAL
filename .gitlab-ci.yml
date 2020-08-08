@@ -27,7 +27,7 @@ debian_test:
   stage: test
   before_script:
     - apt update
-    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake gcovr cppcheck
+    - DEBIAN_FRONTEND=noninteractive apt --yes install cmake gcovr cppcheck build-essential
   script:
     - cd build/Debug
     - ctest -E pluginval
