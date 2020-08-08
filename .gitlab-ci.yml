@@ -15,7 +15,7 @@ debian_buster_x64_build:
     - cmake -DINSTALL_PREFIX=$(pwd)/build/deps -DBUILD_DIR=build/deps -P scripts/install.cmake 
     - cmake -G "Ninja" -DCMAKE_BUILD_TYPE=Release  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B build/Release
     - cmake --build build/Release/ 
-    - cmake -E env CXXFLAGS="-g -O0 -Wall -Wextra -Wpedantic -Wshadow  -W --coverage" C_FLAGS="-g -O0 -Wall -W --coverage" LDFLAGS="--coverage -lgcov" cmake -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B $(pwd)/build/Debug
+    - cmake -E env CXXFLAGS="-g -O0 -Wall -Wextra -Wpedantic -Wshadow  -W -Werror --coverage" C_FLAGS="-g -O0 -Wall -W --coverage" LDFLAGS="--coverage -lgcov" cmake -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_PREFIX_PATH=$(pwd)/build/deps -S . -B $(pwd)/build/Debug
     - cmake --build $(pwd)/build/Debug
   artifacts:    
     paths:
