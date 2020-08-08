@@ -41,12 +41,13 @@ enable_testing()
 add_subdirectory(test)
 endif(XPLUG_BUILD_TESTS)
 
+add_subdirectory(formats)
 
 if(XPLUG_BUILD_EXAMPLES)
 add_subdirectory(examples)
 endif(XPLUG_BUILD_EXAMPLES)
 
-add_subdirectory(formats)
+
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(deps)

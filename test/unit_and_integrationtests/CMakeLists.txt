@@ -25,7 +25,6 @@ add_executable(unit_tests ${CMAKE_CURRENT_BINARY_DIR}/catch_main.cpp
     "base/TestPluginBases.cpp"
     "TestGlobalData.cpp"
     )
-    message("${CMAKE_CURRENT_LIST_DIR}/../test_utils LD")
 target_include_directories(unit_tests PUBLIC "${CMAKE_CURRENT_LIST_DIR}" "${CMAKE_CURRENT_LIST_DIR}/../test_utils" "../test_utils")
 
 if (NOT WIN32)
