@@ -1,6 +1,7 @@
 #ifndef XVALIDATE_HPP
 #define XVALIDATE_HPP
 #include "tools/Logger.hpp"
+#include<memory>
 class IFormatTestSuite;
 
 /**
@@ -9,7 +10,7 @@ class IFormatTestSuite;
  */
 void RegisterTestSuite(std::shared_ptr<IFormatTestSuite>);
 IFormatTestSuite*
-GetTestSuite(std::string formatName);
+GetTestSuite(const std::string& formatName);
 
 Logger&
 GlobalLog();
