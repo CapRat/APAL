@@ -1,14 +1,17 @@
+/**
+ * @file VST2 Implementation. Its hard to find Doku and examples for it. It is
+ * also deprecated, so maybe other formats are more important.
+ */
 #include "interfaces/IPlugin.hpp"
 #include "vst_def.hpp"
 
-//#include
-//"C:\Users\Benjamin\Downloads\vst_sdk2_4_rev1\vstsdk2.4\pluginterfaces\vst2.x\aeffectx.h"
 #include <GlobalData.hpp>
 #include <algorithm>
 #include <cstring>
 #include <interfaces/IPlugin.hpp>
 #include <tools/PortHandling.hpp>
 using namespace XPlug;
+
 /**
  * @brief Struct for  use in the vst2 implementation. This struct is stored in
  * the AEffect->user pointer. So it can be casted to this struct. If the VST2
@@ -20,15 +23,13 @@ struct VST2ImplementationData
   IPlugin* plug;
 };
 
-//                                 effect             opcode      index value
-//                                 ptr        opt
 static intptr_t
 vst_dispatcher(AEffect* effect,
                int32_t opcode,
-               int32_t,
+               int32_t, // index
                intptr_t value,
                void* ptr,
-               float)
+               float) // opt
 {
   auto data = static_cast<VST2ImplementationData*>(effect->user);
   switch (opcode) {
@@ -365,7 +366,7 @@ extern "C"
     effect->numParams = 0;
     effect->numPrograms = 0;
 
-    //
+    // Do something with the audiomaster. Maybe support it later.
     if (audioMaster) {
 
       /*  //OPCodes
@@ -482,7 +483,7 @@ extern "C"
         data->plug,
         [sampleFrames, &inputs, &inputIndex, &outputs, &outputIndex](
           IAudioPort* p, size_t) {
-          p->setSampleSize(static_cast<size_t>(sampleFrames));
+          p->setSampleCount(static_cast<size_t>(sampleFrames));
           for (size_t i = 0; i < p->size(); i++) {
             if (p->getDirection() == PortDirection::Input) {
               p->at(i)->feed(inputs[inputIndex]);
@@ -498,13 +499,13 @@ extern "C"
       data->plug->processAudio();
       writeMidiOutput(_effect);
     };
-
+    // Not supported yet.
     /*effect->processDoubleReplacing = [](AEffect* effect, double** inputs,
     double** outputs, int32_t sampleFrames) { auto implementationData =
     static_cast<VST2ImplementationData*>(effect->user); int inputIndex = 0; int
     outputIndex = 0; iteratePorts<IAudioPort>(implementationData->plug,
     [sampleFrames, inputs, &inputIndex, outputs, &outputIndex](IAudioPort* p,
-    size_t) { p->setSampleSize(static_cast<size_t>(sampleFrames)); for (size_t i
+    size_t) { p->setSampleCount(static_cast<size_t>(sampleFrames)); for (size_t i
     = 0; i < p->size(); i++) { if (p->getDirection() == PortDirection::Input) {
                     p->at(i)->feed( nullptr, inputs[inputIndex]);
                     inputIndex++;
@@ -536,11 +537,6 @@ extern "C"
       // auto implementationData =
       // static_cast<VST2ImplementationData*>(_effect->user);
     };
-
-    // pointers
-
-    // done
-    // effect->object = obj;
 
     return effect;
   }

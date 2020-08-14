@@ -24,8 +24,8 @@ enum class PortType
 
 /**
  * @brief Representation of in and outputs of an plugin. An IPort has multiple
- * Channels, which can be accessed though at. In Future there could be added
- * iteratorinterfaces.
+ * Channels, which can be accessed through at. In Future there could be added
+ * iteratorinterfaces or methods for optimized access. 
  */
 class IPort
 {

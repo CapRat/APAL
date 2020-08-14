@@ -17,16 +17,26 @@ enum class Feature
 };
 
 /**
- * @brief Componetn, wich identifies which Features the Plugin supports.
+ * @brief InterfaceComponent, wich identifies which Features the Plugin
+ * supports.
  */
 class IFeatureComponent
 {
 public:
+  /**
+   * @brief Function, which reports, weather a Feature is supported or not. So
+   * the formatlibrary calls this function to tests if the plugin make use of a
+   * functionality or not. This gives the formatlibrary the ability to opimize
+   * processtime.
+   * @param feature feature which should be supported or not.
+   * @return if the feature is supported true is returned and false if
+   * otherwhise.
+   */
   virtual bool supportsFeature(Feature feature) = 0;
 
   /**
    * @brief  Method, which is  used speacially in DEBUG builds. This Method is
-   * called, when an Pluginformat should uses a given Feature, which leads to
+   * called, when an Pluginformat should use a given Feature, which leads to
    * strange workarrounds effects. Like when VST2 should use multiple ports,
    * which are not mono. VST2 just supports 1 In and 1 Out, so just these Ports
    * are used.

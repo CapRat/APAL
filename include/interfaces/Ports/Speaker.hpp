@@ -133,6 +133,16 @@ getSpeakerPositionAt(size_t index)
   return SpeakerPosition::Undefined;
 }
 
+/**
+ * @brief Gets the SpeakerPosition of the given index as Stringrepresentation.
+ * Not fully implemented yet. There are also some template overlaods for
+ * somekind of SpeakerConfiguration, so Mono would always return an empty
+ * String.
+ * @param index of the Speaker in the configuration.  Mapped through
+ * getSpeakerPositionAt().
+ * @return String representation of an SpeakerPosition, like FC(for FrontCenter)
+ * or FLH (for FrontLeftHeight).
+ */
 template<SpeakerConfiguration c>
 constexpr const char*
 getSpeakerSuffix(size_t index)

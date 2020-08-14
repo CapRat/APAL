@@ -3,6 +3,9 @@
 #include "tools/LibLoading.hpp"
 #include <vector>
 using namespace XPlug;
+/**
+ * @brief LADSPA Test Suite for XValidate/system_tests
+ */
 class LADSPATestSuite : public FormatTestSuiteBase
 {
 public:
@@ -30,6 +33,7 @@ public:
       LoadFunc<LADSPA_Descriptor_Function>(lib, "ladspa_descriptor");
     size_t index = 0;
     const LADSPA_Descriptor* desc = nullptr;
+    // All things loaded. Than Run normal execution of Plugin.
     while (desc = ladspa_descriptor_fnc(index++), desc != nullptr) {
       auto handle = desc->instantiate(desc, sampleRate);
       desc->activate(handle);

@@ -9,8 +9,9 @@
 #include <vst/ivsteditcontroller.h>
 #include <vst/ivstevents.h>
 /**
- * @brief Implementation of the IEventList interfacem but without query ,addref
- * and release functions, because it should not be needed.
+ * @brief Implementation of the IEventList interface but without query ,addref
+ * and release functions, because it should not be needed. Its implemented with
+ * std::vector.
  */
 class EventList : public Steinberg::Vst::IEventList
 {
@@ -169,6 +170,12 @@ public:
     andthen                                                                    \
   }
 #define ERROR_IF(cond, msg) ERROR_IF_AND_THAN(cond, msg, return false;)
+/**
+ * @brief The VST3 Module Class, which should be used to host VST3 Modules. Like
+ * the other Module classes its quick and dirty and should be refractored if
+ * used more often or in other cases than in tests. But its already better
+ * written, than the other Module Classes in the other Formats.
+ */
 class VST3Module
 {
 private:
@@ -198,7 +205,11 @@ public:
   {
     return initfnc != nullptr && exitfnc != nullptr;
   }
-
+  /**
+   * @brief COnstructor, which loads the plugin and the required Functions.
+   * @param pluginPath The Path to the vst3 Binary... TODO: Rewrite here to
+   * support binary and package.
+   */
   inline explicit VST3Module(std::string pluginPath)
   {
     using namespace XPlug;
@@ -255,12 +266,23 @@ public:
     if (this->runInitFncLampda != nullptr)
       this->runInitFncLampda();
   }
+
+  /**
+   * @brief Destructor, which runs the Exitfunction and unloads the VST3
+   * library.
+   */
   inline ~VST3Module()
   {
     if (this->runExitFncLampda != nullptr)
       this->runExitFncLampda();
     XPlug::UnloadLib(this->pluginLibrary);
   }
+
+  /**
+   * @brief Initializes the Plugin, like loading the requred Classes and saves
+   * them internally.
+   * @return true, if successfull, false if not.
+   */
   inline bool initialize()
   {
     using namespace Steinberg;
@@ -343,6 +365,10 @@ public:
     return this->audioProcessor != nullptr && this->editController != nullptr;
   }
 
+  /**
+   * @brief terminates the loaded classes, if initialized before.
+   * @return true, if successfull, false if not.
+   */
   inline bool deinitalize()
   {
     if (editController != nullptr)
@@ -354,6 +380,11 @@ public:
     return true;
   }
 
+  /**
+   * @brief Allocates internally the required data, to run process.
+   * @param audioPortBufferSize  Size of each audioport or bus.
+   * @return true, if successfull, false if not.
+   */
   inline bool allocateData(size_t audioPortBufferSize)
   {
     using namespace Steinberg;
@@ -382,6 +413,10 @@ public:
     return true;
   }
 
+  /**
+   * @brief executs the process function of the audioprocessor.
+   * @return true, if successfull, false if not.
+   */
   inline bool run()
   {
     ERROR_IF(this->audioProcessor->setProcessing(true) != Steinberg::kResultOk,
@@ -393,8 +428,25 @@ public:
              "Error, while set Processing to false");
     return true;
   }
+
+  /**
+   * @brief Gets the last error that is occured. If not error is occured an
+   * empty String is returned.
+   * @return Last errormessage or an empty string.
+   */
   inline std::string getLastError() { return lastError; }
+
+  /**
+   * @brief Gets the last warning that is occured. If not error is occured an
+   * empty string is returned.
+   * @return last warningmessage or an empty string.
+   */
   inline std::string getLastWarning() { return lastWarning; }
+  /**
+   * @brief Gets the current Data Buffer to manipulate if, if wanted. Use it
+   * with care!
+   * @return reference to the internal data Buffer
+   */
   inline ProcessDataClass* getDataBuffer() { return pData.get(); }
 };
 

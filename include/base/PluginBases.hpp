@@ -49,8 +49,8 @@ public:
 };
 
 /**
- * @brief LazyPlugin, which just implements all Methods, except Process. Also it
- * uses some Components, which match the Lazy Approach.
+ * @brief LazyPlugin, which just implements all methods, except process. Also it
+ * uses some components, which match the lazy approach.
  */
 class LazyPlugin
   : public ModularPlugin<StaticInfoComponent,

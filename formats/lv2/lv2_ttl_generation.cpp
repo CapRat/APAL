@@ -1,13 +1,18 @@
 #include "lv2_ttl_generation.hpp"
-#include <sstream>
-//#include <iostream>
 #include <cstring>
 #include <fstream>
 #include <interfaces/Ports/IAudioPort.hpp>
+#include <sstream>
 #include <tools/PortHandling.hpp>
 #include <tools/StringTools.hpp>
 using namespace XPlug;
 
+/**
+ * @brief FUnction to convert SpeakerConfiguration to LV2 PortGroups. Not
+ * supported yet.
+ * @param conf the configuration to convert
+ * @return A string, which can be used for an LV2 ttl.
+ */
 std::string
 mapSpeakerConfToLV2Type(SpeakerConfiguration conf)
 {
@@ -112,7 +117,6 @@ getTTLFromPlugin(IPlugin* pluginPtr)
     }
     return false;
   });
-  // std::strcpy(ttlFile,plugTTL.str().c_str());
   return plugTTL.str();
 }
 

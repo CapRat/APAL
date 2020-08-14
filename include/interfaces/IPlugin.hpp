@@ -32,36 +32,70 @@ public:
 #define REGISTER_PLUGIN(PluginClassName)                                       \
   static PluginRegistrator<PluginClassName> instance##PluginClassName =        \
     PluginRegistrator<PluginClassName>()
-#define EMPTY_STRING ""
 
-// Class which is used to get called from implementation files.
+/**
+ * @brief This is the mainclass for the internal API. IPlugin handles some basic
+ * functions like initialisation and deactivation. It also hold references for
+ * the required components. The API is designed component based, so the
+ * components are quiet important!
+ */
 class IPlugin
 {
 public:
+  /**
+   * @brief Virtual destructor, to make destruction safe.
+   */
   virtual ~IPlugin() = default;
 
   /**
-   * @brief Procssing Audio and Midi data.
+   * @brief Processing audio and MIDI data. This call should do the main
+   * processing. Before this function is called, the Plugin is initialized with
+   * init and activated.
    */
   virtual void processAudio() = 0;
 
-  virtual void
-  init() = 0; // initialize the plugin. This is happening not on static
-              // creation, but on first time when the plugin is loaded.
-  virtual void deinit() = 0; // deinitialize the plugin.
+  /**
+   * @brief initialize the plugin. This is happening not on static creation, but
+   * on first time when the plugin is loaded.
+   */
+  virtual void init() = 0;
 
-  virtual void activate() = 0;   // activate the plugin(resume from deactivate)
+  /**
+   * @brief deinitialize the plugin. Init must be called, before deinit is
+   * called.
+   */
+  virtual void deinit() = 0;
+
+  /**
+   * @brief activates the plugin. Is called after init. Can be called after a
+   * deactivate call. The default start is a deactivated state.
+   */
+  virtual void activate() = 0;
+  /**
+   * @brief deactivates the plugin. Is called after deinit. Can be called after
+   * an activate call.
+   */
   virtual void deactivate() = 0; // deactivates the plugin (put it to sleep)
 
-  // virtual void registerPlugin() = 0;
-
+  /**
+   * @brief Gets a reference to the IInfoComponent.
+   * @return a reference to the IInfoComponent. It must not be freed. Its
+   * livetime is the same as the IPlugin instance.
+   */
   virtual IInfoComponent* getInfoComponent() = 0;
-  /*
-          virtual size_t getParameterCount() = 0;
-          virtual void* getParameter() = 0;
-          virtual void setParameter(void*) = 0;*/
 
+  /**
+   * @brief  Gets a reference to the IPortComponent.
+   * @return a reference to the IPortComponent. It must not be freed. Its
+   * livetime is the same as the IPlugin instance.
+   */
   virtual IPortComponent* getPortComponent() = 0;
+
+  /**
+   * @brief  Gets a reference to the IFeatureComponent.
+   * @return a reference to the IFeatureComponent. It must not be freed. Its
+   * livetime is the same as the IPlugin instance.
+   */
   virtual IFeatureComponent* getFeatureComponent() = 0;
 };
 

@@ -47,8 +47,6 @@ public:
    * @return PluginPtr to plugin.
    */
   PluginPtr getPlugin(std::string name);
-
-  // PluginController getPlugin(size_t index);
 };
 
 GlobalDataType&
@@ -60,6 +58,11 @@ typedef XPlug::GlobalDataType& (*globalDataFncPtr)();
 
 extern "C"
 {
+  /**
+   * @brief Just a simple Function, which makes the Version callable. Should
+   * also be packed in the Plugin, maybe its usefull in the future.
+   * @return Version of the current XPLUG version.
+   */
   VERSION XPlugGetVersion();
 }
 

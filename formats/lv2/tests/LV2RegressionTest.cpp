@@ -1,6 +1,9 @@
 #include "CatchTools.hpp"
 #include "LV2Module.hpp"
 #include "regression_data.hpp"
+/**
+ * @brief Testcase, which tests, weather Midiforwarding is working or not.
+ */
 TEST_CASE("LV2 Midi Forwarding regression")
 {
   LV2Module mod(MIDI_FORWARDER);

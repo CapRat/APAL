@@ -1,6 +1,9 @@
 #include "CatchTools.hpp"
 #include "VST2Module.hpp"
 #include "regression_data.hpp"
+/**
+ * @brief Regressiontest, which tests midi through the MidiForwarder.
+ */
 TEST_CASE("VST2 Midi Forwarding regression")
 {
   VST2Module module(

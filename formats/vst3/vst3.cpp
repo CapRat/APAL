@@ -1,20 +1,25 @@
 /**
- * In the VST3 Implementation, Calls to midi out should be done in processAudio,
- * because after the Function, Data from output ports are written to the given
- * Port.
+ * @file In the VST3 Implementation, Calls to midi out should be done in
+ * processAudio, because after the Function, Data from output ports are written
+ * to the given Port.
  */
 
 #define INIT_CLASS_IID
+#include "GlobalData.hpp"
 #include "VST3AudioProcessorImpl.hpp"
 #include "VST3EditControllerImpl.hpp"
-//#include "public.sdk/source/vst/vstcomponent.h"
-#include "GlobalData.hpp"
 #include "interfaces/IPlugin.hpp"
+#include "public.sdk/source/main/pluginfactory.h"
+
 using namespace Steinberg;
 using namespace Vst;
 
 /****************INITIALILSATION*******************/
 
+/**
+ * @brief Initialisation Function.
+ * @return
+ */
 bool
 InitModule()
 {
@@ -60,7 +65,7 @@ extern "C"
   }
 }
 
-#include "public.sdk/source/main/pluginfactory.h"
+
 
 //#define stringPluginName "Supercool2"
 

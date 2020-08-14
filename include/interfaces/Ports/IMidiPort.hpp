@@ -4,7 +4,7 @@
 namespace XPlug {
 
 /**
- * @brief Midi events with correct Byte type.
+ * @brief Midi events as enum with correct Byte representation.
  */
 enum class MidiEvents : uint8_t
 {
@@ -21,7 +21,7 @@ enum class MidiEvents : uint8_t
 typedef std::array<uint8_t, 3> MidiMessage;
 
 /**
- * @brief MidiPort, which manage mutliple MidiEvents.
+ * @brief IMidiPort derives from IPort and manages mutliple MidiEvents.
  */
 class IMidiPort : public IPort
 {

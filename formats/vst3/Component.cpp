@@ -9,10 +9,6 @@
 //------------------------------------------------------------------------
 Component::Component()
   : __funknownRefCount(1)
-/*    : audioInputs(kAudio, kInput)
-    , audioOutputs(kAudio, kOutput)
-    , eventInputs(kEvent, kInput)
-    , eventOutputs(kEvent, kOutput)*/
 {}
 
 tresult PLUGIN_API
@@ -51,10 +47,6 @@ Component::initialize(FUnknown*)
 tresult PLUGIN_API
 Component::terminate()
 {
-  /*audioInputs.clear();
-  audioOutputs.clear();
-  eventInputs.clear();
-  eventOutputs.clear();*/
   XPlug::GlobalData().getPlugin(plugIndex)->deinit();
   return kResultOk;
 }
@@ -92,16 +84,6 @@ Component::getBusCount(MediaType type, BusDirection dir)
   }
 }
 
-/**
- BusList* Component::getBusList (MediaType type, BusDirection dir)
-{
-    if (type == kAudio)
-        return dir == kInput ? &audioInputs : &audioOutputs;
-    else if (type == kEvent)
-        return dir == kInput ? &eventInputs : &eventOutputs;
-    return nullptr;
-}
-*/
 
 tresult PLUGIN_API
 Component::getBusInfo(MediaType type,
@@ -143,7 +125,8 @@ Component::getBusInfo(MediaType type,
   bus.flags = BusInfo::kDefaultActive;
   return kResultOk;
 }
-// RoutingInfo& inInfo, RoutingInfo& outInfo)
+
+
 tresult PLUGIN_API
 Component::getRoutingInfo(RoutingInfo&, RoutingInfo&)
 {

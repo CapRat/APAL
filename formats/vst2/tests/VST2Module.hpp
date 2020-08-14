@@ -3,43 +3,13 @@
 #include "tools/LibLoading.hpp"
 #include "vst_def.hpp"
 typedef AEffect* (*VSTPluginMain)(audioMasterCallback);
-/*
-struct VST2AudioData {
-    float** inData = nullptr;
-    float** outData = nullptr;
-    size_t inDataSize = 0;
-    size_t outDataSize = 0;
-    size_t sampleCount = 0;
 
-    inline ~VST2AudioData() { this->free(); }
-    inline bool allocate() {
-        this->free();
-        inData = new float* [inDataSize];
-        outData = new float* [outDataSize];
-        for (int i = 0; i < inDataSize; i++)
-            inData[i] = new float[sampleCount];
-        for (int i = 0; i < outDataSize; i++)
-            outData[i] = new float[sampleCount];
-        return true;
-    }
-
-    inline bool free() {
-        if (inData != nullptr) {
-            for (int i = 0; i < inDataSize; i++)
-                if (inData[i] != nullptr)
-                    delete[] inData[i];
-            delete[] inData;
-        }
-        if (outData != nullptr) {
-            for (int i = 0; i < outDataSize; i++)
-                if (outData[i] != nullptr)
-                    delete[] outData[i];
-            delete[] outData;
-        }
-        return true;
-    }
-};*/
-
+/**
+ * @brief Simple Class, which is used to host vst2 Plugins.
+ * Main task of this class is to call Pluginfunctions in a correct way and
+ * expose an... kind of easy Interface. Like the other Module classes its an
+ * quick and dirty class for tests. If its used more often, refractor it.
+ */
 class VST2Module
 {
 private:
@@ -50,9 +20,20 @@ private:
   audioMasterCallback aMasterCallback = nullptr;
 
 public:
+  // reference to the plugin library
   XPlug::library_t pluginLib = nullptr;
+  // the library represented as AEffect.
   AEffect* effect = nullptr;
 
+  /**
+   * @brief  Creates an VST Module. Also loads the library and Function, so when
+   * an invalid path is given... its created.. but it shouldnt be used here.
+   * TODO: Add exceptions here, so an invalid path throw an exception.
+   * @param pluginPath path to vst2 binary.
+   * @param cb the audioMasterCallback, which should be specified from host. If
+   * not given an implementation which does nothing, except returning a 100 o
+   * audioMasterVersion is taken.
+   */
   inline VST2Module(std::string pluginPath, audioMasterCallback cb = nullptr)
   {
     if (cb == nullptr) {
@@ -73,11 +54,20 @@ public:
     VSTPluginMain_fnc =
       XPlug::LoadFunc<VSTPluginMain>(pluginLib, "VSTPluginMain");
   }
+  /**
+   * @brief Calls the internal Free Method and unloads the library. So
+   * everything is freed.
+   */
   inline ~VST2Module()
   {
     this->free();
     XPlug::UnloadLib(this->pluginLib);
   }
+
+  /**
+   * @brief initalizes the plugin with the required function calls.
+   * @return returns true, if successful and false if not.
+   */
   inline bool intialise()
   {
     effect = VSTPluginMain_fnc(aMasterCallback);
@@ -90,12 +80,21 @@ public:
                        0); // Activate plugin (1 turn on , 0 turn off)
     return true;
   }
+  /**
+   * @brief Deinitalizes the plugin, with the required function calls.
+   * @return returns true, if successful and false if not.
+   */
   inline bool deinitialize()
   {
     effect->dispatcher(effect, effMainsChanged, 0, 0, nullptr, 0);
     effect->dispatcher(effect, effClose, 0, 0, nullptr, 0); // Close Effect
     return true;
   }
+  /**
+   * @brief Allocates Memory internal for the required Functions
+   * @param _samplesize the size of each allocated array.
+   * @return returns true, if successful and false if not.
+   */
   inline bool allocate(size_t _samplesize)
   {
     this->free();
@@ -109,6 +108,11 @@ public:
     return true;
   }
 
+  /**
+   * @brief frees every allocated Memory. Clears nothing, if nothing is
+   * allocated.
+   * @return  returns true, if successful and false if not.
+   */
   inline bool free()
   {
     if (inData != nullptr) {
@@ -127,11 +131,19 @@ public:
     }
     return true;
   }
-
+  /**
+   * @brief Runs the plugin process function.
+   */
   inline void run()
   {
     effect->processReplacing(effect, inData, outData, this->samplesize);
   }
+
+  /**
+   * @brief Sends an MidiMessage to the Plugin. (Receiving is done with the
+   * given  audioMasterCallback callback function in the constructor.(
+   * @param msg message to send.
+   */
   inline void sendMidi(char msg[3])
   {
     if (effect->dispatcher(

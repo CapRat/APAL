@@ -1,4 +1,5 @@
 #include "IFormatTestSuite.hpp"
+#include "LV2Module.hpp"
 #include "lilv.h"
 #include "tools/LibLoading.hpp"
 #include <algorithm>
@@ -11,115 +12,10 @@
 #include <vector>
 using namespace XPlug;
 
-/*
-template <typename T, size_t size>
-struct Atom_Sequence{
-    LV2_Atom_Sequence seq;
-    T events[size];
-} ;
-
-
-
-std::string replaceInString(std::string strToChange, const std::string
-itemToReplace, const std::string substitute)
-{
-    while (strToChange.find(itemToReplace) != std::string::npos)
-        strToChange.replace(strToChange.find(itemToReplace), 1, substitute);
-    return strToChange;
-}
-
-struct LV2Features {
-    std::vector<LV2_Feature*> features;
-    std::vector<std::string> uridmapHandle;
-    LV2_URID_Map uridmap;
-
-
-    LV2Features() {
-        uridmap = { &uridmapHandle,
-           [](LV2_URID_Map_Handle handle, const char* uri)->LV2_URID {
-               auto cHandle = (std::vector<std::string>*)handle;
-               auto res = std::find(cHandle->begin(), cHandle->end(),
-std::string(uri)); if (res != cHandle->end()) return
-std::distance(cHandle->begin(), res) + 1; cHandle->push_back(std::string(uri));
-               return cHandle->size();
-       } };
-        uridMapFeature = { LV2_URID__map,&uridmap };
-        features.push_back(&uridMapFeature);
-    }
-
-private:
-    LV2_Feature uridMapFeature;
-};
-enum Direction{Input, Output};
-enum PortType {
-    Audio,
-    Midi
-};
-
-// Struct for a 3 byte MIDI event, used for writing notes
-typedef struct {
-    LV2_Atom_Event event;
-    uint8_t        msg[3];
-} MIDINoteEvent;
-
-struct MidiEventBuffer {
-    LV2_Atom_Sequence seq;
-    MIDINoteEvent midiEvents[40];
-};
-
-
-struct Port {
-    const LilvPort* lilvPort=nullptr;
-    void* data = nullptr;
-    PortType type;
-    LV2Features* feat;
-
-
-    void allocate(size_t sample_count) {
-
-
-        switch (this->type) {
-        case Midi:
-            this->data=new MidiEventBuffer;
-            memset(data, 0,sizeof(MidiEventBuffer));
-            ((MidiEventBuffer*)this->data)->seq.atom.type =
-feat->uridmap.map(feat->uridmap.handle, LV2_ATOM__Sequence); MIDINoteEvent ev;
-            ev.event.body.size = sizeof(MIDINoteEvent);
-            ev.event.time.beats = 0;
-            ev.event.body.type= feat->uridmap.map(feat->uridmap.handle,
-LV2_MIDI__MidiEvent); ev.msg[0] = 0xFF; ev.msg[1] = 0xFF; ev.msg[2] = 0xFF;
-
-            lv2_atom_sequence_clear(&((MidiEventBuffer*)this->data)->seq);
-            lv2_atom_sequence_append_event(&((MidiEventBuffer*)this->data)->seq,
-                sizeof(LV2_Atom_Sequence_Body) +
-sizeof(MIDINoteEvent[40]),(LV2_Atom_Event*)&ev );
-
-            return;
-        case Audio:
-            data = new float[sample_count];
-            return;
-        }
-    }
-    ~Port(){
-        switch (this->type) {
-        case Midi:
-            delete  (MidiEventBuffer*)this->data;
-            return;
-        case Audio:
-            delete[] (float*)this->data;
-            return;
-        default:
-            delete this->data;
-        }
-    }
-};
-struct Plugin {
-    const LilvPlugin* lilvPlugin;
-    std::vector<Port> ports;
-
-};*/
-
-#include "LV2Module.hpp"
+/**
+ * @brief Simple Testclass, derived from FormatTestSuiteBase to Test LV2 Format.
+ * Using the LV2Module to make LV2 calls.
+ */
 class LV2TestSuite : public FormatTestSuiteBase
 {
 
@@ -151,7 +47,6 @@ public:
       plug.activate();
       for (auto& p : plug.ports) {
         if (p.type == PortType::Midi && p.dir == Direction::Input) {
-          // uint8_t* x= { 0x1,0x2,0x3 };
           p.addMidiMsg(0x1, 0x2, 0x3);
           p.addMidiMsg(0xFF, 0xFF, 0xFF);
         }

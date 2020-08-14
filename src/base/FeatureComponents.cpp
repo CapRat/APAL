@@ -24,9 +24,6 @@ XPlug::DynamicFeatureComponent::addSupportedFeature(Feature feat)
   this->supportedFeatures.push_back(feat);
 }
 
-XPlug::AutomaticFeatureComponent::AutomaticFeatureComponent()
-  : DynamicFeatureComponent::DynamicFeatureComponent()
-{}
 
 XPlug::AutomaticFeatureComponent::AutomaticFeatureComponent(
   IPortComponent* pComp,

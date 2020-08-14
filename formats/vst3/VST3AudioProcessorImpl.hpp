@@ -5,6 +5,10 @@
 using namespace Steinberg;
 using namespace Vst;
 
+/**
+ * @brief Implementation of the VST3 AudioProcessor interface. It maps the calls
+ * to the internal API if available.
+ */
 class VST3AudioProccessorImpl
   : public Component
   , public IAudioProcessor

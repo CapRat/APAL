@@ -52,6 +52,15 @@ iteratePorts(IPlugin* plug, std::function<bool(T*, size_t)> iterFunc)
   iteratePorts<T>(plug, XPlug::PortDirection::All, iterFunc);
 }
 
+/**
+ * @brief gets a Port at the given index. The filtering is done before, so its
+ * not an absolute index.
+ * @tparam T Type of Ports to be filtered.
+ * @param plug plugin to get Ports from.
+ * @param index index which match the wanted port.
+ * @param dir filters the direction from the Port.
+ * @return the matched port or nullptr if nothing is found.
+ */
 template<typename T>
 T*
 getPortAt(IPlugin* plug, size_t index, PortDirection dir = PortDirection::All)

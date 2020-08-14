@@ -1,3 +1,10 @@
+/**
+ * @file Multiple classes ans structs, which should represent an LV2_Module, to
+ * make hosting with tests easier. This classes are not written with that much
+ * efford, because its just for testing. So if more stability is needed, Work
+ * iss needed to make it more stable.
+ */
+
 #ifndef LV2_MODULE_HPP
 #define LV2_MODULE_HPP
 
@@ -11,7 +18,15 @@
 #include <exception>
 #include <map>
 #include <vector>
-
+/**
+ * @brief Replaces an item in a string with a subtitude.
+ * @param strToChange String to manipulate, the changed string is returned. The
+ * given String is notchanged!
+ * @param itemToReplace The item, which should be replaced in the strToChange,
+ * if found.
+ * @param substitute Value to replace the found items with.
+ * @return The new changed string.
+ */
 inline std::string
 replaceInString(std::string strToChange,
                 const std::string& itemToReplace,
@@ -21,14 +36,10 @@ replaceInString(std::string strToChange,
     strToChange.replace(strToChange.find(itemToReplace), 1, substitute);
   return strToChange;
 }
-
-template<typename T, size_t size>
-struct Atom_Sequence
-{
-  LV2_Atom_Sequence seq;
-  T events[size];
-};
-
+/**
+ * @brief Struct, which holds LV2Fetures, whcih can be passed to LV2-Plugins.
+ * Currently only supports LV2_URID_Map
+ */
 struct LV2Features
 {
   std::vector<LV2_Feature*> features;
@@ -57,12 +68,17 @@ struct LV2Features
 private:
   LV2_Feature uridMapFeature;
 };
-
+/**
+ * @brief Enum, which represents a Direction
+ */
 enum Direction
 {
   Input,
   Output
 };
+/**
+ * @brief Enum, which represents a Porttype
+ */
 enum PortType
 {
   Undefined,
@@ -70,22 +86,32 @@ enum PortType
   Midi
 };
 
-// Struct for a 3 byte MIDI event, used for writing notes
+/**
+ * @brief Struct for a 3 byte MIDI event, used for writing notes
+ */
 typedef struct
 {
   LV2_Atom_Event event;
   uint8_t msg[3];
 } MIDINoteEvent;
 
+/**
+ * @brief MidiEventBuffer Bufferstruct, which can be used as Atom Sequence and
+ * can store more than 30 MidiEvents.
+ */
 struct MidiEventBuffer
 {
   LV2_Atom_Sequence seq;
-  MIDINoteEvent midiEvents[40];
+  MIDINoteEvent
+    midiEvents[40]; // Chust a buffersize, The type doesnt matter. Because of
+                    // the strange LV2 Padding, its not enough space for 40
+                    // Events, but for enough to operate properly.
 };
 
 /**
  * @brief Port Class, which saves the given Data, and also deltes it, if not
- * used anymore.
+ * used anymore. Can be used as audio and midi port. But do not change the Type
+ * in between.
  */
 struct Port
 {
@@ -108,6 +134,9 @@ public:
     this->features = _features;
     this->dir = _dir;
   }
+  /**
+   * @brief Speacial CopyConstructor, which memcopys data, wehen copied.
+   */
   Port(const Port& other)
   {
     features = other.features;
@@ -119,6 +148,14 @@ public:
     memcpy(this->data, other.data, this->size_of_data);
   }
 
+  inline ~Port() { free(); }
+
+  /**
+   * @brief Allocates Data for an Port, with the given Samplecound.
+   * If data is already allocated, it will be freed before new allocation!
+   * @param sample_count Size of the new allocated Array in this Port. Only
+   * Used, when this is an Audioport.
+   */
   inline void allocate(size_t sample_count)
   {
     if (this->data != nullptr)
@@ -145,21 +182,30 @@ public:
     }
   }
 
+  /**
+   * @brief Adds a MidiMessage to the current Buffer, only works if this is an
+   * Midi Type port.
+   * @param b1 first Byte of Message.
+   * @param b2 second Byte of Message.
+   * @param b3 third Byte of Message.
+   */
   inline void addMidiMsg(uint8_t b1, uint8_t b2, uint8_t b3)
   {
-    MIDINoteEvent ev{
-      { 0,
-        { sizeof(MIDINoteEvent) - sizeof(LV2_Atom),
-          features->uridmap.map(features->uridmap.handle,
-                                LV2_MIDI__MidiEvent) } }, // LV2_Atom_Event
-      { b1, b2, b3 }                                      // new MidiMsg
-    };
+    MIDINoteEvent ev{ { 0,
+                        { sizeof(MIDINoteEvent) - sizeof(LV2_Atom),
+                          features->uridmap.map(features->uridmap.handle,
+                                                LV2_MIDI__MidiEvent) } },
+                      { b1, b2, b3 } };
     lv2_atom_sequence_append_event(
       &reinterpret_cast<MidiEventBuffer*>(this->data)->seq,
       sizeof(MIDINoteEvent[40]),
       (LV2_Atom_Event*)&ev);
   }
 
+  /**
+   * @brief frees the current allocated Memory in this class. Frees nothing, if
+   * nothing is allocated.
+   */
   inline void free()
   {
     switch (this->type) {
@@ -175,8 +221,11 @@ public:
     }
     this->data = nullptr;
   }
-  inline ~Port() { free(); }
 };
+
+/**
+ * @brief Represents an LV2Plugin as a class.
+ */
 struct Plugin
 {
 private:
@@ -191,8 +240,7 @@ public:
    * @brief Creates an LV2 PLugin representation
    * @param lilvPlugin
    * @param features
-   * @param w
-   * @return
+   * @param w the lilv world, where the Plugin lives in.
    */
   Plugin(const LilvPlugin* _lilvPlugin,
          const LV2Features* _features,
@@ -205,6 +253,7 @@ public:
     auto midiEvent = lilv_new_uri(w, LILV_URI_MIDI_EVENT);
     auto inPort = lilv_new_uri(w, LILV_URI_INPUT_PORT);
     auto outPort = lilv_new_uri(w, LILV_URI_OUTPUT_PORT);
+    // create the needed Ports for this Plugin.
     for (uint32_t i = 0; i < lilv_plugin_get_num_ports(this->lilvPlugin); i++) {
       auto lilvPort = lilv_plugin_get_port_by_index(this->lilvPlugin, i);
       auto pType = PortType::Undefined;
@@ -264,6 +313,12 @@ public:
   inline void verify() { lilv_plugin_verify(this->lilvPlugin); }
 };
 
+/**
+ * @brief This is the LV2Moduel class which... mainly does sth on Construction
+ * and holds a Vector of Plugins, which should be used then...
+ * Like i Said, if this is used more and needs to be better... there is a lot of
+ * Room for improvement.
+ */
 class LV2Module
 {
 private:

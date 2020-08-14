@@ -16,6 +16,11 @@ using namespace sv_lite;
 
 #endif
 namespace XPlug {
+/**
+ * @brief NotImplementedException, to be used when something in this project is
+ * not implemented yet. Currently not used that much, but in the opensource
+ * cycle it should be used more.
+ */
 struct NotImplementedException : public std::exception
 {
   const char* what() const noexcept
@@ -23,8 +28,5 @@ struct NotImplementedException : public std::exception
     return "functionality is not implemented yet.";
   }
 };
-// std::array<float, 5> x;
-// template <size_t size>
-// typedef std::array<float,size> audio_data;
 }
 #endif //! TYPES_HPP

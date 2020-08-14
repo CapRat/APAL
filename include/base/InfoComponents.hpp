@@ -3,6 +3,10 @@
 #include <interfaces/IInfoComponent.hpp>
 namespace XPlug {
 
+/**
+ * @brief  currently only implementation of the IInfoComponent. Stores infos in
+ * variables and satisfies the Interface.
+ */
 class StaticInfoComponent : public IInfoComponent
 {
 public:

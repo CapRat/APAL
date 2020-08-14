@@ -1,3 +1,8 @@
+/**
+ * @file Implementation file for the LV2 Format. The needed API functions are
+ * defined here. Also the access to the Plugin is implemented here.
+ */
+
 #include "GlobalData.hpp"
 #include <interfaces/IPlugin.hpp>
 #include <lv2/atom/atom.h>
@@ -11,6 +16,10 @@
 #include <vector>
 using namespace XPlug;
 
+/**
+ * @brief Handle, wich is used, to create an possibility to write and read  Midi
+ * more easily.
+ */
 struct MidiHandle
 {
   LV2_Atom_Sequence* midiDataLocation;
@@ -19,7 +28,7 @@ struct MidiHandle
 };
 /**
  * @brief Treats the MidiHandle, at it would be an input. (Put MidiMsg in Pipe)
- * @param in
+ * @param in Input MidiHandle.
  */
 inline void
 handleInput(MidiHandle* in)
@@ -35,17 +44,19 @@ handleInput(MidiHandle* in)
   }
 }
 
-// Struct for a 3 byte MIDI event, used for writing notes
+/**
+ * @brief Struct for a 3 byte MIDI event, used for writing notes
+ */
 typedef struct
 {
   LV2_Atom_Event event;
-  // MidiMessage msg;
   uint8_t msg[3];
 } MIDINoteEvent;
+
 /**
  * @brief Treats the MidiHandle, at it would be an output. (fetches things from
  * the Pipe to the output)
- * @param in
+ * @param out Output Midihandle.
  */
 inline void
 handleOutput(MidiHandle* out)
@@ -70,12 +81,17 @@ handleOutput(MidiHandle* out)
   }
 }
 
+/**
+ * @brief LV2Handle, wich is used to pass Data arount, between LV2-API function
+ * calls.
+ */
 struct LV2HandleDataType
 {
-  IPlugin* plug;
-  const LV2_Descriptor* lv2Desc;
-  LV2_URID_Map* map;
-  std::vector<MidiHandle> midiHandles;
+  IPlugin* plug;                 // Reference to current Plugin
+  const LV2_Descriptor* lv2Desc; // Reference to LV2 Descripor
+  LV2_URID_Map* map;             // URID Map to map ids.
+  std::vector<MidiHandle>
+    midiHandles; // Midihandles, to use when writing to output.
 };
 
 inline bool
@@ -88,32 +104,32 @@ supportsMidi(IPlugin* plug, IPort* port)
 }
 
 /**
-   The `lv2_descriptor()` function is the entry point to the plugin library. The
-   host will load symbols the library and call this function repeatedly with
-   increasing indices to find all the plugins defined in the library.  The
-   descriptorIndex is not an indentifier, the URI of the returned descriptor is
-   used to determine the identify of the plugin.
-
-   This method is in the ``discovery'' threading class, so no other functions
-   or methods in this plugin library will be called concurrently with it.
-*/
+ * @brief Map, which maps URIs form plugins to ids, to match the internal API
+ * structure.
+ */
 static std::unordered_map<std::string, uint32_t> URI_INDEX_MAP;
 extern "C"
 {
+  /**
+   * @brief Implementation of the lv2_descriptor entrypoint.
+   * @param index index of a Plugin to load(compatible with lv2)
+   * @return nullptr if index is invalid or an Pointer to the LV2_Descriptor for
+   * the Plugin.
+   */
   const LV2_Descriptor* lv2_descriptor(uint32_t index)
   {
+    // return nullptr, if out of range.
     if (index >= GlobalData().getNumberOfRegisteredPlugins())
-      return NULL;
+      return nullptr;
     PluginPtr plug = GlobalData().getPlugin(index);
 
     auto desc = new LV2_Descriptor();
 
+    // get the identifaction URI for the Plugin.
     desc->URI = plug->getInfoComponent()->getPluginURI().data();
     URI_INDEX_MAP[std::string(plug->getInfoComponent()->getPluginURI())] =
       index;
 
-    // LV2_Descriptor desc = lv2DescriptorArray.at(lv2DescriptorArray.size() -
-    // 1);
     desc->activate = [](LV2_Handle instance) {
       auto data = static_cast<LV2HandleDataType*>(instance);
       data->plug->activate();
@@ -136,11 +152,11 @@ extern "C"
             if (midiPort != nullptr) {
               if (supportsMidi(data->plug, midiPort)) {
                 if (data->midiHandles.capacity() <
-                    getNumberOfPorts<IMidiPort>(
-                      data->plug,
-                      PortDirection::All)) // Resize if vector is not big enough
+                    getNumberOfPorts<IMidiPort>(data->plug, PortDirection::All))
+                  // Resize if vector is not big enough
                   data->midiHandles.resize(getNumberOfPorts<IMidiPort>(
                     data->plug, PortDirection::All));
+                // Allocate for every MIDI Port an Midihandle
                 data->midiHandles[midiPortIndex] =
                   MidiHandle{ (LV2_Atom_Sequence*)DataLocation,
                               midiPort,
@@ -156,43 +172,27 @@ extern "C"
             midiPortIndex++;
           return false;
         });
-
-      /*  auto midiPort =
-         dynamic_cast<IMidiPort*>(data->plug->getPortComponent()->at(IPort)); if
-         (midiPort != nullptr && (
-             (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiInput)&&midiPort->getDirection()==PortDirection::Input
-         ) ||
-             (data->plug->getFeatureComponent()->supportsFeature(Feature::MidiOutput)
-         && midiPort->getDirection() == PortDirection::Output)
-             )) {
-              data->midiHandles.push_back( MidiHandle{
-                 (LV2_Atom_Sequence*)DataLocation,
-                 midiPort,
-                 data->map->map(data->map->handle, LV2_MIDI__MidiEvent)
-             });
-         }
-         else {
-             getAudioChannelFromIndex(data->plug,
-         IPort)->feed((float*)DataLocation);
-         }*/
-      //  midiData->body.
     };
 
     desc->instantiate = [](const LV2_Descriptor* descriptor,
                            double,
                            const char*,
                            const LV2_Feature* const* features) -> LV2_Handle {
+      // map an uri to an id, to use it  with the internal API
       auto descriptorIndex = URI_INDEX_MAP[std::string(descriptor->URI)];
       GlobalData().getPlugin(descriptorIndex)->init();
       auto lv2Handle = new LV2HandleDataType{
         GlobalData().getPlugin(descriptorIndex).get(), descriptor, nullptr, {}
       };
+      // Get The URID_Map feature, which is needed to use with midi.
       for (int i = 0; features[i]; ++i) {
         if (!strcmp(features[i]->URI, LV2_URID__map)) {
           lv2Handle->map = (LV2_URID_Map*)features[i]->data;
           break;
         }
       }
+      // When the map feature is not present, we cant instantiate... Maybe skip
+      // this, if its not absolutly neccessary.
       if (!lv2Handle->map) {
         return NULL;
       }
@@ -215,23 +215,35 @@ extern "C"
 
       iteratePorts<IAudioPort>(data->plug,
                                [SampleCount](IAudioPort* p, size_t) {
-                                 p->setSampleSize(SampleCount);
+                                 p->setSampleCount(SampleCount);
                                  return false;
                                });
+      // Handle Input Midi
       for (auto mHandle : data->midiHandles)
         if (mHandle.connectedMidiPort->getDirection() == PortDirection::Input)
           handleInput(&mHandle);
+      // process (and also write output midi inside here, to the internal API)
       data->plug->processAudio();
+      // Handle Output Midi, which was written while processing.
       for (auto mHandle : data->midiHandles)
         if (mHandle.connectedMidiPort->getDirection() == PortDirection::Output)
           handleOutput(&mHandle);
     };
 
+    // Currently is realy no need to support extension data.
     desc->extension_data = [](const char*) -> const void* { return nullptr; };
 
     return desc;
   }
 
+  /**
+   * @brief Implementation of the lv2_lib_descriptor. Its pretty straight
+   * forward and uses lv2_descriptor mainly.
+   * @param  bundle_path is the path to a bundle.
+   * @param  features An array of supported Features by the host.
+   * @return new LV2_Lib_Descriptor wich can be used to fetch Plugins, which are
+   * created for the internal API.
+   */
   const LV2_Lib_Descriptor* lv2_lib_descriptor(const char*,
                                                const LV2_Feature* const*)
   {

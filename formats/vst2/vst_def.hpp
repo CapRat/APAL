@@ -1,7 +1,7 @@
 /**
- * File to check, which VST2 Version should be used. It should make sure, that
- * everything is defined. If USE_VST2_SDK variable is set, the official sdk2
- * headers are used.
+ * @file File to check, which VST2 Version should be used. It should make sure,
+ * that everything is defined. If USE_VST2_SDK variable is set, the official
+ * sdk2 headers are used.
  */
 
 #ifndef VST_DEF_HPP

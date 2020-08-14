@@ -1,6 +1,9 @@
 #include "CatchTools.hpp"
 #include "VST3Module.hpp"
 #include "regression_data.hpp"
+/**
+ * @brief Regressiontest to test Midi routing with the MidiForwarder example.
+ */
 TEST_CASE("VST3 Midi Forwarding regression")
 {
   VST3Module module(MIDI_FORWARDER);

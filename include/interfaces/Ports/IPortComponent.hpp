@@ -5,12 +5,12 @@
 namespace XPlug {
 
 /**
- * @brief Component for Porthandling. This Interface and the implementation
+ * @brief Component for porthandling. This interface and the implementation
  * handles multiple IPorts. The creation and adding ports, is handled by the
- * implementation. Virtually this Component holds 3 Arrays. The Input, outputs
- * and inandoutputs ports. The meaning of the indexes is implemntationdependent.
- * So look there, if you want to know, which indecies are meaningful for which
- * port.
+ * implementation. Virtually this Component holds multiple Arrays. The input,
+ * output and inandoutput ports for controller and audio data. The meaning of
+ * the indexes is implemntationdependent. So look there, if you want to know,
+ * which indecies are meaningful for which port.
  */
 class IPortComponent
 {

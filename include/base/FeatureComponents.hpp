@@ -1,3 +1,7 @@
+/**
+ * @file groups all IFeatureComponent implementations.
+ */
+
 #ifndef FEATURE_COMPONENTS_HPP
 #define FEATURE_COMPONENTS_HPP
 #include <algorithm>
@@ -7,6 +11,9 @@
 #include <vector>
 namespace XPlug {
 class IPortComponent;
+/**
+ * @brief Exception, which is called, when a feature is not supported
+ */
 struct UseOfNonSupportedFeature : public std::exception
 {
   UseOfNonSupportedFeature(Feature f)
@@ -20,6 +27,10 @@ struct UseOfNonSupportedFeature : public std::exception
   Feature feat;
 };
 
+/**
+ * @brief Static Feature Component, wiht is initialized with a fixed number of
+ * Features. Its implemented with an std::array.
+ */
 template<size_t numOfFeatures>
 class StaticFeatureComponent : public IFeatureComponent
 {
@@ -46,6 +57,10 @@ protected:
   std::array<Feature, numOfFeatures> supportedFeatures;
 };
 
+/**
+ * @brief Implementation of the IFeatureComponent with an dynamic
+ * array(std::vector), so features can be dynamicly added.
+ */
 class DynamicFeatureComponent : public IFeatureComponent
 {
 public:
@@ -62,11 +77,24 @@ public:
 protected:
   std::vector<Feature> supportedFeatures;
 };
+
+/**
+ * @brief Extends the Function of the DynamicFeatureComponent with the automatic
+ * Detection of Features. For this to work, Information about other Components
+ * is required, so they should be inserted in the Constructor. Also Features can
+ * additionally added, because the AutomaticFeatureComponent is a
+ * DynamicFeatureComponent.
+ */
 class AutomaticFeatureComponent : public DynamicFeatureComponent
 {
 public:
-  AutomaticFeatureComponent();
-  //   AutomaticFeatureComponent(IPortComponent* pComp);
+  /**
+   * @brief Constructor, which calls automaticly detectFeaturs. If something
+   * changed on the components, call  detectFeatures afterwards.
+   * @param pComp PortComponent, where features like about Midi and so on are
+   * extracted from.
+   * @param features additional features.
+   */
   AutomaticFeatureComponent(IPortComponent* pComp,
                             std::vector<Feature> features = {});
   void detectFeatures(IPortComponent* pComp);

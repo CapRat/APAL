@@ -4,7 +4,7 @@
 #include "Speaker.hpp"
 namespace XPlug {
 /**
- * @brief Class, which implements AudioChannel
+ * @brief Interfaceclass, which implements AudioChannel
  */
 class IAudioChannel
 {
@@ -42,7 +42,7 @@ public:
 };
 
 /**
- * @brief
+ * @brief An Audioport, which derives from port. 
  */
 class IAudioPort : public IPort
 {
@@ -61,11 +61,11 @@ public:
   virtual SpeakerConfiguration getConfig() = 0;
 
   /**
-   * @brief  Gets the Size of samples for each Channel. (all channelbuffes
-   * should have the same size)
-   * @return Size of samples for each Channel.
+   * @brief  Gets the number of samples for each Channel. (all channels
+   * should have the same number of samples.)
+   * @return Number of samples for each Channel.
    */
-  virtual size_t getSampleSize() = 0;
+  virtual size_t getSampleCount() = 0;
 
   /**
    * @brief  Sets the Size of samples for each Channel. (all channelbuffes
@@ -73,18 +73,17 @@ public:
    * plugins side, while initalizing data.
    * @param sampleSize the new samplesize.
    */
-  virtual void setSampleSize(size_t sampleSize) = 0;
+  virtual void setSampleCount(size_t sampleSize) = 0;
 
   /**
-   * @brief Typesafe implementation of at. Must have this strange name, because
-   * you cant overlaod functions, which just differ in returntype.
-   * @param index
-   * @return
+   * @brief Gets the channel at the given Index.
+   * @param index index of the wanted channel.
+   * @return Channel with the given index.
    */
   virtual IAudioChannel* at(size_t index) = 0;
   /**
    * @brief returns the numbers of channels in this Port.
-   * @return
+   * @return numbers of channels in this Port.
    */
   virtual size_t size() = 0;
 };

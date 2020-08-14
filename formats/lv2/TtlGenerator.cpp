@@ -1,3 +1,6 @@
+/**
+ * @file TtlGenerator helper application, to genereate LV2 ttl files.
+ */
 #include "lv2_ttl_generation.hpp"
 #include <fstream>
 #include <interfaces/IPlugin.hpp>
@@ -7,12 +10,11 @@
 #include <tools/StringTools.hpp>
 
 using namespace XPlug;
-
+/********FUNCTION VARIABLES*********/
 std::string (*getTTLFromPluginPtr)(IPlugin*) = nullptr;
 std::string (*getManifestFromMultpleInfosPtr)(std::vector<TTLPluginInfo>) =
   nullptr;
 std::vector<TTLPluginInfo> (*getPluginInfosPtr)(const std::string&) = nullptr;
-
 void
 writeOutBundle(std::vector<TTLPluginInfo> infoArray,
                const std::string& fileOutDir = "./")

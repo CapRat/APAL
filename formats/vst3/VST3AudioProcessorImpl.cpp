@@ -239,7 +239,7 @@ VST3AudioProccessorImpl::process(ProcessData& data)
   int32 outputIndex = 0;
   iteratePorts<IAudioPort>(
     plug, [&inputIndex, &outputIndex, &data](IAudioPort* p, size_t) {
-      p->setSampleSize(data.numSamples);
+      p->setSampleCount(data.numSamples);
       if (p->getDirection() == PortDirection::Input
             ? inputIndex < data.numInputs
             : outputIndex < data.numOutputs) {

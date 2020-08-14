@@ -3,7 +3,10 @@
 #include <Types.hpp>
 namespace XPlug {
 /**
- * @brief Interface, which is used to retreive Information over the Plugin.
+ * @brief Componentinterface, which is used to retreive Information over the
+ * Plugin. Maybe in the Future it can be extended with generic information, but
+ * a better concept is needed. Speacially because it can be used to transfer
+ * IDs, which are needed py formatlibraries.
  */
 class IInfoComponent
 {

@@ -1,10 +1,12 @@
 #include "IFormatTestSuite.hpp"
-//#include "tools/LibLoading.hpp"
-//#include "vst_def.hpp"
 #include "VST2Module.hpp"
 using namespace XPlug;
 typedef AEffect* (*VSTPluginMain)(audioMasterCallback);
 
+/**
+ * @brief Simple Testclass, derived from FormatTestSuiteBase to Test VST2 Format.
+ * Using the VST2Module to make VST2 calls.
+ */
 class VST2TestSuite : public FormatTestSuiteBase
 {
 public:
