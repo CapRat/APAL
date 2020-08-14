@@ -16,9 +16,10 @@ class AudioChannel : public IAudioChannel
 {
 public:
   inline AudioChannel(std::string _channelname, SpeakerPosition _pos)
-    : channelname(_channelname)
+    : data(nullptr)
+    , channelname(_channelname)
     , pos(_pos)
-    , data(nullptr)
+
   {}
   // Geerbt über IAudioChannel
   inline virtual std::string_view getName() override
@@ -35,7 +36,6 @@ public:
 
 private:
   float* data;
-
   std::string channelname;
   SpeakerPosition pos;
 };
