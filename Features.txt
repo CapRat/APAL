@@ -1,4 +1,4 @@
-V 1.0.0:
+V 0.1.0:
     - 32 bit Audioprocessing (float datatype)
     - Multichannelsupport if arch supports it.
     - Base Pluginstructure

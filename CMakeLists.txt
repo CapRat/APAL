@@ -32,7 +32,7 @@ option(XPLUG_JACK_SUPPORT "IS JACK SUPPORTED?" ${JACK_FOUND})
 
 option(XPLUG_INSTALL "Install Xplug and Examples, if Build" ON)
 
-set_version(1 0 0)
+set_version(0 1 0)
 
 
 #####################BUILD######################
