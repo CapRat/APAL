@@ -357,7 +357,7 @@ extern "C"
     effect->dispatcher = vst_dispatcher;
 
     /******************INFORMATION*****************/
-    effect->uniqueID = 0;
+    effect->uniqueID = implementationData->plug->getInfoComponent()->getID();
     effect->version = 0;
     effect->numInputs = static_cast<int>(getNumberOfPorts<IAudioPort>(
       implementationData->plug, PortDirection::Input));

@@ -35,7 +35,11 @@ public:
    * @return Copyright or Licence of the Plugin.
    */
   virtual std::string_view getPluginCopyright() = 0;
-
+  /**
+   * @brief Gets the ID of the Plugin, which is used in the format libraries.
+   * @return returns the id of the plugin.
+  */
+  virtual int64_t getID() = 0;
   /********************Creator/Vendor information*********************/
   /**
    * @brief Gets the Name of the creator, vendor or developer.

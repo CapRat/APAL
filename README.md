@@ -2,7 +2,7 @@
 XPlug is an crossplatform audio abstraction plugin, which is currently under heavy development.
 At the moment it supports VST2, VST3, LV2 and LADSPA. But there are a lot more to come, because its made for adding more Formats to it.
 Because its in an early phase of development it just supports audio and midi processing ( sure a lot more too, but that are details).
-There should be GUI and Parameter support soon, so that this Library can be used in production. 
+There should be GUI and Parameter support soon, so that this Library can be used in production. 6
 
 ## Dependencies
 Before building XPlug make sure, that all dependencies are installed. For the buildprocess you need CMake and an compiler. 

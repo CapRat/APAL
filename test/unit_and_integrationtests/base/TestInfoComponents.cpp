@@ -9,6 +9,7 @@ TEST_CASE("Test InfoComponent Methods")
                            "pluginDescription",
                            "pluginCopyright",
                            "creatorName",
-                           "creatorURL");
+                           "creatorURL",
+                           1234);
   testIInfoComponent(&comp);
 }

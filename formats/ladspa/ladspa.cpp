@@ -131,7 +131,7 @@ extern "C"
     desc->Maker = plug->getInfoComponent()->getCreatorName().data();
     desc->Name = plug->getInfoComponent()->getPluginName().data();
     // desc->Name = "Hans peter";
-    desc->UniqueID = 278375745;
+    desc->UniqueID = plug->getInfoComponent()->getID();
 
     desc->run = [](LADSPA_Handle instance, unsigned long SampleCount) {
       auto data = static_cast<LADSPAHandleDataType*>(instance);
