@@ -10,7 +10,7 @@
 #include <cstring>
 #include <interfaces/IPlugin.hpp>
 #include <tools/PortHandling.hpp>
-using namespace XPlug;
+using namespace APAL;
 
 /**
  * @brief Struct for  use in the vst2 implementation. This struct is stored in

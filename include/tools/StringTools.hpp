@@ -1,7 +1,7 @@
 #ifndef STRING_TOOLS_HPP
 #define STRING_TOOLS_HPP
 #include <string>
-namespace XPlug {
+namespace APAL {
 /**
  * @brief Replaces all occurences of an itemToReplace in the given strToChange
  * @param strToChange string to replaces stuff in.

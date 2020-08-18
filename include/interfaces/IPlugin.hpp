@@ -9,7 +9,7 @@
 #include "Ports/IPortComponent.hpp"
 #include <memory>
 #include <string>
-namespace XPlug {
+namespace APAL {
 /**
  * @brief Template Class to Register Plugins in Sourcefiles. The Use of this is
  * to instantiate a static class, which calls the Code in the Connstructor. Call

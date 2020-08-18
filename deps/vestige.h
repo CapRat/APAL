@@ -1,5 +1,5 @@
 /*
- * IMPORTANT: The author of XPlug has no connection with the
+ * IMPORTANT: The author of APAL has no connection with the
  * author of the VeSTige VST-compatibility header, has had no
  * involvement in its creation.
  *

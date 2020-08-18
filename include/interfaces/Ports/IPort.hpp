@@ -1,7 +1,7 @@
 #ifndef IPORT_HPP
 #define IPORT_HPP
 #include <Types.hpp>
-namespace XPlug {
+namespace APAL {
 enum class PortDirection
 {
   // None = 0,

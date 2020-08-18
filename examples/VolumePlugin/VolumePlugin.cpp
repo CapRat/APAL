@@ -1,7 +1,7 @@
 #include <base/PluginBases.hpp>
 #include <base/Ports.hpp>
 #include <tools/PortHandling.hpp>
-using namespace XPlug;
+using namespace APAL;
 /**
  * @brief VolumePlguin class, which forwards audiodata and just changes the
  * Volume. For an easy start its derived from LazyPlugin, to start easily.
@@ -32,7 +32,7 @@ public:
     this->infoComponent->pluginName = "VolumePlugin";
     this->infoComponent->creatorName = "Benjamin Heisch";
     this->infoComponent->pluginUri =
-      "http://xplug_plug.in/examples/VolumePlugin";
+      "http://APAL_plug.in/examples/VolumePlugin";
   }
 
   // Geerbt über IPlugin

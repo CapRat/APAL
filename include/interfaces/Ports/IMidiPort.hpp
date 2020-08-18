@@ -1,7 +1,7 @@
 #ifndef I_MIDI_PORT_HPP
 #define I_MIDI_PORT_HPP
 #include "IPort.hpp"
-namespace XPlug {
+namespace APAL {
 
 /**
  * @brief Midi events as enum with correct Byte representation.

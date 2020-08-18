@@ -15,7 +15,7 @@ using namespace sv_lite;
 }
 
 #endif
-namespace XPlug {
+namespace APAL {
 /**
  * @brief NotImplementedException, to be used when something in this project is
  * not implemented yet. Currently not used that much, but in the opensource

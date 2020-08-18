@@ -5,7 +5,7 @@
 #define SPOS_TO_SCONF(SpeakerConfigurationtype)                                \
   static_cast<std::underlying_type<SpeakerConfiguration>::type>(               \
     SpeakerConfigurationtype)
-namespace XPlug {
+namespace APAL {
 enum class SpeakerConfiguration : uint64_t;
 
 /**

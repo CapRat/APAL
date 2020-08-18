@@ -5,7 +5,7 @@
 #include <sstream>
 #include <tools/PortHandling.hpp>
 #include <tools/StringTools.hpp>
-using namespace XPlug;
+using namespace APAL;
 
 /**
  * @brief FUnction to convert SpeakerConfiguration to LV2 PortGroups. Not

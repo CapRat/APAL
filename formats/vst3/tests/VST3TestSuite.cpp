@@ -7,7 +7,7 @@
 #include <vst/ivsteditcontroller.h>
 #include <vst/ivstevents.h>
 #include <vst/ivstprocesscontext.h>
-using namespace XPlug;
+using namespace APAL;
 using namespace Steinberg;
 using namespace Vst;
 /**

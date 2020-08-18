@@ -13,7 +13,7 @@
  **/
 #include "CatchTools.hpp"
 #include "tools/LibLoading.hpp"
-using namespace XPlug;
+using namespace APAL;
 #ifdef _WIN32
 #define SYMBOL_EXPORT_TEST_LIB "simple_symbol_export"
 #else

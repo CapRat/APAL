@@ -5,7 +5,7 @@
 #include <initializer_list>
 #include <interfaces/IPlugin.hpp>
 #include <tools/PortHandling.hpp>
-using namespace XPlug;
+using namespace APAL;
 
 class TestPortHandlingPlugin : public IPlugin
 {

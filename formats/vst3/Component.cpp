@@ -40,14 +40,14 @@ Component::release()
 tresult PLUGIN_API
 Component::initialize(FUnknown*)
 {
-  XPlug::GlobalData().getPlugin(plugIndex)->init();
+  APAL::GlobalData().getPlugin(plugIndex)->init();
   return kResultOk;
 }
 
 tresult PLUGIN_API
 Component::terminate()
 {
-  XPlug::GlobalData().getPlugin(plugIndex)->deinit();
+  APAL::GlobalData().getPlugin(plugIndex)->deinit();
   return kResultOk;
 }
 
@@ -70,15 +70,15 @@ int32 PLUGIN_API
 Component::getBusCount(MediaType type, BusDirection dir)
 {
   if (type == kAudio) {
-    return static_cast<int32>(XPlug::getNumberOfPorts<XPlug::IAudioPort>(
-      XPlug::GlobalData().getPlugin(plugIndex).get(),
-      dir == kInput ? XPlug::PortDirection::Input
-                    : XPlug::PortDirection::Output));
+    return static_cast<int32>(APAL::getNumberOfPorts<APAL::IAudioPort>(
+      APAL::GlobalData().getPlugin(plugIndex).get(),
+      dir == kInput ? APAL::PortDirection::Input
+                    : APAL::PortDirection::Output));
   } else if (type == kEvent) {
-    return static_cast<int32>(XPlug::getNumberOfPorts<XPlug::IMidiPort>(
-      XPlug::GlobalData().getPlugin(plugIndex).get(),
-      dir == kInput ? XPlug::PortDirection::Input
-                    : XPlug::PortDirection::Output));
+    return static_cast<int32>(APAL::getNumberOfPorts<APAL::IMidiPort>(
+      APAL::GlobalData().getPlugin(plugIndex).get(),
+      dir == kInput ? APAL::PortDirection::Input
+                    : APAL::PortDirection::Output));
   } else {
     return 0;
   }
@@ -91,23 +91,23 @@ Component::getBusInfo(MediaType type,
                       int32 index,
                       BusInfo& bus)
 {
-  XPlug::IPort* p = nullptr;
+  APAL::IPort* p = nullptr;
   if (index < 0 || index > getBusCount(type, dir))
     return kInvalidArgument;
   if (type == kAudio) {
-    auto ap = XPlug::getPortAt<XPlug::IAudioPort>(
-      XPlug::GlobalData().getPlugin(plugIndex).get(),
+    auto ap = APAL::getPortAt<APAL::IAudioPort>(
+      APAL::GlobalData().getPlugin(plugIndex).get(),
       static_cast<size_t>(index),
-      dir == kInput ? XPlug::PortDirection::Input
-                    : XPlug::PortDirection::Output);
+      dir == kInput ? APAL::PortDirection::Input
+                    : APAL::PortDirection::Output);
     p = ap;
     bus.channelCount = static_cast<int32>(ap->size());
   } else if (type == kEvent) {
-    auto mp = XPlug::getPortAt<XPlug::IMidiPort>(
-      XPlug::GlobalData().getPlugin(plugIndex).get(),
+    auto mp = APAL::getPortAt<APAL::IMidiPort>(
+      APAL::GlobalData().getPlugin(plugIndex).get(),
       static_cast<size_t>(index),
-      dir == kInput ? XPlug::PortDirection::Input
-                    : XPlug::PortDirection::Output);
+      dir == kInput ? APAL::PortDirection::Input
+                    : APAL::PortDirection::Output);
     p = mp;
     bus.channelCount = 16;
   } else {

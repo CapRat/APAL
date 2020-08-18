@@ -14,7 +14,7 @@
 #include <tools/PortHandling.hpp>
 #include <unordered_map>
 #include <vector>
-using namespace XPlug;
+using namespace APAL;
 
 /**
  * @brief Handle, wich is used, to create an possibility to write and read  Midi
@@ -145,7 +145,7 @@ extern "C"
       size_t midiPortIndex = 0;
       iteratePortsFlat(
         data->plug,
-        [IPort, DataLocation, &data, &midiPortIndex](XPlug::IPort* p,
+        [IPort, DataLocation, &data, &midiPortIndex](APAL::IPort* p,
                                                      size_t ind) {
           if (IPort == ind) {
             auto midiPort = dynamic_cast<IMidiPort*>(p);

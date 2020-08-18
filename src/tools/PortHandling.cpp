@@ -1,7 +1,7 @@
 #include <tools/PortHandling.hpp>
-using namespace XPlug;
+using namespace APAL;
 size_t
-XPlug::getAudioChannelCount(IPlugin* plug, XPlug::PortDirection dir)
+APAL::getAudioChannelCount(IPlugin* plug, APAL::PortDirection dir)
 {
   size_t size = 0;
   iteratePorts<IAudioPort>(plug, dir, [&size](IAudioPort* p, size_t) {
@@ -12,7 +12,7 @@ XPlug::getAudioChannelCount(IPlugin* plug, XPlug::PortDirection dir)
 }
 
 void
-XPlug::iterateAudioChannels(
+APAL::iterateAudioChannels(
   IPlugin* plug,
   std::function<bool(IAudioPort*, IAudioChannel*, size_t)> iterFunc)
 {
@@ -27,9 +27,9 @@ XPlug::iterateAudioChannels(
   });
 }
 IAudioChannel*
-XPlug::getAudioChannelFromIndex(IPlugin* plug, size_t index)
+APAL::getAudioChannelFromIndex(IPlugin* plug, size_t index)
 {
-  XPlug::IAudioChannel* channel = nullptr;
+  APAL::IAudioChannel* channel = nullptr;
   iterateAudioChannels(
     plug,
     [&channel, index](IAudioPort*, IAudioChannel* c, size_t channelIndex) {
@@ -42,9 +42,9 @@ XPlug::getAudioChannelFromIndex(IPlugin* plug, size_t index)
   return channel;
 }
 void
-XPlug::iteratePortsFlat(
+APAL::iteratePortsFlat(
   IPlugin* plug,
-  std::function<bool(XPlug::IPort* p, size_t ind)> iterFunc)
+  std::function<bool(APAL::IPort* p, size_t ind)> iterFunc)
 {
   size_t index = 0;
   for (size_t i = 0; i < plug->getPortComponent()->size(); i++) {

@@ -2,7 +2,7 @@
 #define IAUDIO_PORT_HPP
 #include "IPort.hpp"
 #include "Speaker.hpp"
-namespace XPlug {
+namespace APAL {
 /**
  * @brief Interfaceclass, which implements AudioChannel
  */

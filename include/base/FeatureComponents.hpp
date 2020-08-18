@@ -9,7 +9,7 @@
 #include <interfaces/IFeatureComponent.hpp>
 #include <string>
 #include <vector>
-namespace XPlug {
+namespace APAL {
 class IPortComponent;
 /**
  * @brief Exception, which is called, when a feature is not supported

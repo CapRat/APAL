@@ -9,7 +9,7 @@
 #include <tools/LibLoading.hpp>
 #include <tools/StringTools.hpp>
 
-using namespace XPlug;
+using namespace APAL;
 /********FUNCTION VARIABLES*********/
 std::string (*getTTLFromPluginPtr)(IPlugin*) = nullptr;
 std::string (*getManifestFromMultpleInfosPtr)(std::vector<TTLPluginInfo>) =
@@ -41,7 +41,7 @@ main(int argc, char* argv[])
 
   /*********LOAD LIBRARY AND FUNCTIONS********/
   std::string pluginLib(argv[1]);
-  XPlug::replaceInString(pluginLib, "\\", "/");
+  APAL::replaceInString(pluginLib, "\\", "/");
   auto pluginLibHandle = LoadLib(pluginLib.c_str());
   if (pluginLibHandle == nullptr) {
     std::cerr << GetErrorStr() << std::endl;

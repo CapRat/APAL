@@ -2,7 +2,7 @@
 #include "interfaces/InterfaceTestMethods.hpp"
 #include <base/PortComponents.hpp>
 #include <base/Ports.hpp>
-using namespace XPlug;
+using namespace APAL;
 
 TEST_CASE("Test DynamicPortComponent")
 {

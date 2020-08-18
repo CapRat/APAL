@@ -1,7 +1,7 @@
 #include <tools/StringTools.hpp>
 
 std::string
-XPlug::replaceInString(std::string strToChange,
+APAL::replaceInString(std::string strToChange,
                        const std::string itemToReplace,
                        const std::string substitute)
 {
@@ -14,7 +14,7 @@ XPlug::replaceInString(std::string strToChange,
  *Get File Name from a Path with or without extension
  */
 std::string
-XPlug::getFileName(std::string filePath, bool withExtension, char seperator)
+APAL::getFileName(std::string filePath, bool withExtension, char seperator)
 {
   // Get last dot position
   std::size_t dotPos = filePath.rfind('.');

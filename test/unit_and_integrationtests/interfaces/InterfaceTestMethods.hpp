@@ -16,48 +16,48 @@
  * @param plug IPlugin implementation, which should be tested.
  */
 void
-testIPlugin(XPlug::IPlugin* plug);
+testIPlugin(APAL::IPlugin* plug);
 
 /**
  * @brief Tests the IInfoComponent-interface
  * @param infoComp  Interface to test
  */
 void
-testIInfoComponent(XPlug::IInfoComponent* infoComp);
+testIInfoComponent(APAL::IInfoComponent* infoComp);
 
 /**
  * @brief Tests the IFeatureComponent-interface
  * @param featComp Interface to test
  */
 void
-testIFeatureComponent(XPlug::IFeatureComponent* featComp);
+testIFeatureComponent(APAL::IFeatureComponent* featComp);
 
 /**
  * @brief Tests the IPortComponent-interface
  * @param portComp Interface to test
  */
 void
-testIPortComponent(XPlug::IPortComponent* portComp);
+testIPortComponent(APAL::IPortComponent* portComp);
 
 /**
  * @brief Tests an IPort for its Interfacemethods.
  * @param port Implementation to test.
  */
 void
-testIPort(XPlug::IPort* port);
+testIPort(APAL::IPort* port);
 
 /**
  * @brief Tests an IAudioPort for its Interfacemethods.
  * @param aPort Implementation to test.
  */
 void
-testIAudioPort(XPlug::IAudioPort* aPort);
+testIAudioPort(APAL::IAudioPort* aPort);
 
 /**
  * @brief Tests an IMidiPort for its Interfacemethods.
  * @param mPort Implementation to test.
  */
 void
-testIMidiPort(XPlug::IMidiPort* mPort);
+testIMidiPort(APAL::IMidiPort* mPort);
 
 #endif //! INTERFACE_TEST_METHODS_HPP

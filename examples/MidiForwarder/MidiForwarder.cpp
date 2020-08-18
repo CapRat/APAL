@@ -4,7 +4,7 @@
 #include <base/PluginBases.hpp>
 #include <base/Ports.hpp>
 #include <tools/PortHandling.hpp>
-using namespace XPlug;
+using namespace APAL;
 /**
  * @brief MidiForwarder Example class, which has 1 Midi  Input and 2 Midi
  * Outputs. The Midi in signal is forwarded to the 2 Midi Outputs
@@ -33,7 +33,7 @@ public:
     this->infoComponent->pluginName = "MidiForwarder";
     this->infoComponent->creatorName = "Benjamin Heisch";
     this->infoComponent->pluginUri =
-      "http://xplug_plug.in/examples/MidiForwarder";
+      "http://APAL_plug.in/examples/MidiForwarder";
   }
   // Geerbt über IPlugin
   virtual void processAudio() override

@@ -1,6 +1,6 @@
 #include <GlobalData.hpp>
 #include <interfaces/IPlugin.hpp>
-namespace XPlug {
+namespace APAL {
 GlobalDataType&
 GlobalData()
 {
@@ -9,15 +9,15 @@ GlobalData()
 }
 
 VERSION
-XPlugGetVersion()
+APALGetVersion()
 {
   // struct my_struct s2 = { "string literal" };
-  static const struct VERSION XPlug_VERSION = { XPlug_VERSION_MAJOR,
-                                                XPlug_VERSION_MINOR,
-                                                XPlug_VERSION_PATCH,
-                                                XPlug_VERSION_TWEAK,
+  static const struct VERSION APAL_VERSION = { APAL_VERSION_MAJOR,
+                                                APAL_VERSION_MINOR,
+                                                APAL_VERSION_PATCH,
+                                                APAL_VERSION_TWEAK,
                                                 "test" };
-  return XPlug_VERSION;
+  return APAL_VERSION;
 }
 
 size_t
@@ -52,12 +52,12 @@ GlobalDataType::getPlugin(std::string name)
 }
 
 VERSION
-XPlugGetVersion()
+APALGetVersion()
 {
-  return XPlug_VERSION;
+  return APAL_VERSION;
 }
-XPlug::GlobalDataType&
-XPlugGlobalData()
+APAL::GlobalDataType&
+APALGlobalData()
 {
-  return XPlug::GlobalData();
+  return APAL::GlobalData();
 }

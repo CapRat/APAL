@@ -2,7 +2,7 @@
 #define I_PORT_COMPONENT_HPP
 
 #include "IPort.hpp"
-namespace XPlug {
+namespace APAL {
 
 /**
  * @brief Component for porthandling. This interface and the implementation

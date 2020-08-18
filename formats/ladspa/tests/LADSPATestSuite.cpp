@@ -2,7 +2,7 @@
 #include "ladspa.h"
 #include "tools/LibLoading.hpp"
 #include <vector>
-using namespace XPlug;
+using namespace APAL;
 /**
  * @brief LADSPA Test Suite for XValidate/system_tests
  */

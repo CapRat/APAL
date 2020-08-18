@@ -181,7 +181,7 @@ class VST3Module
 private:
   std::string lastError = "";
   std::string lastWarning = "";
-  XPlug::library_t pluginLibrary = nullptr;  // The pluginlibrary
+  APAL::library_t pluginLibrary = nullptr;  // The pluginlibrary
   GetFactoryProc plugLoadFunction = nullptr; // FactoryLoad Function
   void* initfnc = nullptr;                   // functionpointer to init function
   void* exitfnc = nullptr;                   // functionpointer to init function
@@ -212,7 +212,7 @@ public:
    */
   inline explicit VST3Module(std::string pluginPath)
   {
-    using namespace XPlug;
+    using namespace APAL;
     using namespace Steinberg;
     using namespace Vst;
     GetError();
@@ -275,7 +275,7 @@ public:
   {
     if (this->runExitFncLampda != nullptr)
       this->runExitFncLampda();
-    XPlug::UnloadLib(this->pluginLibrary);
+    APAL::UnloadLib(this->pluginLibrary);
   }
 
   /**

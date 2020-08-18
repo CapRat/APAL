@@ -3,11 +3,11 @@
 #include "interfaces/IFeatureComponent.hpp"
 #include "interfaces/Ports/IAudioPort.hpp"
 #include "interfaces/Ports/IMidiPort.hpp"
-using namespace XPlug;
+using namespace APAL;
 #define LAST_FEATURE Feature::MidiOutput
 
 void
-testIFeatureComponent(XPlug::IFeatureComponent* featComp)
+testIFeatureComponent(APAL::IFeatureComponent* featComp)
 {
   // Just test, that no exception is thrown
   for (size_t i = 0; i <= static_cast<size_t>(LAST_FEATURE) + 1; i++) {
@@ -24,7 +24,7 @@ testIFeatureComponent(XPlug::IFeatureComponent* featComp)
 }
 
 void
-testIInfoComponent(XPlug::IInfoComponent* infoComp)
+testIInfoComponent(APAL::IInfoComponent* infoComp)
 {
   REQUIRE_MESSAGE(!infoComp->getCreatorName().empty(), "creator name is empty");
   REQUIRE_MESSAGE(!infoComp->getCreatorURL().empty(), "creator url is empty");
@@ -37,7 +37,7 @@ testIInfoComponent(XPlug::IInfoComponent* infoComp)
 }
 
 void
-testIPort(XPlug::IPort* port)
+testIPort(APAL::IPort* port)
 {
   REQUIRE_MESSAGE(port != nullptr,
                   "Error, dont get nullptr, if size says there should be sth");
@@ -62,19 +62,19 @@ testIPort(XPlug::IPort* port)
   }
 }
 void
-testIAudioPort(XPlug::IAudioPort* aPort)
+testIAudioPort(APAL::IAudioPort* aPort)
 {
   REQUIRE_MESSAGE(aPort != nullptr, "Null Audioport is definitly wrong");
 }
 void
-testIMidiPort(XPlug::IMidiPort* mPort)
+testIMidiPort(APAL::IMidiPort* mPort)
 {
   REQUIRE_MESSAGE(mPort != nullptr, "Null Midiport is definitly wrong");
   // MidiMessage x = { 0x1,0x2,0x3 };
 }
 
 void
-testIPortComponent(XPlug::IPortComponent* portComp)
+testIPortComponent(APAL::IPortComponent* portComp)
 {
   //  INFO("Error, there should nothing above an index size.");
   //  REQUIRE_THROWS(portComp->at(portComp->size()) == nullptr);
@@ -84,7 +84,7 @@ testIPortComponent(XPlug::IPortComponent* portComp)
 }
 
 void
-testIPlugin(XPlug::IPlugin* plug)
+testIPlugin(APAL::IPlugin* plug)
 {
   REQUIRE_NOTHROW(plug->init());
   REQUIRE_NOTHROW(plug->activate());

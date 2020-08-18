@@ -14,7 +14,7 @@ struct TTLPluginInfo
                                 // ttl file with name and extension.
   std::string binFileName = ""; // relative filepath(relative in the Bundle) of
                                 // binary file with name and extension.
-  XPlug::IPlugin* plugPtr = nullptr; // Pointer to IPlugin
+  APAL::IPlugin* plugPtr = nullptr; // Pointer to IPlugin
 };
 
 #ifndef _MSC_VER
@@ -27,7 +27,7 @@ extern "C"
    * so it must be casted to void*
    * @param ttlContent String return value.
    */
-  std::string getTTLFromPlugin(XPlug::IPlugin* pluginPtr);
+  std::string getTTLFromPlugin(APAL::IPlugin* pluginPtr);
 
   /**
    * @brief Function to get an manifest file from multiple Plugininfos.

@@ -1,6 +1,6 @@
 #include "IFormatTestSuite.hpp"
 #include "VST2Module.hpp"
-using namespace XPlug;
+using namespace APAL;
 typedef AEffect* (*VSTPluginMain)(audioMasterCallback);
 
 /**

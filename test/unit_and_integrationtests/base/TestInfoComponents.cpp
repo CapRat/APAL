@@ -1,7 +1,7 @@
 #include "CatchTools.hpp"
 #include "interfaces/InterfaceTestMethods.hpp"
 #include <base/InfoComponents.hpp>
-using namespace XPlug;
+using namespace APAL;
 TEST_CASE("Test InfoComponent Methods")
 {
   StaticInfoComponent comp("pluginName",

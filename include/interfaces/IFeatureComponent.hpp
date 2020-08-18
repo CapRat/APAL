@@ -1,7 +1,7 @@
 #ifndef IFEATURE_COMPONENT_HPP
 #define IFEATURE_COMPONENT_HPP
 #include <string>
-namespace XPlug {
+namespace APAL {
 /**
  * @brief Features which
  */

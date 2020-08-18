@@ -1,6 +1,6 @@
 #include "tools/LibLoading.hpp"
 
-namespace XPlug {
+namespace APAL {
 std::string
 GetErrorStr()
 {
@@ -10,7 +10,7 @@ GetErrorStr()
 }
 #ifdef _WIN32
 #include <windows.h>
-namespace XPlug {
+namespace APAL {
 char* lastError = nullptr;
 char* lastErrorReturnCopy = nullptr;
 library_t
@@ -60,7 +60,7 @@ UnloadLib(library_t lib)
 }
 #else
 #include <dlfcn.h>
-namespace XPlug {
+namespace APAL {
 library_t
 LoadLib(const char* libName)
 {

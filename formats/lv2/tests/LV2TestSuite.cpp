@@ -10,7 +10,7 @@
 #include <lv2/urid/urid.h>
 #include <map>
 #include <vector>
-using namespace XPlug;
+using namespace APAL;
 
 /**
  * @brief Simple Testclass, derived from FormatTestSuiteBase to Test LV2 Format.

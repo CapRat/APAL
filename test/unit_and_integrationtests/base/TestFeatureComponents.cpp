@@ -3,7 +3,7 @@
 #include <base/FeatureComponents.hpp>
 #include <base/PortComponents.hpp>
 #include <base/Ports.hpp>
-using namespace XPlug;
+using namespace APAL;
 TEST_CASE("Test IFeatureInterface Methods")
 {
   DynamicFeatureComponent comp{ { Feature::MidiInput } };

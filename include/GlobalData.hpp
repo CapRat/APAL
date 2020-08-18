@@ -1,10 +1,10 @@
 #ifndef GLOBAL_DATA_HPP
 #define GLOBAL_DATA_HPP
-#include "XPlug_version.h"
+#include "APAL_version.h"
 #include <memory>
 #include <string>
 #include <vector>
-namespace XPlug {
+namespace APAL {
 
 class IPlugin;
 // class PluginController;
@@ -54,16 +54,16 @@ GlobalData();
 
 }
 
-typedef XPlug::GlobalDataType& (*globalDataFncPtr)();
+typedef APAL::GlobalDataType& (*globalDataFncPtr)();
 
 extern "C"
 {
   /**
    * @brief Just a simple Function, which makes the Version callable. Should
    * also be packed in the Plugin, maybe its usefull in the future.
-   * @return Version of the current XPLUG version.
+   * @return Version of the current APAL version.
    */
-  VERSION XPlugGetVersion();
+  VERSION APALGetVersion();
 }
 
 #endif //! GLOBAL_DATA_HPP

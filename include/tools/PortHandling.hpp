@@ -5,7 +5,7 @@
 #include <interfaces/Ports/IMidiPort.hpp>
 #include <interfaces/Ports/IPortComponent.hpp>
 #include <type_traits>
-namespace XPlug {
+namespace APAL {
 
 /**
  * @brief Iterate through all Ports, which are type of the given template
@@ -22,7 +22,7 @@ namespace XPlug {
 template<typename T>
 void
 iteratePorts(IPlugin* plug,
-             XPlug::PortDirection dir,
+             APAL::PortDirection dir,
              std::function<bool(T*, size_t)> iterFunc)
 {
   static_assert(std::is_base_of<IPort, T>::value, "T must derive from IPort.");
@@ -49,7 +49,7 @@ template<typename T>
 inline void
 iteratePorts(IPlugin* plug, std::function<bool(T*, size_t)> iterFunc)
 {
-  iteratePorts<T>(plug, XPlug::PortDirection::All, iterFunc);
+  iteratePorts<T>(plug, APAL::PortDirection::All, iterFunc);
 }
 
 /**
@@ -90,7 +90,7 @@ getPortAt(IPlugin* plug, size_t index, PortDirection dir = PortDirection::All)
  */
 template<typename T>
 size_t
-getNumberOfPorts(IPlugin* plug, XPlug::PortDirection dir)
+getNumberOfPorts(IPlugin* plug, APAL::PortDirection dir)
 {
   size_t size = 0;
   iteratePorts<T>(plug, dir, [&size](T*, size_t) {
@@ -109,7 +109,7 @@ getNumberOfPorts(IPlugin* plug, XPlug::PortDirection dir)
  */
 size_t
 getAudioChannelCount(IPlugin* plug,
-                     XPlug::PortDirection dir = PortDirection::All);
+                     APAL::PortDirection dir = PortDirection::All);
 
 /**
  * @brief Iterates all Audiochannels in a Plugin.
@@ -140,7 +140,7 @@ getAudioChannelFromIndex(IPlugin* plug, size_t index);
  */
 void
 iteratePortsFlat(IPlugin* plug,
-                 std::function<bool(XPlug::IPort*, size_t)> iterFunc);
+                 std::function<bool(APAL::IPort*, size_t)> iterFunc);
 
 }
 #endif //! PORT_HANDLING_HPP

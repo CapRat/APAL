@@ -1,7 +1,7 @@
 #ifndef LIB_LOADING_HPP
 #define LIB_LOADING_HPP
 #include <string>
-namespace XPlug {
+namespace APAL {
 typedef void* library_t;
 
 /**

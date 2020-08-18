@@ -9,7 +9,7 @@
 #include <tools/PortHandling.hpp>
 #include <vector>
 
-using namespace XPlug;
+using namespace APAL;
 
 struct LADSPAHandleDataType
 {

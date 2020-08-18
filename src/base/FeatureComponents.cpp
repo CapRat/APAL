@@ -1,31 +1,31 @@
 #include "base/FeatureComponents.hpp"
 #include "tools/PortHandling.hpp"
-using namespace XPlug;
-XPlug::DynamicFeatureComponent::DynamicFeatureComponent(
+using namespace APAL;
+APAL::DynamicFeatureComponent::DynamicFeatureComponent(
   std::vector<Feature> features)
   : supportedFeatures(std::move(features))
 {}
 bool
-XPlug::DynamicFeatureComponent::supportsFeature(Feature feature)
+APAL::DynamicFeatureComponent::supportsFeature(Feature feature)
 {
   return std::find(supportedFeatures.begin(),
                    supportedFeatures.end(),
                    feature) != supportedFeatures.end();
 }
 void
-XPlug::DynamicFeatureComponent::formatNotSupportedFeature(Feature feature,
+APAL::DynamicFeatureComponent::formatNotSupportedFeature(Feature feature,
                                                           std::string)
 {
   throw UseOfNonSupportedFeature(feature);
 }
 void
-XPlug::DynamicFeatureComponent::addSupportedFeature(Feature feat)
+APAL::DynamicFeatureComponent::addSupportedFeature(Feature feat)
 {
   this->supportedFeatures.push_back(feat);
 }
 
 
-XPlug::AutomaticFeatureComponent::AutomaticFeatureComponent(
+APAL::AutomaticFeatureComponent::AutomaticFeatureComponent(
   IPortComponent* pComp,
   std::vector<Feature> features)
   : DynamicFeatureComponent::DynamicFeatureComponent(features)
@@ -34,7 +34,7 @@ XPlug::AutomaticFeatureComponent::AutomaticFeatureComponent(
 }
 
 void
-XPlug::AutomaticFeatureComponent::detectFeatures(IPortComponent* pComp)
+APAL::AutomaticFeatureComponent::detectFeatures(IPortComponent* pComp)
 {
   // bool suppAudioPort = false;
   bool suppMidiIn = false;

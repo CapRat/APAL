@@ -32,8 +32,8 @@ if (NOT WIN32)
 else()
 endif(NOT WIN32)
 
-target_link_libraries(unit_tests XPlug ${ADD_LIBS})
-add_test(NAME xplug_unit_tests COMMAND unit_tests)
+target_link_libraries(unit_tests APAL ${ADD_LIBS})
+add_test(NAME APAL_unit_tests COMMAND unit_tests)
 
 #add_dependencies(unit_tests SymbolExportLib)#Add Dependency, so that the exportlib is build before the testlib
 

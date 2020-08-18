@@ -5,7 +5,7 @@
 #include "PortComponents.hpp"
 #include <interfaces/IPlugin.hpp>
 #include <memory>
-namespace XPlug {
+namespace APAL {
 /**
  * @brief Modular Plugin, which holds all required components. The
  * componenttypes must be specified. If the default constructor is used, every

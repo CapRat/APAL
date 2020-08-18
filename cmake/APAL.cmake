@@ -1,7 +1,7 @@
 find_package(pluginval)
 find_package(TortureTester)
 find_package(VST3)
-set(__DIR_OF_XPLUG_CMAKE ${CMAKE_CURRENT_LIST_DIR})
+set(__DIR_OF_APAL_CMAKE ${CMAKE_CURRENT_LIST_DIR})
 ###########################HELPER_FUNCTIONS##############################
 # Getting a String of the current architecture(Which is Vst3-Naming compliant)
 # The Architecture stirng will be written in the ARCHITECTURE_NAME Variable.
@@ -74,7 +74,7 @@ function(create_vst3_package)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${VST3_PACKAGE_ROOT}/Contents/Resources 
         COMMAND ${CMAKE_COMMAND} -E make_directory ${VST3_PACKAGE_ROOT}/Contents/${ARCHITECTURE_NAME} 
         COMMAND ${CMAKE_COMMAND} -E copy  $<TARGET_FILE:${TARGET}> ${VST3_PACKAGE_ROOT}/Contents/${ARCHITECTURE_NAME}/$<TARGET_FILE_NAME:${TARGET}> 
-        COMMAND ${CMAKE_COMMAND} -E copy  ${__DIR_OF_XPLUG_CMAKE}/speaker.ico ${VST3_PACKAGE_ROOT}/Plugin.ico)
+        COMMAND ${CMAKE_COMMAND} -E copy  ${__DIR_OF_APAL_CMAKE}/speaker.ico ${VST3_PACKAGE_ROOT}/Plugin.ico)
     if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows" OR ${CMAKE_SYSTEM_NAME} STREQUAL "MSYS")
         file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/generated_desktop.ini CONTENT "[.ShellClassInfo]\nIconResource=Plugin.ico,0")
         set(WINDOWS_EXTRA_DIR "/${ARCHITECTURE_NAME}/")

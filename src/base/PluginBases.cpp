@@ -1,9 +1,9 @@
 #include <base/PluginBases.hpp>
 #include <memory>
 #include <random>
-using namespace XPlug;
+using namespace APAL;
 
-XPlug::LazyPlugin::LazyPlugin()
+APAL::LazyPlugin::LazyPlugin()
 {
   std::default_random_engine engine;
   this->infoComponent = std::make_unique<StaticInfoComponent>(
@@ -20,7 +20,7 @@ XPlug::LazyPlugin::LazyPlugin()
     std::make_unique<AutomaticFeatureComponent>(this->portComponent.get());
 }
 
-XPlug::LazyPlugin::LazyPlugin(std::vector<std::unique_ptr<IPort>> ports)
+APAL::LazyPlugin::LazyPlugin(std::vector<std::unique_ptr<IPort>> ports)
   : LazyPlugin()
 {
   for (size_t i = 0; i < ports.size(); i++) {
@@ -30,17 +30,17 @@ XPlug::LazyPlugin::LazyPlugin(std::vector<std::unique_ptr<IPort>> ports)
 }
 
 void
-XPlug::LazyPlugin::init()
+APAL::LazyPlugin::init()
 {}
 
 void
-XPlug::LazyPlugin::deinit()
+APAL::LazyPlugin::deinit()
 {}
 
 void
-XPlug::LazyPlugin::activate()
+APAL::LazyPlugin::activate()
 {}
 
 void
-XPlug::LazyPlugin::deactivate()
+APAL::LazyPlugin::deactivate()
 {}

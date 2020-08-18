@@ -7,7 +7,7 @@
 #include <queue>
 #include <tools/PortHandling.hpp>
 /*************************Some Port definitions*************************/
-namespace XPlug {
+namespace APAL {
 
 /**
  * @brief Standard implementation of a channel. Pretty straight forward.

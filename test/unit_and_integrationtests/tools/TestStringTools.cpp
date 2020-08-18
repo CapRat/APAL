@@ -1,6 +1,6 @@
 #include "CatchTools.hpp"
 #include <tools/StringTools.hpp>
-using namespace XPlug;
+using namespace APAL;
 TEST_CASE("getFileName Test")
 {
   std::string extPath = "C://test/file/path.ext";

@@ -9,7 +9,7 @@
 #include <tools/PortHandling.hpp>
 
 #include <cmath>
-using namespace XPlug;
+using namespace APAL;
 
 VST3AudioProccessorImpl::VST3AudioProccessorImpl()
 {

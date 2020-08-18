@@ -21,7 +21,7 @@ private:
 
 public:
   // reference to the plugin library
-  XPlug::library_t pluginLib = nullptr;
+  APAL::library_t pluginLib = nullptr;
   // the library represented as AEffect.
   AEffect* effect = nullptr;
 
@@ -50,9 +50,9 @@ public:
     }
 
     aMasterCallback = cb;
-    pluginLib = XPlug::LoadLib(pluginPath.c_str());
+    pluginLib = APAL::LoadLib(pluginPath.c_str());
     VSTPluginMain_fnc =
-      XPlug::LoadFunc<VSTPluginMain>(pluginLib, "VSTPluginMain");
+      APAL::LoadFunc<VSTPluginMain>(pluginLib, "VSTPluginMain");
   }
   /**
    * @brief Calls the internal Free Method and unloads the library. So
@@ -61,7 +61,7 @@ public:
   inline ~VST2Module()
   {
     this->free();
-    XPlug::UnloadLib(this->pluginLib);
+    APAL::UnloadLib(this->pluginLib);
   }
 
   /**

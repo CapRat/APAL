@@ -2,7 +2,7 @@
 #define SIMPLE_PORT_COMPONENT_HPP
 #include <interfaces/Ports/IPortComponent.hpp>
 #include <memory>
-namespace XPlug {
+namespace APAL {
 /**
  * @brief Simple implementation from PortComponent. Ports are stored in 2
  * vectors. The Order is ordered by input and output ports, where the input

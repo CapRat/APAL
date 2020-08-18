@@ -1,6 +1,6 @@
 #include <base/InfoComponents.hpp>
-using namespace XPlug;
-XPlug::StaticInfoComponent::StaticInfoComponent()
+using namespace APAL;
+APAL::StaticInfoComponent::StaticInfoComponent()
 {
   this->pluginName = "";
   this->pluginUri = "";
@@ -10,7 +10,7 @@ XPlug::StaticInfoComponent::StaticInfoComponent()
   this->creatorURL = "";
   this->id = 0;
 }
-XPlug::StaticInfoComponent::StaticInfoComponent(std::string _pluginName,
+APAL::StaticInfoComponent::StaticInfoComponent(std::string _pluginName,
                                                 std::string _pluginUri,
                                                 std::string _pluginDescription,
                                                 std::string _pluginCopyright,
@@ -27,38 +27,38 @@ XPlug::StaticInfoComponent::StaticInfoComponent(std::string _pluginName,
   this->id = _id;
 }
 std::string_view
-XPlug::StaticInfoComponent::getPluginName()
+APAL::StaticInfoComponent::getPluginName()
 {
   return this->pluginName;
 }
 std::string_view
-XPlug::StaticInfoComponent::getPluginURI()
+APAL::StaticInfoComponent::getPluginURI()
 {
   return this->pluginUri;
 }
 std::string_view
-XPlug::StaticInfoComponent::getPluginDescription()
+APAL::StaticInfoComponent::getPluginDescription()
 {
   return this->pluginDescription;
 }
 std::string_view
-XPlug::StaticInfoComponent::getPluginCopyright()
+APAL::StaticInfoComponent::getPluginCopyright()
 {
   return this->pluginCopyright;
 }
 std::string_view
-XPlug::StaticInfoComponent::getCreatorName()
+APAL::StaticInfoComponent::getCreatorName()
 {
   return this->creatorName;
 }
 std::string_view
-XPlug::StaticInfoComponent::getCreatorURL()
+APAL::StaticInfoComponent::getCreatorURL()
 {
   return this->creatorURL;
 }
 
 int64_t
-XPlug::StaticInfoComponent::getID()
+APAL::StaticInfoComponent::getID()
 {
   return this->id;
 }

@@ -1,7 +1,7 @@
 #ifndef I_INFO_COMPONENT_HPP
 #define I_INFO_COMPONENT_HPP
 #include <Types.hpp>
-namespace XPlug {
+namespace APAL {
 /**
  * @brief Componentinterface, which is used to retreive Information over the
  * Plugin. Maybe in the Future it can be extended with generic information, but

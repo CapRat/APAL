@@ -1,7 +1,7 @@
 #include "CatchTools.hpp"
 #include "interfaces/InterfaceTestMethods.hpp"
 #include <base/Ports.hpp>
-using namespace XPlug;
+using namespace APAL;
 
 // function to compare array elements
 char

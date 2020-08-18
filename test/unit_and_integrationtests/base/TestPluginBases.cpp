@@ -1,7 +1,7 @@
 #include "CatchTools.hpp"
 #include "interfaces/InterfaceTestMethods.hpp"
 #include <base/PluginBases.hpp>
-using namespace XPlug;
+using namespace APAL;
 class LazyPluginTestClass : public LazyPlugin
 {
 public:

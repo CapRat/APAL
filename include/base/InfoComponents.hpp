@@ -1,7 +1,7 @@
 #ifndef INFO_COMPONENTS_HPP
 #define INFO_COMPONENTS_HPP
 #include <interfaces/IInfoComponent.hpp>
-namespace XPlug {
+namespace APAL {
 
 /**
  * @brief  currently only implementation of the IInfoComponent. Stores infos in

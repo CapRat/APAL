@@ -74,7 +74,7 @@ extern "C"
   IPluginFactory* PLUGIN_API GetPluginFactory()
   {
     if (!gPluginFactory) {
-      auto plug = XPlug::GlobalData().getPlugin(0);
+      auto plug = APAL::GlobalData().getPlugin(0);
       static PFactoryInfo factoryInfo = {
         plug->getInfoComponent()->getCreatorName().data(),
         plug->getInfoComponent()->getCreatorURL().data(),

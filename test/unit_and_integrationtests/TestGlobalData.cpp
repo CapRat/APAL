@@ -2,7 +2,7 @@
 #include "CatchTools.hpp"
 #include "base/PluginBases.hpp"
 #include <GlobalData.hpp>
-using namespace XPlug;
+using namespace APAL;
 class SimpleExamplePlugin : public LazyPlugin
 {
 public:
@@ -12,7 +12,7 @@ public:
 
 REGISTER_PLUGIN(SimpleExamplePlugin);
 
-using namespace XPlug;
+using namespace APAL;
 TEST_CASE("Registration of derived Plugins")
 {
   REQUIRE_MESSAGE(GlobalData().getNumberOfRegisteredPlugins() >= 1,
